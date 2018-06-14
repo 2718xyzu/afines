@@ -607,6 +607,5 @@ string motor::write()
 string motor::writevm()
 {
     if(vm_store != 0) 
-        return "\n" + std::to_string(vm_store) + "\t" std::to_string(dt) + "\t" std::to_string(force[0]) 
-        + "\t" + std::to_string(force[1]);
+        return "\n" + std::to_string(vm_store);
 }
