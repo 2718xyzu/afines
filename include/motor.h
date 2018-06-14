@@ -30,14 +30,14 @@ class motor
                 array<double, 2> myfov, double delta_t, double v0, double temp, double stiffness, double max_ext_ratio,
                 double ron, double roff, double rend,
                 double fstall, double rcut,
-                double vis, double catchlength, double fractureForce, string BC);
+                double vis, double catchlength, double fractureForce, string BC, array<double, 2> light_param);
 
         motor(array<double, 4> pos, double mlen, filament_ensemble* network,
                 array<int, 2> mystate, array<int, 2> myfindex, array<int, 2> myrindex,
                 array<double, 2> myfov, double delta_t, double v0, double temp, double stiffness, double max_ext_ratio,
                 double ron, double roff, double rend,
                 double fstall, double rcut,
-                double vis, double catchlength, double fractureForce, string BC);
+                double vis, double catchlength, double fractureForce, string BC, array<double, 2> light_param);
 
         motor();
 

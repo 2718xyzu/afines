@@ -34,7 +34,8 @@ motor::motor( array<double, 3> pos,
         double ron, double roff, double rend,
         double fstall, double rcut,
         double vis, double catchlength,
-        double fractureforce, string bc) {
+        double fractureforce, string bc,
+        array<double, 2> light_param) {
 
     vs          = v0;
     mk          = stiffness;//rng(10,100);
@@ -123,7 +124,8 @@ motor::motor( array<double, 4> pos,
         double ron, double roff, double rend,
         double fstall, double rcut,
         double vis, double catchlength,
-        double fractureforce, string bc) {
+        double fractureforce, string bc, 
+        array<double, 2> light_param) {
 
     vs          = v0;
     mk          = stiffness;
@@ -417,6 +419,7 @@ void motor::step_onehead(int hd)
 
     array<double, 2> hpos_new = generate_off_pos(hd);
     double off_prob = metropolis_prob(hd, {0,0}, hpos_new, at_barbed_end[hd] ? kend : koff);
+    bool light_yes = 1;
 
     if (tension > 0)
         off_prob *= exp(tension*catch_length/temperature);
@@ -424,13 +427,21 @@ void motor::step_onehead(int hd)
     if (tension > fracture_force)
         off_prob = 1.0;
 
+    if light_param[0]
+        double radial = hypot(hx[hd],hy[hd]);
+
     //cout<<"\nDEBUG: at barbed end? : "<<at_barbed_end[hd]<<"; off_prob = "<<off_prob;
     // attempt detachment
     if ( event(off_prob) ) this->detach_head(hd, hpos_new);
     else{
-
+            if light_param[0]{
+                double radial = hypot(hx[hd],hy[hd]);
+                if radial > light_param[1]
+                    light_yes = 0;
+            }
         //calculate motor velocity
         if (vs != 0 && !(at_barbed_end[hd])){
+
             double vm = vs;
             if (state[pr(hd)] != 0){
                 vm = my_velocity(vs,

@@ -63,6 +63,9 @@ int main(int argc, char* argv[]){
     bool restart;
     double restart_time;
 
+    bool light_act;
+    double light_radius;
+
     //Options allowed only on command line
     po::options_description generic("Generic options");
     generic.add_options()
@@ -132,6 +135,8 @@ int main(int argc, char* argv[]){
         ("dead_head", po::value<int>(&dead_head)->default_value(0), "index of head to kill")
         
         ("quad_off_flag", po::value<bool>(&quad_off_flag)->default_value(false), "flag to turn off neighbor list updating")
+        ("light_act", po::value<bool>(&light_act)->default_value(false), "Flag to turn on a circle of light activation, where motors can walk only in the light")
+        ("light_radius", po::value<double>(&light_radius)->default_value(6.25), "Radius outside of which motors are turned off");
         ; 
     
     //Hidden options, will be allowed both on command line and 

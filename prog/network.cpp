@@ -81,6 +81,9 @@ int main(int argc, char* argv[]){
     bool restart;
     double restart_time;
 
+    bool light_act;
+    double light_radius;
+
     // Options allowed only on command line
     po::options_description generic("Generic options");
     generic.add_options()
@@ -184,6 +187,8 @@ int main(int argc, char* argv[]){
 
         ("diff_strain_flag", po::value<bool>(&diff_strain_flag)->default_value(false), "flag to turn on linear differential strain")
         ("osc_strain_flag", po::value<bool>(&osc_strain_flag)->default_value(false), "flag to turn on oscillatory differential strain")
+        ("light_act", po::value<bool>(&light_act)->default_value(false), "Flag to turn on a circle of light activation, where motors can walk only in the light")
+        ("light_radius", po::value<double>(&light_radius)->default_value(6.25), "Radius outside of which motors are turned off");
         ;
 
     //Hidden options, will be allowed both on command line and
@@ -228,7 +233,7 @@ int main(int argc, char* argv[]){
     //double actin_density = double(npolymer*nmonomer)/(xrange*yrange);//0.65;
     //cout<<"\nDEBUG: actin_density = "<<actin_density;
     double link_bending_stiffness    = polymer_bending_modulus / link_length;
-
+    array<double, 2> light_param = {double(light_act), light_radius};
     int n_bw_stdout = max(int((tfinal)/(dt*double(nmsgs))),1);
     int n_bw_print  = max(int((tfinal)/(dt*double(nframes))),1);
 
@@ -359,11 +364,11 @@ int main(int argc, char* argv[]){
     if (a_motor_pos_vec.size() == 0 && a_motor_in.size() == 0)
         myosins = new motor_ensemble( a_motor_density, {xrange, yrange}, dt, temperature,
                 a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
-                a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, a_motor_position_arrs, bnd_cnd);
+                a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, a_motor_position_arrs, bnd_cnd, light_param);
     else
         myosins = new motor_ensemble( a_motor_pos_vec, {xrange, yrange}, dt, temperature,
                 a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
-                a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd);
+                a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd, light_param);
     if (dead_head_flag) myosins->kill_heads(dead_head);
 
     cout<<"Adding passive motors (crosslinkers) ...\n";
