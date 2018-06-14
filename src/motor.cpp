@@ -35,7 +35,7 @@ motor::motor( array<double, 3> pos,
         double fstall, double rcut,
         double vis, double catchlength,
         double fractureforce, string bc,
-        array<double, 2> light_param) {
+        array<double, 2> light_input) {
 
     vs          = v0;
     mk          = stiffness;//rng(10,100);
@@ -60,6 +60,7 @@ motor::motor( array<double, 3> pos,
     actin_network = network;
     damp        = (6*pi*vis*mld);
     bd_prefactor= sqrt(temperature/(2*damp*dt));
+    light_param = light_input;
 
     /****for FENE motors******/
     max_ext     = max_ext_ratio*mlen;
@@ -125,7 +126,7 @@ motor::motor( array<double, 4> pos,
         double fstall, double rcut,
         double vis, double catchlength,
         double fractureforce, string bc, 
-        array<double, 2> light_param) {
+        array<double, 2> light_input) {
 
     vs          = v0;
     mk          = stiffness;
@@ -151,6 +152,7 @@ motor::motor( array<double, 4> pos,
     actin_network = network;
     damp        =(6*pi*vis*mld);
     bd_prefactor= sqrt(temperature/(2*damp*dt));
+    light_param = light_input;
 
     /********for FENE springs*********/
     max_ext     = max_ext_ratio*mlen;
@@ -420,6 +422,7 @@ void motor::step_onehead(int hd)
     array<double, 2> hpos_new = generate_off_pos(hd);
     double off_prob = metropolis_prob(hd, {0,0}, hpos_new, at_barbed_end[hd] ? kend : koff);
     bool light_yes = 1;
+    double radial = 20000;
 
     if (tension > 0)
         off_prob *= exp(tension*catch_length/temperature);
@@ -427,20 +430,19 @@ void motor::step_onehead(int hd)
     if (tension > fracture_force)
         off_prob = 1.0;
 
-    if light_param[0]
-        double radial = hypot(hx[hd],hy[hd]);
+    if (light_param[0])
+        radial = hypot(hx[hd],hy[hd]);
 
     //cout<<"\nDEBUG: at barbed end? : "<<at_barbed_end[hd]<<"; off_prob = "<<off_prob;
     // attempt detachment
     if ( event(off_prob) ) this->detach_head(hd, hpos_new);
     else{
-            if light_param[0]{
-                double radial = hypot(hx[hd],hy[hd]);
-                if radial > light_param[1]
-                    light_yes = 0;
+            if (light_param[0]){
+                if (radial > light_param[1])
+                    light_yes = 0;   
             }
         //calculate motor velocity
-        if (vs != 0 && !(at_barbed_end[hd])){
+        if (vs != 0 && !(at_barbed_end[hd]) && light_yes){
 
             double vm = vs;
             if (state[pr(hd)] != 0){
