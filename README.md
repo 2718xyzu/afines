@@ -197,7 +197,7 @@ each list of positions within the file. Thus the structure of actins.txt is:
 ```
 
 * data/pe.txt is the total potential energy of all particles at a given time step and has the format
-    * U(filament_stretch)  U(filament_bend) U(motor_stretch) U(xlink_stretch) where each U is total at that timestep
+    * U(filament_stretch)  U(filament_bend) U(xlink_stretch) U(motor_stretch) where each U is total at that timestep
     * time isn't delineated in these files; rather line 1 is t=t1, line 2, is t=t2, etc.
 
 * data/config_full.cfg is the full set of configuration options used for the simulation. Thus if a simulation did not
@@ -272,6 +272,8 @@ each list of positions within the file. Thus the structure of actins.txt is:
 |osc_strain_flag            |boolean|false          |       |flag to use if differential strain should be oscillatory (like Gardel, Science 2004)|
 |n_bw_shear                 |int    |10^8           |s      |number of timesteps between subsequent differential strains |
 |d_strain_freq              |double |1              |Hz     |frequency of differential oscillatory strain|
+|light_act                  |boolean|false          |       |Flag; true if using light activation|
+|light_radius               |double |6.25           |um     |Radius around center where motors are activated; they are dead elsewhere |
 
 
 ### Contribution guidelines ###
