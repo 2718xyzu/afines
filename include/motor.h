@@ -115,7 +115,7 @@ class motor
 
         string write();
 
-        string writevm(double time_str);
+        string writevm();
 
     public:
 
