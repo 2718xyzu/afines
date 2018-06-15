@@ -1,6 +1,7 @@
 #include "filament_ensemble.h"
 #include "motor_ensemble.h"
 #include "globals.h"
+#include "time.h"
 
 #include <iostream>
 #include <fstream>
@@ -23,7 +24,8 @@ ostream& operator<<(ostream& os, const vector<T>& v)
 //main method
 int main(int argc, char* argv[]){
 
-
+    clock_t t1,t2;
+    t1=clock();
     /***********************
      * VARIABLES           *
      **********************/
@@ -231,7 +233,11 @@ int main(int argc, char* argv[]){
     }
 
     //double actin_density = double(npolymer*nmonomer)/(xrange*yrange);//0.65;
-    //cout<<"\nDEBUG: actin_density = "<<actin_density;
+    cout<<"\nProgram Starting";
+    cout<<"\nDEBUG: clocks_per_sec = "<<CLOCKS_PER_SEC;
+    cout<<"\nDEBUG: initial clock val = "<<t1;
+    t2 = clock();
+    cout<<"\nDEBUG: current clock val = "<<t2;
     double link_bending_stiffness    = polymer_bending_modulus / link_length;
     array<double, 2> light_param = {double(light_act), light_radius};
     int n_bw_stdout = max(int((tfinal)/(dt*double(nmsgs))),1);
@@ -424,7 +430,8 @@ int main(int argc, char* argv[]){
     }
 
     while (t <= tfinal) {
-
+        t2 = clock();
+        cout<<"\nDEBUG: current clock = "<<t2;
         //print to file
 	    if (t+dt/100 >= tinit && (count-unprinted_count)%n_bw_print==0) {
 
