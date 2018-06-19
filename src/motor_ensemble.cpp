@@ -233,7 +233,7 @@ void motor_ensemble::motor_write(ostream& fout)
     }
 }
 
-string motor_ensemble::string_motors();
+string motor_ensemble::string_motors()
 {
     string motors_out = "";
     for (unsigned int i=0; i<n_motors.size(); i++) {
