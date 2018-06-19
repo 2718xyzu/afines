@@ -85,6 +85,7 @@ int main(int argc, char* argv[]){
 
     bool light_act;
     double light_radius;
+    int check_steps;
 
     // Options allowed only on command line
     po::options_description generic("Generic options");
@@ -246,6 +247,7 @@ int main(int argc, char* argv[]){
     int n_bw_stdout = max(int((tfinal)/(dt*double(nmsgs))),1);
     int n_bw_print  = max(int((tfinal)/(dt*double(nframes))),1);
     double next_bw_print = 0;
+    double previous_bw_print = 0;
     double bw_print_interval = tfinal/nframes;
     double dt_var = dt;
 
@@ -356,6 +358,7 @@ int main(int argc, char* argv[]){
     t4 = clock();
     cout<<"\nCreating actin network..";
     filament_ensemble * net;
+    filament_ensemble * net_old;
     if (actin_pos_vec.size() == 0 && actin_in.size() == 0){
         net = new filament_ensemble(npolymer, nmonomer, nmonomer_extra, extra_bead_prob, {xrange, yrange}, {xgrid, ygrid}, dt,
                 temperature, actin_length, viscosity, link_length, actin_position_arrs, link_stretching_stiffness, fene_pct, link_bending_stiffness,
@@ -373,6 +376,7 @@ int main(int argc, char* argv[]){
 
     cout<<"\nAdding active motors...";
     motor_ensemble * myosins;
+    motor_ensemble * myosins_old;
 
     if (a_motor_pos_vec.size() == 0 && a_motor_in.size() == 0)
         myosins = new motor_ensemble( a_motor_density, {xrange, yrange}, dt, temperature,
@@ -386,6 +390,7 @@ int main(int argc, char* argv[]){
 
     cout<<"Adding passive motors (crosslinkers) ...\n";
     motor_ensemble * crosslks;
+    motor_ensemble * crosslks_old;
 
     if(p_motor_pos_vec.size() == 0 && p_motor_in.size() == 0)
         crosslks = new motor_ensemble( p_motor_density, {xrange, yrange}, dt, temperature,
@@ -440,17 +445,17 @@ int main(int argc, char* argv[]){
 
 string actins_past, links_past, time_str_past, motors_past, crosslks_past, thermo_past, pe_past,
     stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
-double t_past = 0;
+double time_past = 0;
 
 
     while (t <= tfinal) {
         t2 = clock();
         //cout<<"\nDEBUG: current clock = "<<t2;
         //print to file
-	    if (t+dt_var/100 >= tinit && t+dt_var>(next_bw_print+bw_print_interval) {
+	    if (t+dt_var/100 >= tinit && t+dt_var>(next_bw_print+bw_print_interval)) {
             
             if (t>tinit) time_str ="\n";
-            time_str += "t = "+to_string(t_past);
+            time_str += "t = "+to_string(time_past);
 
             file_a << time_str_past<<"\tN = "<<to_string(net->get_nactins());
             file_a << actins_past;
@@ -469,11 +474,11 @@ double t_past = 0;
             //crosslks->motor_write(file_pm);
 
             file_th << time_str<<"\tN = "<<to_string(net->get_nfilaments());
-            file << thermo_past;
+            file_th << thermo_past;
             //net->write_thermo(file_th);
 
             file_pe << stretching_energy_past + "\t" + bending_energy_past + "\t" +
-                potential_energy_motors_past + "\t" + potential_energy_crosslks_past + endl;
+                potential_energy_motors_past + "\t" + potential_energy_crosslks_past << endl;
             //file_pe << net->get_stretching_energy()<<"\t"<<net->get_bending_energy()<<"\t"<<
             //    myosins->get_potential_energy()<<"\t"<<crosslks->get_potential_energy()<<endl;
 
@@ -571,14 +576,16 @@ double t_past = 0;
             if (net_status == 2 || myosins_status == 2 || crosslks_status == 2) {
                 //if something has blown up
                 cout<<"\nEnergy exceeded, status: n_s = "<<net_status<<" m_s = "<<myosins_status<<" c_s = "<<crosslks_status;
+                //t -= check_steps * dt_var;
                 //dt_var /= 2;
                 net = net_old;
                 myosins = myosins_old;
                 crosslks = crosslks_old;
+                
             } else {
                 if (net_status == 0 && myosins_status == 0 && crosslks_status == 0) {
                     //dt_var *= 1.5;
-                    cout<<"\nAll energies are low"
+                    cout<<"\nAll energies are low";
                 }
                     
                 net_old = net;
