@@ -182,6 +182,7 @@ class filament_ensemble
         double max_links_per_quad_per_filament, max_links_per_quad; 
         bool straight_filaments = false, quad_off_flag;
         double pe_stretch, pe_bend, ke, fracture_force;
+        extern double dt;
 
         array<double,2> fov, view;
         array<int, 2> nq, half_nq;

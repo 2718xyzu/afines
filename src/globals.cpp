@@ -16,6 +16,7 @@
 /* distances in microns, time in seconds, forces in pN */
 mt19937_64 generator;
 normal_distribution<double> distribution(0,1);
+extern double dt;
 //uniform_real_distribution<double> distribution(-0.5,0.5);
 
 /*generic functions to be used below*/

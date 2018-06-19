@@ -249,7 +249,7 @@ int main(int argc, char* argv[]){
     double next_bw_print = 0;
     double previous_bw_print = 0;
     double bw_print_interval = tfinal/nframes;
-    double dt_var = dt;
+    double dt = dt;
 
     int unprinted_count = int(double(tinit)/dt);
 
@@ -452,7 +452,7 @@ double time_past = 0;
         t2 = clock();
         //cout<<"\nDEBUG: current clock = "<<t2;
         //print to file
-	    if (t+dt_var/100 >= tinit && t+dt_var>(next_bw_print+bw_print_interval)) {
+	    if (t+dt/100 >= tinit && t+dt>(next_bw_print+bw_print_interval)) {
             
             if (t>tinit) time_str ="\n";
             time_str += "t = "+to_string(time_past);
@@ -504,7 +504,7 @@ double time_past = 0;
             t3 = clock();
             cout<<"\n DEBUG: writing ticks = "<<(t3-t2);
         }
-		else if (t<previous_bw_print && (t+dt_var)>previous_bw_print){
+		else if (t<previous_bw_print && (t+dt)>previous_bw_print){
 
             time_past = t;
             actins_past = net->string_actins();
@@ -517,7 +517,7 @@ double time_past = 0;
         }
         
         //print time count
-        if (time_of_strain!=0 && close(t, time_of_strain, dt_var/(10*time_of_strain))){
+        if (time_of_strain!=0 && close(t, time_of_strain, dt/(10*time_of_strain))){
             //Perform the shear here
             cout<<"\nDEBUG: t = "<<t<<"; adding pre_strain of "<<pre_strain<<" um here";
             net->update_delrx( pre_strain );
@@ -563,7 +563,7 @@ double time_past = 0;
         net->clear_broken();
 
 
-        t+=dt_var;
+        t+=dt;
 		count++;
 
         
@@ -576,15 +576,15 @@ double time_past = 0;
             if (net_status == 2 || myosins_status == 2 || crosslks_status == 2) {
                 //if something has blown up
                 cout<<"\nEnergy exceeded, status: n_s = "<<net_status<<" m_s = "<<myosins_status<<" c_s = "<<crosslks_status;
-                //t -= check_steps * dt_var;
-                //dt_var /= 2;
+                //t -= check_steps * dt;
+                //dt /= 2;
                 net = net_old;
                 myosins = myosins_old;
                 crosslks = crosslks_old;
                 
             } else {
                 if (net_status == 0 && myosins_status == 0 && crosslks_status == 0) {
-                    //dt_var *= 1.5;
+                    //dt *= 1.5;
                     cout<<"\nAll energies are low";
                 }
                     

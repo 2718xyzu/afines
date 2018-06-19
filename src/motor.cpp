@@ -284,7 +284,7 @@ bool motor::attach(int hd)
             else if(allowed_bind(hd, it->second)){
 
                 intPoint = actin_network->get_filament((it->second).at(0))->get_link((it->second).at(1))->get_intpoint();
-                not_off_prob += metropolis_prob(hd, it->second, intPoint, r_on*dt_var);
+                not_off_prob += metropolis_prob(hd, it->second, intPoint, r_on*dt);
 
                 if (mf_rand < not_off_prob)
                 {
@@ -346,12 +346,12 @@ void motor::update_force_fraenkel_fene()
 
 void motor::brownian_relax(int hd)
 {
-    bd_prefactor= sqrt(temperature/(2*damp*dt_var));
+    bd_prefactor= sqrt(temperature/(2*damp*dt));
     double new_rnd_x= rng_n(0,1), new_rnd_y = rng_n(0,1);
     double vx =  pow(-1,hd)*force[0] / damp + bd_prefactor*(new_rnd_x + prv_rnd_x[hd]);
     double vy =  pow(-1,hd)*force[1] / damp + bd_prefactor*(new_rnd_y + prv_rnd_y[hd]);
     kinetic_energy = vx*vx + vy*vy;
-    array<double, 2> pos = boundary_check(hd, hx[hd] + vx*dt_var, hy[hd] + vy*dt_var);
+    array<double, 2> pos = boundary_check(hd, hx[hd] + vx*dt, hy[hd] + vy*dt);
     hx[hd] = pos[0];
     hy[hd] = pos[1];
 
@@ -384,7 +384,7 @@ void motor::update_angle()
 
 array<double, 2> motor::boundary_check(int hd, double x, double y)
 {
-    return pos_bc(BC, actin_network->get_delrx(), dt_var, fov, {(x - hx[hd])/dt_var, (y - hy[hd])/dt_var}, {x, y});
+    return pos_bc(BC, actin_network->get_delrx(), dt, fov, {(x - hx[hd])/dt, (y - hy[hd])/dt}, {x, y});
 }
 
 array<double, 2> motor::generate_off_pos(int hd){
@@ -395,8 +395,8 @@ array<double, 2> motor::generate_off_pos(int hd){
 
     array<double, 2> bind_disp_rot = {bind_disp[hd][0]*c - bind_disp[hd][1]*s, bind_disp[hd][0]*s + bind_disp[hd][1]*c};
 
-    return pos_bc(BC, actin_network->get_delrx(), dt_var, fov,
-            {-bind_disp_rot[0]/dt_var, -bind_disp_rot[1]/dt_var},
+    return pos_bc(BC, actin_network->get_delrx(), dt, fov,
+            {-bind_disp_rot[0]/dt, -bind_disp_rot[1]/dt},
             {hx[hd] - bind_disp_rot[0], hy[hd] - bind_disp_rot[1]}
             );
     //array<double, 2> newpos = {hx[hd]-bind_disp_rot[0], hy[hd]-bind_disp_rot[1]};
@@ -426,7 +426,7 @@ void motor::step_onehead(int hd)
     // if ( event(offrate) ) this->detach_head(hd);
 
     array<double, 2> hpos_new = generate_off_pos(hd);
-    double off_prob = metropolis_prob(hd, {0,0}, hpos_new, at_barbed_end[hd] ? r_end*dt_var : r_off*dt_var);
+    double off_prob = metropolis_prob(hd, {0,0}, hpos_new, at_barbed_end[hd] ? r_end*dt : r_off*dt);
     bool light_yes = 1;
     double radial = 20000;
 
@@ -456,7 +456,7 @@ void motor::step_onehead(int hd)
                         pow(-1, hd)*dot(force, actin_network->get_direction(f_index[hd], l_index[hd])),
                         stall_force);
             }
-            this->update_pos_a_end(hd, pos_a_end[hd]+dt_var*vm); // update relative position
+            this->update_pos_a_end(hd, pos_a_end[hd]+dt*vm); // update relative position
         }
         if (state[hd] == 1) this->update_position_attached(hd);  // update absolute position
 
@@ -607,7 +607,7 @@ string motor::to_string()
             hx[0], hy[0], hx[1], hy[1], mphi,
             state[0],  state[1], f_index[0],  f_index[1], l_index[0],  l_index[1],
             vs, max_bind_dist, mk, stall_force, mld,
-            r_on*dt_var, r_off*dt_var, r_end*dt_var, dt_var, temperature, damp,
+            r_on*dt, r_off*dt, r_end*dt, dt, temperature, damp,
             fov[0],  fov[1], pos_a_end[0], pos_a_end[1], shear, force[0], force[1]);
     return buffer;
 }

@@ -129,7 +129,7 @@ class filament
         double kb, temperature, dt,
                 fracture_force, kinetic_energy, damp, kToverLp, bd_prefactor;
         double gamma, max_shear, delrx, y_thresh;
-
+        extern double dt;
         array<double,2> fov;
         array<int,2> nq;
         vector<array<double, 2> > prv_rnds;

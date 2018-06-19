@@ -549,7 +549,7 @@ void filament_ensemble::update()
     
     this->update_energies();
     
-    t += dt_var;
+    t += dt;
 
 }
 
@@ -615,7 +615,7 @@ filament_ensemble::filament_ensemble(int npolymer, int nactins_min, int nactins_
     dt = delta_t;
     temperature = temp;
     shear_stop = 1e10;
-    shear_dt = dt_var;
+    shear_dt = dt;
     t = 0;
     delrx = 0;
     fracture_force = frac_force;
@@ -682,7 +682,7 @@ filament_ensemble::filament_ensemble(double density, array<double,2> myfov, arra
     dt = delta_t;
     temperature = temp;
     shear_stop = 1e10;
-    shear_dt = dt_var;
+    shear_dt = dt;
     t = 0;
     delrx = 0;
     fracture_force = frac_force;
