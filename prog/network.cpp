@@ -249,7 +249,7 @@ int main(int argc, char* argv[]){
     double next_bw_print = 0;
     double previous_bw_print = 0;
     double bw_print_interval = tfinal/nframes;
-    double dt = dt;
+    // double dt = dt;
 
     int unprinted_count = int(double(tinit)/dt);
 
@@ -582,9 +582,9 @@ double time_past = 0;
                 myosins->set_dt(dt);
                 crosslks->set_dt(dt);
                 //copy constructors//
-                // *net = *net_old;
-                // *myosins = *myosins_old;
-                // *crosslks = *crosslks_old;
+                *net = *net_old;
+                *myosins = *myosins_old;
+                *crosslks = *crosslks_old;
                 
             } else {
                 if (net_status == 0 && myosins_status == 0 && crosslks_status == 0) {
@@ -596,9 +596,9 @@ double time_past = 0;
                 }
 
                 //copy constructors// 
-                // net_old = net;
-                // myosins = myosins_old;
-                // crosslks = crosslks_old;
+                *net_old = *net;
+                *myosins = *myosins_old;
+                *crosslks = *crosslks_old;
             }
             t5 = clock();
             cout<<"\n Time for check = "<<(t4-t3);
