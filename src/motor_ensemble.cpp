@@ -300,3 +300,11 @@ int motor_ensemble::check_energies()
 void motor_ensemble::print_ensemble_thermo(){
     cout<<"\nAll Motors\t:\tKE = "<<ke<<"\tPEs = "<<pe<<"\tPEb = "<<0<<"\tTE = "<<(ke+pe);
 }
+
+void motor_ensemble::set_dt(double dt_var){
+        for (unsigned int m = 0; m < n_motors.size(); m++)
+    {
+        n_motors[m]->set_dt(dt_var);
+    }
+
+}

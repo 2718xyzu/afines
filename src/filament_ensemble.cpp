@@ -782,3 +782,9 @@ filament_ensemble::filament_ensemble(vector<vector<double> > actins, array<doubl
     
     fls = { };
 } 
+
+filament_ensemble::set_dt(double dt_var){
+    for (unsigned int f = 0; f < network.size(); f++)
+        network[f]->set_dt(dt_var);
+  
+}

@@ -576,21 +576,29 @@ double time_past = 0;
             if (net_status == 2 || myosins_status == 2 || crosslks_status == 2) {
                 //if something has blown up
                 cout<<"\nEnergy exceeded, status: n_s = "<<net_status<<" m_s = "<<myosins_status<<" c_s = "<<crosslks_status;
-                //t -= check_steps * dt;
-                //dt /= 2;
-                net = net_old;
-                myosins = myosins_old;
-                crosslks = crosslks_old;
+                t -= check_steps * dt;
+                dt /= 2;
+                net->set_dt(dt);
+                myosins->set_dt(dt);
+                crosslks->set_dt(dt);
+                //copy constructors//
+                // *net = *net_old;
+                // *myosins = *myosins_old;
+                // *crosslks = *crosslks_old;
                 
             } else {
                 if (net_status == 0 && myosins_status == 0 && crosslks_status == 0) {
-                    //dt *= 1.5;
+                    dt *= 1.5;
+                    net->set_dt(dt);
+                    myosins->set_dt(dt);
+                    crosslks->set_dt(dt);
                     cout<<"\nAll energies are low";
                 }
-                    
-                net_old = net;
-                myosins = myosins_old;
-                crosslks = crosslks_old;
+
+                //copy constructors// 
+                // net_old = net;
+                // myosins = myosins_old;
+                // crosslks = crosslks_old;
             }
             t5 = clock();
             cout<<"\n Time for check = "<<(t4-t3);

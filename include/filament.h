@@ -124,6 +124,8 @@ class filament
         
         array<double,2> get_bead_position(int bead);
 
+        void set_dt(double dt_var);
+
     protected:
         
         double kb, temperature, dt,

@@ -680,3 +680,8 @@ double filament::get_end2end()
         return dist_bc(BC, actins[actins.size() - 1]->get_xcm() - actins[0]->get_xcm(),  
                            actins[actins.size() - 1]->get_ycm() - actins[0]->get_ycm(), fov[0], fov[1], delrx);
 } 
+
+void filament::set_dt(double dt_var){
+    dt = dt_var;
+
+}
