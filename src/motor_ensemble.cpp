@@ -34,6 +34,7 @@ motor_ensemble::motor_ensemble(double mdensity, array<double, 2> myfov, double d
 
     ke = 0;
     pe = 0;
+    fracture_force = fractureforce;
 
     int nm = int(ceil(mdensity*fov[0]*fov[1]));
     cout<<"\nDEBUG: Number of motors:"<<nm<<"\n";
@@ -76,6 +77,7 @@ motor_ensemble::motor_ensemble(vector<vector<double> > motors, array<double, 2> 
 
     ke = 0;
     pe = 0;
+    fracture_force = fractureforce;
 
     int nm = motors.size();
     cout<<"\nDEBUG: Number of motors:"<<nm<<"\n";
@@ -282,8 +284,9 @@ int motor_ensemble::check_energies()
     double cutoff_force = 1.5 * fracture_force;
         for (unsigned int m = 0; m < n_motors.size(); m++)
     {
-        double one_force = n_motors[m]->get_force();
-        if one_force>cutoff_force{
+        array<double, 2> force_vec = n_motors[m]->get_force();
+        double one_force = hypot(force_vec[0],force_vec[1]);
+        if (one_force>cutoff_force) {
             status = 2;
             relax = 0;
         }

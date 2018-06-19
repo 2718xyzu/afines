@@ -73,7 +73,7 @@ class motor_ensemble
     private:
 
         double mld, gamma, tMove;
-        double ke, pe, v;
+        double ke, pe, v, fracture_force;
 
         array<double, 2> fov;
         filament_ensemble *f_network;

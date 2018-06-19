@@ -51,6 +51,9 @@ motor::motor( array<double, 3> pos,
     kon         = ron*dt;
     koff        = roff*dt;
     kend        = rend*dt;
+    r_on        = ron;
+    r_off       = roff;
+    r_end       = rend;
     mphi        = pos[2];
     state       = mystate;
     f_index     = myfindex; //filament index for each head
@@ -143,6 +146,9 @@ motor::motor( array<double, 4> pos,
     kon         = ron*dt;
     koff        = roff*dt;
     kend        = rend*dt;
+    r_on        = ron;
+    r_off       = roff;
+    r_end       = rend;
 
     state       = mystate;
     f_index     = myfindex; //filament index for each head
@@ -278,7 +284,7 @@ bool motor::attach(int hd)
             else if(allowed_bind(hd, it->second)){
 
                 intPoint = actin_network->get_filament((it->second).at(0))->get_link((it->second).at(1))->get_intpoint();
-                not_off_prob += metropolis_prob(hd, it->second, intPoint, ron*dt_var);
+                not_off_prob += metropolis_prob(hd, it->second, intPoint, r_on*dt_var);
 
                 if (mf_rand < not_off_prob)
                 {
@@ -420,7 +426,7 @@ void motor::step_onehead(int hd)
     // if ( event(offrate) ) this->detach_head(hd);
 
     array<double, 2> hpos_new = generate_off_pos(hd);
-    double off_prob = metropolis_prob(hd, {0,0}, hpos_new, at_barbed_end[hd] ? rend*dt_var : roff*dt_var);
+    double off_prob = metropolis_prob(hd, {0,0}, hpos_new, at_barbed_end[hd] ? r_end*dt_var : r_off*dt_var);
     bool light_yes = 1;
     double radial = 20000;
 
@@ -601,7 +607,7 @@ string motor::to_string()
             hx[0], hy[0], hx[1], hy[1], mphi,
             state[0],  state[1], f_index[0],  f_index[1], l_index[0],  l_index[1],
             vs, max_bind_dist, mk, stall_force, mld,
-            ron*dt_var, roff*dt_var, rend*dt_var, dt_var, temperature, damp,
+            r_on*dt_var, r_off*dt_var, r_end*dt_var, dt_var, temperature, damp,
             fov[0],  fov[1], pos_a_end[0], pos_a_end[1], shear, force[0], force[1]);
     return buffer;
 }

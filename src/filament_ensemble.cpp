@@ -355,16 +355,18 @@ void filament_ensemble::update_energies(){
 int filament_ensemble::check_energies(){
     int status = 1;
     int relax = 1;
-    double cutoff_force = 1.5 * frac_force;
+    double cutoff_force = 1.5 * fracture_force;
     for (unsigned int m = 0; m < network.size(); m++)
     {
-        for (unsigned int i = 0; i < 10; i++) //change this 
-        double one_force = network[m]->get_force(m,i);
-        if one_force>cutoff_force{
-            status = 2;
-            relax = 0;
+        for (unsigned int i = 0; i < 10; i++){ //change this 
+            array<double, 2> force_vec = network[m]->get_actin(i)->get_force();
+            double one_force = hypot(force_vec[0],force_vec[1]);
+            if (one_force>cutoff_force){
+                status = 2;
+                relax = 0;
+            }
+            if (one_force > fracture_force) relax = 0;
         }
-        if (one_force > fracture_force) relax = 0;
         //pe += n_motors[m]->get_stretching_energy_fene();
     }
     if (relax) status = 0;
@@ -616,6 +618,7 @@ filament_ensemble::filament_ensemble(int npolymer, int nactins_min, int nactins_
     shear_dt = dt_var;
     t = 0;
     delrx = 0;
+    fracture_force = frac_force;
     
     if (seed == -1){
         straight_filaments = true;
@@ -682,6 +685,7 @@ filament_ensemble::filament_ensemble(double density, array<double,2> myfov, arra
     shear_dt = dt_var;
     t = 0;
     delrx = 0;
+    fracture_force = frac_force;
     
     if (seed == -1){
         straight_filaments = true;
@@ -736,6 +740,7 @@ filament_ensemble::filament_ensemble(vector<vector<double> > actins, array<doubl
     temperature = temp;
     t = 0;
     delrx = 0;
+    fracture_force = frac_force;
 
     view[0] = 1;
     view[1] = 1;

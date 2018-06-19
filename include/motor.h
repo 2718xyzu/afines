@@ -117,7 +117,7 @@ class motor
 
     public:
         
-        double mphi,mld, vs, stall_force, max_bind_dist, mk, kon, koff, kend, temperature, dt,
+        double mphi,mld, vs, stall_force, max_bind_dist, mk, kon, koff, kend, r_on, r_off, r_end, temperature, dt,
                damp, shear, max_ext, eps_ext, kinetic_energy, bd_prefactor, tension, catch_length,
                fracture_force;
 

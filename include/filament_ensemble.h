@@ -181,7 +181,7 @@ class filament_ensemble
         double gamma, shear_stop, shear_dt, shear_speed, delrx;
         double max_links_per_quad_per_filament, max_links_per_quad; 
         bool straight_filaments = false, quad_off_flag;
-        double pe_stretch, pe_bend, ke;
+        double pe_stretch, pe_bend, ke, fracture_force;
 
         array<double,2> fov, view;
         array<int, 2> nq, half_nq;
