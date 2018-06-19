@@ -112,7 +112,7 @@ class actin_ensemble
         void set_visc(double v);
 
     private:
-        double dt, temperature, fov[2], view[2], rho, ld, visc, gamma;
+        double temperature, fov[2], view[2], rho, ld, visc, gamma, dt;
         
         double link_ld;
         

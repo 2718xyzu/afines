@@ -23,7 +23,7 @@ ostream& operator<<(ostream& os, const vector<T>& v)
 
 //main method
 int main(int argc, char* argv[]){
-    
+
     clock_t t1,t2,t3,t4,t5;
     t1=clock();
     /***********************
@@ -192,6 +192,8 @@ int main(int argc, char* argv[]){
         ("osc_strain_flag", po::value<bool>(&osc_strain_flag)->default_value(false), "flag to turn on oscillatory differential strain")
         ("light_act", po::value<bool>(&light_act)->default_value(false), "Flag to turn on a circle of light activation, where motors can walk only in the light")
         ("light_radius", po::value<double>(&light_radius)->default_value(6.25), "Radius outside of which motors are turned off")
+
+        ("check_steps", po::value<int>(&check_steps)->default_value(100), "Number of loop iterations over which backtracking occurs")
         ;
 
     //Hidden options, will be allowed both on command line and
@@ -245,6 +247,7 @@ int main(int argc, char* argv[]){
     int n_bw_print  = max(int((tfinal)/(dt*double(nframes))),1);
     double next_bw_print = 0;
     double bw_print_interval = tfinal/nframes;
+    double dt_var = dt;
 
     int unprinted_count = int(double(tinit)/dt);
 
@@ -442,11 +445,10 @@ double t_past = 0;
 
     while (t <= tfinal) {
         t2 = clock();
-        cout<<"\nDEBUG: current clock = "<<t2;
+        //cout<<"\nDEBUG: current clock = "<<t2;
         //print to file
-	    if (t+dt/100 >= tinit && t+dt>(next_bw_print+bw_print_interval) {
+	    if (t+dt_var/100 >= tinit && t+dt_var>(next_bw_print+bw_print_interval) {
             
-            t2 = clock();
             if (t>tinit) time_str ="\n";
             time_str += "t = "+to_string(t_past);
 
@@ -474,9 +476,7 @@ double t_past = 0;
                 potential_energy_motors_past + "\t" + potential_energy_crosslks_past + endl;
             //file_pe << net->get_stretching_energy()<<"\t"<<net->get_bending_energy()<<"\t"<<
             //    myosins->get_potential_energy()<<"\t"<<crosslks->get_potential_energy()<<endl;
-            
-            t3 = clock();
-            cout<<"\n DEBUG: writing ticks = "<<(t3-t2);
+
 
             file_a<<std::flush;
             file_l<<std::flush;
@@ -496,7 +496,10 @@ double t_past = 0;
             potential_energy_motors_past = myosins->get_potential_energy();
             potential_energy_crosslks_past = crosslks->get_potential_energy();
 
-		else if (t<previous_bw_print && (t+dt)>previous_bw_print){
+            t3 = clock();
+            cout<<"\n DEBUG: writing ticks = "<<(t3-t2);
+        }
+		else if (t<previous_bw_print && (t+dt_var)>previous_bw_print){
 
             time_past = t;
             actins_past = net->string_actins();
@@ -507,9 +510,9 @@ double t_past = 0;
             potential_energy_motors_past = myosins->get_potential_energy();
             potential_energy_crosslks_past = crosslks->get_potential_energy();
         }
-
+        
         //print time count
-        if (time_of_strain!=0 && close(t, time_of_strain, dt/(10*time_of_strain))){
+        if (time_of_strain!=0 && close(t, time_of_strain, dt_var/(10*time_of_strain))){
             //Perform the shear here
             cout<<"\nDEBUG: t = "<<t<<"; adding pre_strain of "<<pre_strain<<" um here";
             net->update_delrx( pre_strain );
@@ -531,12 +534,12 @@ double t_past = 0;
             cout<<"\nDEBUG: t = "<<t<<"; adding d_strain of "<<d_strain_amp<<" um here; total strain = "<<pre_strain<<" um";
         }
 
-        if (count%n_bw_stdout==0) {
+        if (count%n_bw_stdout==0) { //suppressed output here to view debug messages better
 			cout<<"\nTime counts: "<<count;
 		    //net->print_filament_thermo();
-            net->print_network_thermo();
-            crosslks->print_ensemble_thermo();
-            myosins->print_ensemble_thermo();
+            //net->print_network_thermo();
+            //crosslks->print_ensemble_thermo();
+            //myosins->print_ensemble_thermo();
         }
 
         //update network
@@ -555,29 +558,39 @@ double t_past = 0;
         net->clear_broken();
 
 
-        t+=dt;
+        t+=dt_var;
 		count++;
 
-        if (count%check_steps == 0){
+        
+        if (count%check_steps == 0){ //in order to run without any dynamic time step, set check_steps to 1E30
+            t3 = clock();
             int net_status = net->check_energies();
             int myosins_status = myosins->check_energies();
             int crosslks_status = crosslks->check_energies();
-
+            t4 = clock();
             if (net_status == 2 || myosins_status == 2 || crosslks_status == 2) {
                 //if something has blown up
+                cout<<"\nEnergy exceeded, status: n_s = "<<net_status<<" m_s = "<<myosins_status<<" c_s = "<<crosslks_status;
+                //dt_var /= 2;
                 net = net_old;
                 myosins = myosins_old;
                 crosslks = crosslks_old;
-            else 
-                if (net_status == 0 && myosins_status == 0 && crosslks_status == 0){
-                    dt *= 1.5;
+            } else {
+                if (net_status == 0 && myosins_status == 0 && crosslks_status == 0) {
+                    //dt_var *= 1.5;
+                    cout<<"\nAll energies are low"
+                }
+                    
                 net_old = net;
                 myosins = myosins_old;
                 crosslks = crosslks_old;
+            }
+            t5 = clock();
+            cout<<"\n Time for check = "<<(t4-t3);
+            cout<<"\n Time for record = "<<(t5-t4);
+            cout<<"\n DEBUG: time for this step = "<<(t5-t2);
         }
-
-        t5 = clock();
-        cout<<"\n DEBUG: time for this step = "<<(t5-t2);
+        
 
     }
 

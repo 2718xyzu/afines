@@ -237,6 +237,15 @@ void filament_ensemble::write_actins(ofstream& fout)
     } 
 }
 
+string filament_ensemble::string_actins()
+{
+    string actins_out = "";
+    for (unsigned int i=0; i<network.size(); i++) {
+        actins_out += network[i]->write_actins(i);
+    }
+    return actins_out;
+}
+
  
 void filament_ensemble::write_links(ofstream& fout)
 {
@@ -245,11 +254,28 @@ void filament_ensemble::write_links(ofstream& fout)
     } 
 }
 
+string filament_ensemble::string_links() 
+{
+    string links_out = "";
+    for (unsigned int i=0; i<network.size(); i++) {
+        links_out += network[i]->write_links(i);
+    } 
+    return links_out;
+}
+
  
 void filament_ensemble::write_thermo(ofstream& fout){
     for (unsigned int f = 0; f < network.size(); f++)
         fout<<network[f]->write_thermo(f);
     
+}
+
+string filament_ensemble::string_thermo()
+{
+    string thermo_out = "";
+    for (unsigned int f = 0; f < network.size(); f++)
+        thermo_out += network[f]->write_thermo(f);
+    return thermo_out;
 }
 
  
@@ -324,6 +350,25 @@ void filament_ensemble::update_energies(){
         pe_bend += network[f]->get_bending_energy();
         pe_stretch += network[f]->get_stretching_energy();
     }
+}
+
+int filament_ensemble::check_energies(){
+    int status = 1;
+    int relax = 1;
+    double cutoff_force = 1.5 * frac_force;
+    for (unsigned int m = 0; m < network.size(); m++)
+    {
+        for (unsigned int i = 0; i < 10; i++) //change this 
+        double one_force = network[m]->get_force(m,i);
+        if one_force>cutoff_force{
+            status = 2;
+            relax = 0;
+        }
+        if (one_force > fracture_force) relax = 0;
+        //pe += n_motors[m]->get_stretching_energy_fene();
+    }
+    if (relax) status = 0;
+    return status;
 }
 
  
@@ -502,7 +547,7 @@ void filament_ensemble::update()
     
     this->update_energies();
     
-    t += dt;
+    t += dt_var;
 
 }
 
@@ -568,7 +613,7 @@ filament_ensemble::filament_ensemble(int npolymer, int nactins_min, int nactins_
     dt = delta_t;
     temperature = temp;
     shear_stop = 1e10;
-    shear_dt = dt;
+    shear_dt = dt_var;
     t = 0;
     delrx = 0;
     
@@ -634,7 +679,7 @@ filament_ensemble::filament_ensemble(double density, array<double,2> myfov, arra
     dt = delta_t;
     temperature = temp;
     shear_stop = 1e10;
-    shear_dt = dt;
+    shear_dt = dt_var;
     t = 0;
     delrx = 0;
     

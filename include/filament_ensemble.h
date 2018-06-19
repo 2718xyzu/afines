@@ -126,10 +126,16 @@ class filament_ensemble
         void update_forces(int fil, int actin, double f2, double f3);
 
         void write_actins(ofstream& fout);
+
+        string string_actins();
         
         void write_links(ofstream& fout);
+
+        string string_links();
         
         void write_thermo(ofstream& fout);
+
+        string string_thermo();
         
         void set_straight_filaments(bool is_straight);
 
@@ -166,10 +172,12 @@ class filament_ensemble
         void update_energies();
         
         void turn_quads_off();
+
+        int check_energies();
     
     protected:
 
-        double t, dt, temperature, link_ld, visc, min_time;
+        double t, temperature, link_ld, visc, min_time, dt;
         double gamma, shear_stop, shear_dt, shear_speed, delrx;
         double max_links_per_quad_per_filament, max_links_per_quad; 
         bool straight_filaments = false, quad_off_flag;

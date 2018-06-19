@@ -116,8 +116,8 @@ class motor
         string write();
 
     public:
-
-        double mphi,mld, vs, stall_force, max_bind_dist, mk, kon, koff, kend, dt, temperature,
+        
+        double mphi,mld, vs, stall_force, max_bind_dist, mk, kon, koff, kend, temperature, dt,
                damp, shear, max_ext, eps_ext, kinetic_energy, bd_prefactor, tension, catch_length,
                fracture_force;
 

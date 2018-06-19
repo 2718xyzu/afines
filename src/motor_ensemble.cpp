@@ -233,6 +233,15 @@ void motor_ensemble::motor_write(ostream& fout)
     }
 }
 
+string motor_ensemble::string_motors();
+{
+    string motors_out = "";
+    for (unsigned int i=0; i<n_motors.size(); i++) {
+        motors_out += n_motors[i]->write();
+    }   
+    return motors_out;
+}
+
 
 void motor_ensemble::add_motor(motor * m)
 {
@@ -266,6 +275,24 @@ double motor_ensemble::get_potential_energy(){
     return pe;
 }
 
+int motor_ensemble::check_energies()
+{
+    int status = 1;
+    int relax = 1;
+    double cutoff_force = 1.5 * fracture_force;
+        for (unsigned int m = 0; m < n_motors.size(); m++)
+    {
+        double one_force = n_motors[m]->get_force();
+        if one_force>cutoff_force{
+            status = 2;
+            relax = 0;
+        }
+        if (one_force > fracture_force) relax = 0;
+        //pe += n_motors[m]->get_stretching_energy_fene();
+    }
+    if (relax) status = 0;
+    return status;
+}
 
 void motor_ensemble::print_ensemble_thermo(){
     cout<<"\nAll Motors\t:\tKE = "<<ke<<"\tPEs = "<<pe<<"\tPEb = "<<0<<"\tTE = "<<(ke+pe);

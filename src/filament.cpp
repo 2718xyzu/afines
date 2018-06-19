@@ -30,7 +30,7 @@ filament::filament(){
     delrx=0;
     damp = infty;
     y_thresh=2;
-    bd_prefactor = sqrt(temperature/(2*dt*damp));
+    bd_prefactor = sqrt(temperature/(2*dt_var*damp));
 }
 
 filament::filament(array<double, 2> myfov, array<int, 2> mynq, double deltat, double temp, double shear, 
@@ -48,7 +48,7 @@ filament::filament(array<double, 2> myfov, array<int, 2> mynq, double deltat, do
     kinetic_energy  = 0;
     damp            = infty;
     y_thresh        = 1;
-    bd_prefactor = sqrt(temperature/(2*dt*damp));
+    bd_prefactor = sqrt(temperature/(2*dt_var*damp));
 
 }
 
@@ -71,7 +71,7 @@ filament::filament(array<double, 3> startpos, int nactin, array<double, 2> myfov
     damp = 6*pi*actinRadius*visc;
     y_thresh = 1;
     
-    bd_prefactor = sqrt(temperature/(2*dt*damp));
+    bd_prefactor = sqrt(temperature/(2*dt_var*damp));
 
     double phi, variance;
     array<double, 2> next_pos;
@@ -86,8 +86,8 @@ filament::filament(array<double, 3> startpos, int nactin, array<double, 2> myfov
     for (int j = 1; j < nactin; j++) {
 
         //next_pos = boundary_check(j-1, actins[j-1]->get_xcm() + linkLength*cos(phi), actins[j-1]->get_ycm() + linkLength*sin(phi));
-        next_pos = pos_bc(BC, delrx, dt, fov, 
-                {linkLength*cos(phi)/dt, linkLength*sin(phi)/dt},
+        next_pos = pos_bc(BC, delrx, dt_var, fov, 
+                {linkLength*cos(phi)/dt_var, linkLength*sin(phi)/dt_var},
                 {actins[j-1]->get_xcm() + linkLength*cos(phi), actins[j-1]->get_ycm() + linkLength*sin(phi)});
         actins.push_back( new actin(next_pos[0], next_pos[1], actinRadius, visc) );
         prv_rnds.push_back({0,0});
@@ -139,7 +139,7 @@ filament::filament(vector<actin *> actinvec, array<double, 2> myfov, array<int, 
         }
     }
     
-    bd_prefactor = sqrt(temperature/(2*dt*damp));
+    bd_prefactor = sqrt(temperature/(2*dt_var*damp));
 
 }
 
@@ -222,7 +222,7 @@ void filament::update_positions()
         prv_rnds[i] = new_rnds;
         //cout<<"\nDEBUG: actin force = ("<<actins[i]->get_force()[0]<<" , "<<actins[i]->get_force()[1]<<")";
         kinetic_energy += vx*vx + vy*vy;
-        newpos = pos_bc(BC, delrx, dt, fov, {vx, vy}, {actins[i]->get_xcm() + vx*dt, actins[i]->get_ycm() + vy*dt});
+        newpos = pos_bc(BC, delrx, dt_var, fov, {vx, vy}, {actins[i]->get_xcm() + vx*dt_var, actins[i]->get_ycm() + vy*dt_var});
         actins[i]->set_xcm(newpos[0]);
         actins[i]->set_ycm(newpos[1]);
         actins[i]->reset_force(); 
@@ -256,8 +256,8 @@ void filament::update_positions_range(int lo, int hi)
         prv_rnds[i] = new_rnds;
         //cout<<"\nDEBUG: actin force = ("<<actins[i]->get_force()[0]<<" , "<<actins[i]->get_force()[1]<<")";
         kinetic_energy += vx*vx + vy*vy;
-        //newpos = boundary_check(i, actins[i]->get_xcm() + vx*dt, actins[i]->get_ycm() + vy*dt); 
-        newpos = pos_bc(BC, delrx, dt, fov, {vx, vy}, {actins[i]->get_xcm() + vx*dt, actins[i]->get_ycm() + vy*dt});
+        //newpos = boundary_check(i, actins[i]->get_xcm() + vx*dt_var, actins[i]->get_ycm() + vy*dt_var); 
+        newpos = pos_bc(BC, delrx, dt_var, fov, {vx, vy}, {actins[i]->get_xcm() + vx*dt_var, actins[i]->get_ycm() + vy*dt_var});
         actins[i]->set_xcm(newpos[0]);
         actins[i]->set_ycm(newpos[1]);
         actins[i]->reset_force(); 
@@ -421,11 +421,11 @@ vector<filament *> filament::fracture(int node){
     if (lower_half.size() > 0)
         newfilaments.push_back(
                 new filament(lower_half, fov, nq, links[0]->get_l0(), links[0]->get_kl(), links[0]->get_fene_ext(), kb, 
-                    dt, temperature, fracture_force, gamma, BC));
+                    dt_var, temperature, fracture_force, gamma, BC));
     if (upper_half.size() > 0)
         newfilaments.push_back(
                 new filament(upper_half, fov, nq, links[0]->get_l0(), links[0]->get_kl(), links[0]->get_fene_ext(), kb, 
-                    dt, temperature, fracture_force, gamma, BC));
+                    dt_var, temperature, fracture_force, gamma, BC));
 
     for (int i = 0; i < (int)(lower_half.size()); i++) delete lower_half[i];
     for (int i = 0; i < (int)(upper_half.size()); i++) delete upper_half[i];
@@ -467,7 +467,7 @@ string filament::to_string(){
         out += actins[i]->to_string();
 
     sprintf(buffer, "fov = (%f, %f)\tnq = (%d, %d)\tgamma = %f\ttemperature = %f\tdt = %f\tfracture_force=%f\n",
-            fov[0], fov[1], nq[0], nq[1], gamma, temperature, dt, fracture_force);
+            fov[0], fov[1], nq[0], nq[1], gamma, temperature, dt_var, fracture_force);
    
     return out + buffer; 
 

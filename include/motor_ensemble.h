@@ -56,6 +56,8 @@ class motor_ensemble
 
         void motor_write(ostream& fout);
 
+        string string_motors();
+
         void print_ensemble_thermo();
 
         void motor_tension(ofstream& fout);
@@ -65,6 +67,8 @@ class motor_ensemble
         void set_shear(double g);
 
         void kill_heads(int i);
+
+        int check_energies();
 
     private:
 

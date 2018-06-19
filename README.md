@@ -225,6 +225,7 @@ each list of positions within the file. Thus the structure of actins.txt is:
 |dir                        |string |"."            |       |directory for output files|
 |myseed                     |int    |time(NULL)     |       |seed of random number generator|
 |restart                    |bool   |false          |       |if true, will restart simulation from last timestep recorded|
+|check_steps                |int    |100            |steps  |Number of loop iterations which the program backtracks if the energies have blown up|
 |restart_time               |double |-1             |s      |time to restart simulation from|
 |**ACTIN**                  |       |               |       | |
 |nmonomer                   |double |11             |       |number of beads per filament|
