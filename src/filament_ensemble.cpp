@@ -358,7 +358,7 @@ int filament_ensemble::check_energies(){
     double cutoff_force = 1.5 * fracture_force;
     for (unsigned int m = 0; m < network.size(); m++)
     {
-        for (unsigned int i = 0; i < network[m]->get_nactins(); i++){ 
+        for (int i = 0; i < network[m]->get_nactins(); i++){ 
             array<double, 2> force_vec = network[m]->get_actin(i)->get_force();
             double one_force = hypot(force_vec[0],force_vec[1]);
             if (one_force>cutoff_force){
@@ -792,8 +792,8 @@ void filament_ensemble::set_dt(double dt_var){
 vector<vector<double > > filament_ensemble::get_vecvec(){
     vector<vector<double > > vec_out;
     for (unsigned int i=0; i<network.size(); i++) {
-        for (unsigned int j=0; j<network[i]->get_nactins(); j++){}
-            vector<double> out = network[i]->get_vec(j)
+        for (int j=0; j<network[i]->get_nactins(); j++){
+            vector<double> out = network[i]->get_vec(j);
             out.push_back(i);
             vec_out.push_back(out);
         }

@@ -194,7 +194,7 @@ int main(int argc, char* argv[]){
         ("light_act", po::value<bool>(&light_act)->default_value(false), "Flag to turn on a circle of light activation, where motors can walk only in the light")
         ("light_radius", po::value<double>(&light_radius)->default_value(6.25), "Radius outside of which motors are turned off")
 
-        //("check_steps", po::value<int>(&check_steps)->default_value(100), "Number of loop iterations over which backtracking occurs")
+        ("check_steps", po::value<int>(&check_steps)->default_value(100), "Number of loop iterations over which backtracking occurs")
         ;
 
     //Hidden options, will be allowed both on command line and
@@ -251,7 +251,7 @@ int main(int argc, char* argv[]){
     double bw_print_interval = tfinal/nframes;
     // double dt = dt;
 
-    int unprinted_count = int(double(tinit)/dt);
+    //int unprinted_count = int(double(tinit)/dt);
 
     tdir   = dir  + "/txt_stack";
     ddir   = dir  + "/data";
@@ -386,42 +386,43 @@ int main(int argc, char* argv[]){
     motor_ensemble * myosins;
     motor_ensemble * myosins_old;
 
-    if (a_motor_pos_vec.size() == 0 && a_motor_in.size() == 0)
+    if (a_motor_pos_vec.size() == 0 && a_motor_in.size() == 0){
         myosins = new motor_ensemble( a_motor_density, {xrange, yrange}, dt, temperature,
                 a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
                 a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, a_motor_position_arrs, bnd_cnd, light_param);
         myosins_old = new motor_ensemble( a_motor_density, {xrange, yrange}, dt, temperature,
                 a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
                 a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, a_motor_position_arrs, bnd_cnd, light_param);
-    else
+    }
+    else {
         myosins = new motor_ensemble( a_motor_pos_vec, {xrange, yrange}, dt, temperature,
                 a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
                 a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd, light_param);
         myosins_old = new motor_ensemble( a_motor_pos_vec, {xrange, yrange}, dt, temperature,
                 a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
                 a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd, light_param);
-    
+    }
     if (dead_head_flag) myosins->kill_heads(dead_head);
 
     cout<<"Adding passive motors (crosslinkers) ...\n";
     motor_ensemble * crosslks;
     motor_ensemble * crosslks_old;
 
-    if(p_motor_pos_vec.size() == 0 && p_motor_in.size() == 0)
+    if(p_motor_pos_vec.size() == 0 && p_motor_in.size() == 0){
         crosslks = new motor_ensemble( p_motor_density, {xrange, yrange}, dt, temperature,
                 p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
                 p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, p_motor_position_arrs, bnd_cnd, {0,0});
         crosslks_old = new motor_ensemble( p_motor_density, {xrange, yrange}, dt, temperature,
                 p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
                 p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, p_motor_position_arrs, bnd_cnd, {0,0});
-    else
+    }else{
         crosslks = new motor_ensemble( p_motor_pos_vec, {xrange, yrange}, dt, temperature,
                 p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
                 p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
         crosslks_old = new motor_ensemble( p_motor_pos_vec, {xrange, yrange}, dt, temperature,
                 p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
                 p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
-    
+    }
     t5 = clock();
     cout<<"Time to create simulation objects = "<<(t5-t4);
     if (p_dead_head_flag) crosslks->kill_heads(p_dead_head);
