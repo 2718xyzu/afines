@@ -72,6 +72,8 @@ class motor_ensemble
         
         void set_dt(double dt_var);
 
+        vector<vector<double> > get_vecvec();
+
     private:
 
         double mld, gamma, tMove;

@@ -117,6 +117,8 @@ class motor
 
         void set_dt(double dt_var);
 
+        vector<double> get_vec();
+
     public:
         
         double mphi,mld, vs, stall_force, max_bind_dist, mk, kon, koff, kend, r_on, r_off, r_end, temperature, dt,

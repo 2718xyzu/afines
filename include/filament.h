@@ -126,6 +126,8 @@ class filament
 
         void set_dt(double dt_var);
 
+        vector<double> get_vec(int j);
+
     protected:
         
         double kb, temperature, dt,

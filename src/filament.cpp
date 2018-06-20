@@ -685,3 +685,9 @@ void filament::set_dt(double dt_var){
     dt = dt_var;
 
 }
+
+vector<double> filament::get_vec(int j){
+    vector<double> out;
+    out = actins[j]->get_pos();
+    return out;
+}

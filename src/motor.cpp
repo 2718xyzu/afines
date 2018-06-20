@@ -624,3 +624,16 @@ string motor::write()
 void motor::set_dt(double dt_var){
     dt = dt_var;
 }
+
+vector<double> motor::get_vec(){
+    vector<double> out;
+    out.push_back(hx[0]);
+    out.push_back(hy[0]);
+    out.push_back(disp[0]);
+    out.push_back(disp[1]);
+    out.push_back(f_index[0]);
+    out.push_back(f_index[1]);
+    out.push_back(l_index[0]);
+    out.push_back(l_index[1]);
+    return out;
+}

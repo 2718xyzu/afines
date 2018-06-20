@@ -308,3 +308,12 @@ void motor_ensemble::set_dt(double dt_var){
     }
 
 }
+
+vector<vector<double> > motor_ensemble::get_vecvec(){
+    vector<vector<double> > out;
+    for (unsigned int m = 0; m < n_motors.size(); m++)
+    {
+        out.push_back(n_motors[m]->get_vec());
+    }
+    return out;
+}
