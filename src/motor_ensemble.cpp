@@ -37,7 +37,7 @@ motor_ensemble::motor_ensemble(double mdensity, array<double, 2> myfov, double d
     fracture_force = fractureforce;
 
     int nm = int(ceil(mdensity*fov[0]*fov[1]));
-    cout<<"\nDEBUG: Number of motors:"<<nm<<"\n";
+    //cout<<"\nDEBUG: Number of motors:"<<nm<<"\n";
 
     double alpha = 1, motorx, motory, mang;
     array<double, 3> motor_pos;
@@ -80,7 +80,7 @@ motor_ensemble::motor_ensemble(vector<vector<double> > motors, array<double, 2> 
     fracture_force = fractureforce;
 
     int nm = motors.size();
-    cout<<"\nDEBUG: Number of motors:"<<nm<<"\n";
+    //cout<<"\nDEBUG: Number of motors:"<<nm<<"\n";
 
     array<double, 4> motor_pos;
     array<int, 2> f_index, l_index, state;
@@ -104,7 +104,7 @@ motor_ensemble::motor_ensemble(vector<vector<double> > motors, array<double, 2> 
 
 
 motor_ensemble::~motor_ensemble( ){
-    cout<<"DELETING MOTOR ENSEMBLE\n";
+    //cout<<"DELETING MOTOR ENSEMBLE\n";
     int s = n_motors.size();
     for (int i = 0; i < s; i++){
         delete n_motors[i];

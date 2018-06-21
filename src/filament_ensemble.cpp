@@ -22,7 +22,7 @@ filament_ensemble::filament_ensemble(){}
 
  
 filament_ensemble::~filament_ensemble(){ 
-    cout<<"DELETING FILAMENT_ENSEMBLE\n";
+    //cout<<"DELETING FILAMENT_ENSEMBLE\n";
     
     int s = network.size();
     
