@@ -39,7 +39,7 @@ int main(int argc, char* argv[]){
     double grid_factor;
 
     // Time
-    int count, count_past, total_count, nframes, nmsgs, n_bw_shear;
+    int count, total_count, nframes, nmsgs, n_bw_shear;
     double t, tinit, tfinal, dt;
 
     // Environment
@@ -257,8 +257,8 @@ int main(int argc, char* argv[]){
     for (double time_of_print = 0; time_of_print<(tfinal+1); time_of_print+=bw_print_interval){
         print_times_temp.push_back(time_of_print);
     }
-    for (vector<int>::reverse_iterator rit = print_times_temp.rbegin(); rit != print_times_temp.rend(); ++rit){
-        print_times.push_back(*rit);
+    for (int i = print_times_temp.size()-1; i>=0; i--){
+        print_times.push_back(print_times_temp[i]);
     }
     check_steps = max(min(check_steps, n_bw_print),1);
     // double dt = dt;
@@ -466,7 +466,6 @@ int main(int argc, char* argv[]){
     cout<<"\nUpdating motors, filaments and crosslinks in the network.."<<endl;
     string time_str = "";
     count=0;
-    count_past = 0;
     total_count = 0;
     t = tinit;
     pre_strain = strain_pct * xrange;
@@ -481,10 +480,11 @@ int main(int argc, char* argv[]){
         net->update_shear();
     }
 
-    vector<string> actins_past, links_past, time_str_past, motors_past, crosslks_past, thermo_past, pe_past,
-        stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
-    vector<double> time_past = 0;
-    vector<double> count_diff = 0;
+    vector<string> actins_past, links_past, time_str_past, motors_past, crosslks_past, thermo_past, pe_past;
+    vector<double> stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
+    vector<double> time_past;
+    vector<double> count_diff, count_past;
+
 
     // time_past.push_back(t);
     // count_past.push_back(count);
@@ -606,13 +606,14 @@ int main(int argc, char* argv[]){
             // previous_bw_print = next_bw_print;
             // next_bw_print += bw_print_interval;
             time_past.push_back(t);
-            count_diff.push_back((count-count_past.end()));
+            count_diff.push_back((count-count_past.back()));
             count_past.push_back(count);
             actins_past.push_back(net->string_actins());
             links_past.push_back(net->string_links());
             motors_past.push_back(myosins->string_motors());
             crosslks_past.push_back(crosslks->string_motors());
             thermo_past.push_back(net->string_thermo());
+            bending_energy_past.push_back(net->get_bending_energy());
             stretching_energy_past.push_back(net->get_stretching_energy());
             potential_energy_motors_past.push_back(myosins->get_potential_energy());
             potential_energy_crosslks_past.push_back(crosslks->get_potential_energy());
@@ -687,6 +688,7 @@ int main(int argc, char* argv[]){
                 stretching_energy_past.clear();
                 potential_energy_motors_past.clear();
                 potential_energy_crosslks_past.clear();
+                bending_energy_past.clear();
 
                 
             } else {
@@ -716,9 +718,9 @@ int main(int argc, char* argv[]){
                     p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
                 slow_down = 0;
                 int flush = 0;
-                for (int i = 0; i<time_past.size(); i++){
+                for (unsigned int i = 0; i<time_past.size(); i++){
                         
-                        if (time_past>tinit) time_str ="\n";
+                        if (time_past[i]>tinit) time_str ="\n";
                         time_str += "t = "+to_string(time_past[i]);
 
                         file_a << time_str<<"\tN = "<<to_string(net->get_nactins());
@@ -741,8 +743,8 @@ int main(int argc, char* argv[]){
                         file_th << thermo_past[i];
                         //net->write_thermo(file_th);
 
-                        file_pe << stretching_energy_past[i] + "\t" + bending_energy_past[i] + "\t" +
-                            potential_energy_motors_past[i] + "\t" + potential_energy_crosslks_past[i] << endl;
+                        file_pe << to_string(stretching_energy_past[i]) + "\t" + to_string(bending_energy_past[i]) + "\t" +
+                            to_string(potential_energy_motors_past[i]) + "\t" + to_string(potential_energy_crosslks_past[i]) << endl;
                         //file_pe << net->get_stretching_energy()<<"\t"<<net->get_bending_energy()<<"\t"<<
                         //    myosins->get_potential_energy()<<"\t"<<crosslks->get_potential_energy()<<endl;
                         file_time <<(double(bw_print_interval)/double(count-count_past[i]))<<endl;
