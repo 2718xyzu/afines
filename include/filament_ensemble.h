@@ -173,7 +173,7 @@ class filament_ensemble
         
         void turn_quads_off();
 
-        int check_energies();
+        int check_energies(int slow_down);
 
         void set_dt(double dt_var);
 

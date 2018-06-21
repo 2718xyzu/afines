@@ -38,7 +38,7 @@ int main(int argc, char* argv[]){
     double grid_factor;
 
     // Time
-    int count, nframes, nmsgs, n_bw_shear;
+    int count, count_past, nframes, nmsgs, n_bw_shear;
     double t, tinit, tfinal, dt;
 
     // Environment
@@ -68,8 +68,8 @@ int main(int argc, char* argv[]){
     string config_file, actin_in, a_motor_in, p_motor_in;
 
     // Output
-    string   dir, tdir, ddir,  afile,  amfile,  pmfile,  lfile, thfile, pefile;
-    ofstream o_file, file_a, file_am, file_pm, file_l, file_th, file_pe;
+    string   dir, tdir, ddir,  afile,  amfile,  pmfile,  lfile, thfile, pefile, tfile;
+    ofstream o_file, file_a, file_am, file_pm, file_l, file_th, file_pe, file_time;
     ios_base::openmode write_mode = ios_base::out;
 
     // External Force
@@ -86,6 +86,7 @@ int main(int argc, char* argv[]){
     bool light_act;
     double light_radius;
     int check_steps;
+    int slow_down = 0; //
 
     // Options allowed only on command line
     po::options_description generic("Generic options");
@@ -249,6 +250,7 @@ int main(int argc, char* argv[]){
     double next_bw_print = 0;
     double previous_bw_print = 0;
     double bw_print_interval = tfinal/nframes;
+    check_steps = max(min(check_steps, n_bw_print),1);
     // double dt = dt;
 
     //int unprinted_count = int(double(tinit)/dt);
@@ -263,6 +265,7 @@ int main(int argc, char* argv[]){
     pmfile = tdir + "/pmotors.txt";
     thfile = ddir + "/filament_e.txt";
     pefile = ddir + "/pe.txt";
+    tfile  = ddir + "/time.txt";
 
     if(fs::create_directory(dir1)) cerr<< "Directory Created: "<<afile<<std::endl;
     if(fs::create_directory(dir2)) cerr<< "Directory Created: "<<thfile<<std::endl;
@@ -341,6 +344,7 @@ int main(int argc, char* argv[]){
     file_pm.open(pmfile.c_str(), write_mode);
 	file_th.open(thfile.c_str(), write_mode);
 	file_pe.open(pefile.c_str(), write_mode);
+    file_time.open(tfile.c_str(), write_mode);
 
 
     // DERIVED QUANTITIES :
@@ -450,7 +454,7 @@ int main(int argc, char* argv[]){
 
     // Run the simulation
     cout<<"\nUpdating motors, filaments and crosslinks in the network.."<<endl;
-    string time_str;
+    string time_str = "";
     count=0;
     t = tinit;
     pre_strain = strain_pct * xrange;
@@ -465,13 +469,22 @@ int main(int argc, char* argv[]){
         net->update_shear();
     }
 
-string actins_past, links_past, time_str_past, motors_past, crosslks_past, thermo_past, pe_past,
-    stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
-double time_past = 0;
+    string actins_past, links_past, time_str_past, motors_past, crosslks_past, thermo_past, pe_past,
+        stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
+    double time_past = 0;
 
+    time_past = t;
+    actins_past = net->string_actins();
+    links_past = net->string_links();
+    motors_past = myosins->string_motors();
+    crosslks_past = crosslks->string_motors();
+    thermo_past = net->string_thermo();
+    stretching_energy_past = net->get_stretching_energy();
+    potential_energy_motors_past = myosins->get_potential_energy();
+    potential_energy_crosslks_past = crosslks->get_potential_energy();
 
     while (t <= tfinal) {
-        t2 = clock();
+        //t2 = clock();
         //cout<<"\nDEBUG: current clock = "<<t2;
         //print to file
 	    if (t+dt/100 >= tinit && t+dt>(next_bw_print+bw_print_interval)) {
@@ -479,7 +492,7 @@ double time_past = 0;
             if (t>tinit) time_str ="\n";
             time_str += "t = "+to_string(time_past);
 
-            file_a << time_str_past<<"\tN = "<<to_string(net->get_nactins());
+            file_a << time_str<<"\tN = "<<to_string(net->get_nactins());
             file_a << actins_past;
             //net->write_actins(file_a); //change so not a file write but a variable save
 
@@ -503,7 +516,8 @@ double time_past = 0;
                 potential_energy_motors_past + "\t" + potential_energy_crosslks_past << endl;
             //file_pe << net->get_stretching_energy()<<"\t"<<net->get_bending_energy()<<"\t"<<
             //    myosins->get_potential_energy()<<"\t"<<crosslks->get_potential_energy()<<endl;
-
+            file_time <<(double(bw_print_interval)/double(count-count_past))<<endl;
+        
 
             file_a<<std::flush;
             file_l<<std::flush;
@@ -511,20 +525,23 @@ double time_past = 0;
             file_pm<<std::flush;
             file_th<<std::flush;
             file_pe<<std::flush;
+            file_time<<std::flush;
             
             previous_bw_print = next_bw_print;
             next_bw_print += bw_print_interval;
             time_past = t;
+            count_past = count;
             actins_past = net->string_actins();
             links_past = net->string_links();
             motors_past = myosins->string_motors();
+            crosslks_past = crosslks->string_motors();
             thermo_past = net->string_thermo();
             stretching_energy_past = net->get_stretching_energy();
             potential_energy_motors_past = myosins->get_potential_energy();
             potential_energy_crosslks_past = crosslks->get_potential_energy();
 
-            t3 = clock();
-            cout<<"\n DEBUG: writing ticks = "<<(t3-t2)<<endl;
+            //t3 = clock();
+            //cout<<"\n DEBUG: writing ticks = "<<(t3-t2)<<endl;
         }
 		else if (t<previous_bw_print && (t+dt)>previous_bw_print){
 
@@ -532,6 +549,7 @@ double time_past = 0;
             actins_past = net->string_actins();
             links_past = net->string_links();
             motors_past = myosins->string_motors();
+            crosslks_past = crosslks->string_motors();
             thermo_past = net->string_thermo();
             stretching_energy_past = net->get_stretching_energy();
             potential_energy_motors_past = myosins->get_potential_energy();
@@ -541,7 +559,7 @@ double time_past = 0;
         //print time count
         if (time_of_strain!=0 && close(t, time_of_strain, dt/(10*time_of_strain))){
             //Perform the shear here
-            cout<<"\nDEBUG: t = "<<t<<"; adding pre_strain of "<<pre_strain<<" um here"<<endl;
+            //cout<<"\nDEBUG: t = "<<t<<"; adding pre_strain of "<<pre_strain<<" um here"<<endl;
             net->update_delrx( pre_strain );
             net->update_shear();
         }
@@ -550,7 +568,7 @@ double time_past = 0;
             d_strain = d_strain_amp * sin(2*pi*d_strain_freq * ( t - time_of_dstrain) );
             net->update_delrx( pre_strain + d_strain );
             net->update_d_strain( d_strain - prev_d_strain );
-            cout<<"\nDEBUG: t = "<<t<<"; adding d_strain of "<<(d_strain-prev_d_strain)<<" um here; total strain = "<<(pre_strain+d_strain);
+            //cout<<"\nDEBUG: t = "<<t<<"; adding d_strain of "<<(d_strain-prev_d_strain)<<" um here; total strain = "<<(pre_strain+d_strain);
             cout<<endl;
             prev_d_strain = d_strain;
         }
@@ -564,11 +582,11 @@ double time_past = 0;
         }
 
         if (count%n_bw_stdout==0) { //suppressed output here to view debug messages better
-			cout<<"\nTime counts: "<<count;
-		    //net->print_filament_thermo();
-            //net->print_network_thermo();
-            //crosslks->print_ensemble_thermo();
-            //myosins->print_ensemble_thermo();
+			cout<<"\nTime counts: "<<count<<"; t = "<<t;
+		    net->print_filament_thermo();
+            net->print_network_thermo();
+            crosslks->print_ensemble_thermo();
+            myosins->print_ensemble_thermo();
         }
 
         //update network
@@ -592,16 +610,16 @@ double time_past = 0;
 
         
         if (count%check_steps == 0){ //in order to run without any dynamic time step, set check_steps to 1E30
-            t3 = clock();
-            int net_status = net->check_energies();
-            int myosins_status = myosins->check_energies();
-            int crosslks_status = crosslks->check_energies();
-            t4 = clock();
+            //t3 = clock();
+            int net_status = net->check_energies(slow_down);
+            int myosins_status = myosins->check_energies(slow_down);
+            int crosslks_status = crosslks->check_energies(slow_down);
+            //t4 = clock();
             if (net_status == 2 || myosins_status == 2 || crosslks_status == 2) {
                 //if something has blown up
                 cout<<"\nEnergy exceeded, status: n_s = "<<net_status<<" m_s = "<<myosins_status<<" c_s = "<<crosslks_status<<endl;
                 t -= check_steps * dt;
-                dt /= 1.5;
+                dt /= 2;
                 net->set_dt(dt);
                 myosins->set_dt(dt);
                 crosslks->set_dt(dt);
@@ -624,8 +642,8 @@ double time_past = 0;
                     p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
                 
             } else {
-                if (net_status == 0 && myosins_status == 0 && crosslks_status == 0) {
-                    dt *= 1.5;
+                if (net_status == 0 && myosins_status == 0 && crosslks_status == 0 && dt<(tfinal/double(nmsgs*2))) {
+                    dt *= 1.005;
                     net->set_dt(dt);
                     myosins->set_dt(dt);
                     crosslks->set_dt(dt);
@@ -651,10 +669,10 @@ double time_past = 0;
                     p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
                 
             }
-            t5 = clock();
-            cout<<"\n Time for check = "<<(t4-t3)<<endl;
-            cout<<"\n Time for record = "<<(t5-t4)<<endl;
-            cout<<"\n DEBUG: time for this step = "<<(t5-t2)<<endl;
+            //t5 = clock();
+            //cout<<"\n Time for check = "<<(t4-t3)<<endl;
+            //cout<<"\n Time for record = "<<(t5-t4)<<endl;
+            //cout<<"\n DEBUG: time for this step = "<<(t5-t2)<<endl;
         }
         
 
