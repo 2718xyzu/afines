@@ -39,6 +39,8 @@ class filament
         filament(vector<actin *> actinvec, array<double, 2> myfov, array<int, 2> mynq, double linkLength, double stretching_stiffness, double ext, double bending_stiffness, 
                 double deltat, double temp, double fracture, double gamma, string bc);
        
+        filament(const filament& other);
+
         filament();
         
         ~filament();

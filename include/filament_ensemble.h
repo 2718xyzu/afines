@@ -45,6 +45,8 @@ class filament_ensemble
         filament_ensemble(vector< vector<double> > actins, array<double,2> myfov, array<int,2> mynq, double delta_t, double temp,
                 double vis, double link_len, double stretching, double ext, double bending, double frac_force, string bc); 
         
+        filament_ensemble(const filament_ensemble& other);
+       
         ~filament_ensemble();
         
         void nlist_init();
