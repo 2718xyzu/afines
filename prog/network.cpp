@@ -88,7 +88,9 @@ int main(int argc, char* argv[]){
     double light_radius;
     int check_steps;
     int slow_down = 0; //
+    int slowed_down = 0;
     int slow_param = 0;
+    int stable_checks = 0;
 
     // Options allowed only on command line
     po::options_description generic("Generic options");
@@ -653,8 +655,9 @@ int main(int argc, char* argv[]){
                 }else{
                     slow_down = 1;
                 }
-                if (slow_down) {
+                if (slow_down && dt>1E-4) {
                     dt /= 2;
+                    slowed_down = 1;
                     cout<<"\nSlow Down, status: n_s = "<<net_status<<" m_s = "<<myosins_status<<" c_s = "<<crosslks_status<<endl;
                 } else {
                     cout<<"\nEnergy exceeded, status: n_s = "<<net_status<<" m_s = "<<myosins_status<<" c_s = "<<crosslks_status<<endl;
@@ -705,14 +708,25 @@ int main(int argc, char* argv[]){
 
                 
             } else {
-                if (net_status == 0 && myosins_status == 0 && crosslks_status == 0 && dt<(tfinal/double(nmsgs*2))) {
-                    dt *= 1.005;
-                    net->set_dt(dt);
-                    myosins->set_dt(dt);
-                    crosslks->set_dt(dt);
-                    cout<<"\nAll energies are low"<<endl;
+                if (slowed_down) {
+                    dt *= 1.5;
+                    slowed_down = 0;
+                }
+                if (net_status == 0 && myosins_status == 0 && crosslks_status == 0) {
+                    if (stable_checks>250 && dt<(tfinal/double(nmsgs*2)) && dt<8E-4){
+                        dt *= 1.1;
+                        net->set_dt(dt);
+                        myosins->set_dt(dt);
+                        crosslks->set_dt(dt);
+                        stable_checks = 0;
+                        cout<<"\nAll energies are low, speeding up now"<<endl;
+                    }
+                    stable_checks += 5;
+                    
+                    cout<<"\nAll energies are low (no change)"<<endl;
                 } else {
-                    cout<<"No change"<<endl;
+                    cout<<"No change in time step, non-relaxed state"<<endl;
+                    stable_checks += 1;
                 }
 
                 curr_actin_pos_vec = net->get_vecvec();
