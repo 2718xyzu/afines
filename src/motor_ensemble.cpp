@@ -292,7 +292,7 @@ int motor_ensemble::check_energies(int slow_down)
             status = 2;
             relax = 0;
         }
-        if (one_force > fracture_force) relax = 0;
+        if (one_force > fracture_force/2) relax = 0;
         //pe += n_motors[m]->get_stretching_energy_fene();
     }
     if (relax) status = 0;
