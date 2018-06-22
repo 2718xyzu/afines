@@ -484,7 +484,8 @@ int main(int argc, char* argv[]){
     vector<double> stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
     vector<double> time_past;
     vector<double> count_diff, count_past;
-
+    count_past.push_back(0);
+    // cout<<"line 487"<<endl;
 
     // time_past.push_back(t);
     // count_past.push_back(count);
@@ -549,22 +550,24 @@ int main(int argc, char* argv[]){
         }
 
         //update network
+        // cout<<"line 552"<<endl;
         net->update();//updates all forces, velocities and positions of filaments
-
+        // cout<<"line 554"<<endl;
         //update cross linkers
         if (static_cl_flag)
             crosslks->motor_update();
         else
             crosslks->motor_walk(t);
-
+        // cout<<"line 560"<<endl;
         //update motors
         myosins->motor_walk(t);
 
         //clear the vector of fractured filaments
         net->clear_broken();
-
+        // cout<<"step = "<<count<<endl;
     if (t+dt/100 >= tinit && t+dt>print_times.back()) { 
-           
+           cout<<"attempt to record"<<endl;
+           cout<<"Time printing = "<<print_times.back()<<endl;
             /* if (time_past>tinit) time_str ="\n";
             time_str += "t = "+to_string(time_past);
 
@@ -619,6 +622,7 @@ int main(int argc, char* argv[]){
             potential_energy_crosslks_past.push_back(crosslks->get_potential_energy());
             
             print_times.pop_back();
+            // cout<<"Yay, printed!"<<endl;
 
             //t3 = clock();
             //cout<<"\n DEBUG: writing ticks = "<<(t3-t2)<<endl;
@@ -680,6 +684,7 @@ int main(int argc, char* argv[]){
                 time_past.clear();
                 count_diff.clear();
                 count_past.clear();
+                count_past.push_back(count);
                 actins_past.clear();
                 links_past.clear();
                 motors_past.clear();
@@ -753,6 +758,20 @@ int main(int argc, char* argv[]){
 
                 }
                 if (flush) {
+                    time_past.clear();
+                    count_diff.clear();
+                    count_past.clear();
+                    count_past.push_back(count);
+                    actins_past.clear();
+                    links_past.clear();
+                    motors_past.clear();
+                    crosslks_past.clear();
+                    thermo_past.clear();
+                    stretching_energy_past.clear();
+                    potential_energy_motors_past.clear();
+                    potential_energy_crosslks_past.clear();
+                    bending_energy_past.clear();
+
                     file_a<<std::flush;
                     file_l<<std::flush;
                     file_am<<std::flush;
