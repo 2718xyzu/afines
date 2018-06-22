@@ -44,6 +44,7 @@ Link::Link(double len, double stretching_stiffness, double max_ext_ratio, filame
 Link::Link(const Link& other, filament* f){
     kl = other.kl;
     l0 = other.l0;
+    fil = f;
     aindex = other.aindex;
     fov = other.fov;
     nq = other.nq;
@@ -65,7 +66,7 @@ Link::Link(const Link& other, filament* f){
 
     disp = other.disp;
 
-
+    quad = other.quad;
 }
 
 Link::~Link(){ 

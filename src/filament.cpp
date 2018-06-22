@@ -143,6 +143,28 @@ filament::filament(vector<actin *> actinvec, array<double, 2> myfov, array<int, 
 
 }
 
+filament::filament(const filament& other){
+    for (unsigned int i = 0; i < other.actins.size(); i++){
+
+    }
+        
+    
+    for (unsigned int i = 0; i < other.links.size(); i++){
+
+
+    }
+
+    fov = other.fov;
+    nq = other.nq;
+    gamma = other.gamma;
+    temperature = other.temperature;
+    dt = other.dt;
+    fracture_force = that.fracture_force;
+    
+
+}
+
+
 filament::~filament(){
     
     //cout<<"DELETING FILAMENT\n";
