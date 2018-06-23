@@ -650,6 +650,7 @@ int main(int argc, char* argv[]){
             if (net_status == 2 || myosins_status == 2 || crosslks_status == 2) {
                 t -= check_steps * dt;
                 count -= check_steps;
+                stable_checks = 0;
                 if (net_status==0 && crosslks_status==0 && slow_down == 0){
                     slow_down = 0;
                 }else{
