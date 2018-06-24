@@ -91,6 +91,8 @@ int main(int argc, char* argv[]){
     int slowed_down = 0;
     int slow_param = 0;
     int stable_checks = 0;
+    int stable_thresh = 250;
+    if (stable_checks == 1) stable_thresh = 10000;
 
     // Options allowed only on command line
     po::options_description generic("Generic options");
@@ -245,6 +247,7 @@ int main(int argc, char* argv[]){
     cout<<"\nProgram Starting";
     cout<<"\nDEBUG: clocks_per_sec = "<<CLOCKS_PER_SEC;
     cout<<"\nDEBUG: initial clock val = "<<t1;
+    t2 = t3; 
     t2 = clock();
     cout<<"\nDEBUG: current clock val = "<<t2;
     double link_bending_stiffness    = polymer_bending_modulus / link_length;
@@ -714,7 +717,7 @@ int main(int argc, char* argv[]){
                     slowed_down = 0;
                 }
                 if (net_status == 0 && myosins_status == 0 && crosslks_status == 0) {
-                    if (stable_checks>250 && dt<(tfinal/double(nmsgs*2)) && dt<8E-4){
+                    if (stable_checks>stable_thresh && dt<(tfinal/double(nmsgs*2)) && dt<8E-4){
                         dt *= 1.1;
                         net->set_dt(dt);
                         myosins->set_dt(dt);
