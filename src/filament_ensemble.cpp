@@ -355,7 +355,7 @@ void filament_ensemble::update_energies(){
 int filament_ensemble::check_energies(int slow_down){
     int status = 1;
     int relax = 1;
-    double cutoff_force = 1.5 * fracture_force + slow_down;
+    double cutoff_force = 2 * stretching * link_len;
     for (unsigned int m = 0; m < network.size(); m++)
     {
         for (int i = 0; i < network[m]->get_nactins(); i++){ 

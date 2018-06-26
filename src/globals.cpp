@@ -766,6 +766,13 @@ closefiles:
 
 }
 
+double get_upper_dt(double tfinal,double t){
+    double upper_dt;
+    if (tfinal<100) tfinal = 100;
+    upper_dt = (5E-5)*exp(3*t/tfinal);
+    return upper_dt;
+}
+
 template int sgn<int>(int);
 template int sgn<double>(double);
 template int sgn<float>(float);

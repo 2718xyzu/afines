@@ -91,8 +91,9 @@ int main(int argc, char* argv[]){
     int slowed_down = 0;
     int slow_param = 0;
     int stable_checks = 0;
-    int stable_thresh = 250;
-    if (stable_checks == 1) stable_thresh = 10000;
+    int stable_thresh;
+    if (stable_checks == 1) stable_thresh = 100000;
+    else stable_thresh = round(100000/stable_checks);
 
     // Options allowed only on command line
     po::options_description generic("Generic options");
@@ -297,9 +298,9 @@ int main(int argc, char* argv[]){
 
 
     // To get positions from input files:
-    vector<vector<double> > actin_pos_vec, old_actin_pos_vec, curr_actin_pos_vec;
+    vector<vector<double> > actin_pos_vec;
     vector<vector<double> > a_motor_pos_vec, p_motor_pos_vec; 
-    vector<vector<double> > old_a_motor_pos_vec, old_p_motor_pos_vec, curr_a_motor_pos_vec, curr_p_motor_pos_vec;
+    vector<vector<double> > stored_actin_pos_vec, stored_a_motor_pos_vec, stored_p_motor_pos_vec;
 
     if (actin_in.size() > 0)
         actin_pos_vec   = file2vecvec(actin_in, "\t");
@@ -385,18 +386,18 @@ int main(int argc, char* argv[]){
         net = new filament_ensemble(npolymer, nmonomer, nmonomer_extra, extra_bead_prob, {xrange, yrange}, {xgrid, ygrid}, dt,
                 temperature, actin_length, viscosity, link_length, actin_position_arrs, link_stretching_stiffness, fene_pct, link_bending_stiffness,
                 link_fracture_force, bnd_cnd, myseed);
-        net_old = new filament_ensemble(npolymer, nmonomer, nmonomer_extra, extra_bead_prob, {xrange, yrange}, {xgrid, ygrid}, dt,
-                temperature, actin_length, viscosity, link_length, actin_position_arrs, link_stretching_stiffness, fene_pct, link_bending_stiffness,
-                link_fracture_force, bnd_cnd, myseed);
+        // net_old = new filament_ensemble(npolymer, nmonomer, nmonomer_extra, extra_bead_prob, {xrange, yrange}, {xgrid, ygrid}, dt,
+        //         temperature, actin_length, viscosity, link_length, actin_position_arrs, link_stretching_stiffness, fene_pct, link_bending_stiffness,
+        //         link_fracture_force, bnd_cnd, myseed);
     }else{
         net = new filament_ensemble(actin_pos_vec, {xrange, yrange}, {xgrid, ygrid}, dt,
                 temperature, viscosity, link_length,
                 link_stretching_stiffness, fene_pct, link_bending_stiffness,
                 link_fracture_force, bnd_cnd);
-        net_old = new filament_ensemble(actin_pos_vec, {xrange, yrange}, {xgrid, ygrid}, dt,
-                temperature, viscosity, link_length,
-                link_stretching_stiffness, fene_pct, link_bending_stiffness,
-                link_fracture_force, bnd_cnd);
+        // net_old = new filament_ensemble(actin_pos_vec, {xrange, yrange}, {xgrid, ygrid}, dt,
+        //         temperature, viscosity, link_length,
+        //         link_stretching_stiffness, fene_pct, link_bending_stiffness,
+        //         link_fracture_force, bnd_cnd);
     }
 
     if (link_intersect_flag) p_motor_pos_vec = net->link_link_intersections(p_motor_length, p_linkage_prob);
@@ -414,17 +415,17 @@ int main(int argc, char* argv[]){
         myosins = new motor_ensemble( a_motor_density, {xrange, yrange}, dt, temperature,
                 a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
                 a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, a_motor_position_arrs, bnd_cnd, light_param);
-        myosins_old = new motor_ensemble( a_motor_density, {xrange, yrange}, dt, temperature,
-                a_motor_length, net_old, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
-                a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, a_motor_position_arrs, bnd_cnd, light_param);
+        // myosins_old = new motor_ensemble( a_motor_density, {xrange, yrange}, dt, temperature,
+        //         a_motor_length, net_old, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
+        //         a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, a_motor_position_arrs, bnd_cnd, light_param);
     }
     else {
         myosins = new motor_ensemble( a_motor_pos_vec, {xrange, yrange}, dt, temperature,
                 a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
                 a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd, light_param);
-        myosins_old = new motor_ensemble( a_motor_pos_vec, {xrange, yrange}, dt, temperature,
-                a_motor_length, net_old, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
-                a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd, light_param);
+        // myosins_old = new motor_ensemble( a_motor_pos_vec, {xrange, yrange}, dt, temperature,
+        //         a_motor_length, net_old, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
+        //         a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd, light_param);
     }
     if (dead_head_flag) myosins->kill_heads(dead_head);
 
@@ -436,17 +437,22 @@ int main(int argc, char* argv[]){
         crosslks = new motor_ensemble( p_motor_density, {xrange, yrange}, dt, temperature,
                 p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
                 p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, p_motor_position_arrs, bnd_cnd, {0,0});
-        crosslks_old = new motor_ensemble( p_motor_density, {xrange, yrange}, dt, temperature,
-                p_motor_length, net_old, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
-                p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, p_motor_position_arrs, bnd_cnd, {0,0});
+        // crosslks_old = new motor_ensemble( p_motor_density, {xrange, yrange}, dt, temperature,
+        //         p_motor_length, net_old, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
+        //         p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, p_motor_position_arrs, bnd_cnd, {0,0});
     }else{
         crosslks = new motor_ensemble( p_motor_pos_vec, {xrange, yrange}, dt, temperature,
                 p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
                 p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
-        crosslks_old = new motor_ensemble( p_motor_pos_vec, {xrange, yrange}, dt, temperature,
-                p_motor_length, net_old, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
-                p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
+        // crosslks_old = new motor_ensemble( p_motor_pos_vec, {xrange, yrange}, dt, temperature,
+        //         p_motor_length, net_old, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
+        //         p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
     }
+
+    stored_actin_pos_vec = net->get_vecvec();
+    stored_a_motor_pos_vec = myosins->get_vecvec();
+    stored_p_motor_pos_vec = crosslks->get_vecvec();
+
     t5 = clock();
     cout<<"Time to create simulation objects = "<<(t5-t4);
     if (p_dead_head_flag) crosslks->kill_heads(p_dead_head);
@@ -496,36 +502,9 @@ int main(int argc, char* argv[]){
     vector<double> count_diff, count_past;
     count_past.push_back(0);
     time_diff.push_back(0);
-    // cout<<"line 487"<<endl;
-
-    // time_past.push_back(t);
-    // count_past.push_back(count);
-    // actins_past.push_back(net->string_actins());
-    // links_past.push_back(net->string_links());
-    // motors_past.push_back(myosins->string_motors());
-    // crosslks_past.push_back(crosslks->string_motors());
-    // thermo_past.push_back(net->string_thermo());
-    // stretching_energy_past.push_back(net->get_stretching_energy());
-    // potential_energy_motors_past.push_back(myosins->get_potential_energy());
-    // potential_energy_crosslks_past.push_back(crosslks->get_potential_energy());
 
     while (t <= tfinal) {
-        //t2 = clock();
-        //cout<<"\nDEBUG: current clock = "<<t2;
-        //print to file
-	    
-		// else if (t<previous_bw_print && (t+dt)>previous_bw_print){
 
-        //     time_past = t;
-        //     actins_past = net->string_actins();
-        //     links_past = net->string_links();
-        //     motors_past = myosins->string_motors();
-        //     crosslks_past = crosslks->string_motors();
-        //     thermo_past = net->string_thermo();
-        //     stretching_energy_past = net->get_stretching_energy();
-        //     potential_energy_motors_past = myosins->get_potential_energy();
-        //     potential_energy_crosslks_past = crosslks->get_potential_energy();
-        // }
         
         //print time count
         if (time_of_strain!=0 && close(t, time_of_strain, dt/(10*time_of_strain))){
@@ -578,47 +557,8 @@ int main(int argc, char* argv[]){
         // cout<<"step = "<<count<<endl;
     if (t+dt/100 >= tinit && t+dt>print_times.back()) { 
            cout<<"attempt to record"<<endl;
-           cout<<"Time printing = "<<print_times.back()<<endl;
-            /* if (time_past>tinit) time_str ="\n";
-            time_str += "t = "+to_string(time_past);
-
-            file_a << time_str<<"\tN = "<<to_string(net->get_nactins());
-            file_a << actins_past;
-            //net->write_actins(file_a); //change so not a file write but a variable save
-
-            file_l << time_str<<"\tN = "<<to_string(net->get_nlinks());
-            file_l << links_past;
-            //net->write_links(file_l);
-
-            file_am << time_str<<"\tN = "<<to_string(myosins->get_nmotors());
-            file_am << motors_past;
-            //myosins->motor_write(file_am);
-
-            file_pm << time_str<<"\tN = "<<to_string(crosslks->get_nmotors());
-            file_pm << crosslks_past;
-            //crosslks->motor_write(file_pm);
-
-            file_th << time_str<<"\tN = "<<to_string(net->get_nfilaments());
-            file_th << thermo_past;
-            //net->write_thermo(file_th);
-
-            file_pe << stretching_energy_past + "\t" + bending_energy_past + "\t" +
-                potential_energy_motors_past + "\t" + potential_energy_crosslks_past << endl;
-            //file_pe << net->get_stretching_energy()<<"\t"<<net->get_bending_energy()<<"\t"<<
-            //    myosins->get_potential_energy()<<"\t"<<crosslks->get_potential_energy()<<endl;
-            file_time <<(double(bw_print_interval)/double(count-count_past))<<endl;
+           cout<<"Time recording = "<<print_times.back()<<endl;
         
-
-            file_a<<std::flush;
-            file_l<<std::flush;
-            file_am<<std::flush;
-            file_pm<<std::flush;
-            file_th<<std::flush;
-            file_pe<<std::flush;
-            file_time<<std::flush; */
-            
-            // previous_bw_print = next_bw_print;
-            // next_bw_print += bw_print_interval;
             time_past.push_back(t);
             count_diff.push_back((count-count_past.back()));
             count_past.push_back(count);
@@ -633,10 +573,6 @@ int main(int argc, char* argv[]){
             potential_energy_crosslks_past.push_back(crosslks->get_potential_energy());
             
             print_times.pop_back();
-            // cout<<"Yay, printed!"<<endl;
-
-            //t3 = clock();
-            //cout<<"\n DEBUG: writing ticks = "<<(t3-t2)<<endl;
         }
 
         t+=dt;
@@ -644,7 +580,8 @@ int main(int argc, char* argv[]){
         total_count++;
 
         
-        if (count%check_steps == 0){ //in order to run without any dynamic time step, set check_steps to 1E30 (big number)
+        if (count%check_steps == 0){ 
+            double tcurr = t;
             //t3 = clock();
             int net_status = net->check_energies(slow_param);
             int myosins_status = myosins->check_energies(slow_param);
@@ -659,33 +596,34 @@ int main(int argc, char* argv[]){
                 }else{
                     slow_down = 1;
                 }
-                if (slow_down && dt>1E-4) {
+                if (slow_down && dt>1E-5) {
                     dt /= 2;
                     slowed_down = 1;
-                    cout<<"\nSlow Down, status: n_s = "<<net_status<<" m_s = "<<myosins_status<<" c_s = "<<crosslks_status<<endl;
+                    file_counts<<"\nt = " <<tcurr<<"\tSlow Down, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
                 } else {
-                    cout<<"\nEnergy exceeded, status: n_s = "<<net_status<<" m_s = "<<myosins_status<<" c_s = "<<crosslks_status<<endl;
+                    file_counts<<"\nt = " <<tcurr<<"\tEnergy exceeded, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
                 }
                 slow_down = 1;
                 //something has blown up, so we back up
-                net->set_dt(dt);
-                myosins->set_dt(dt);
-                crosslks->set_dt(dt);
-                //copy constructors//
-                old_actin_pos_vec = net_old->get_vecvec();
-                old_a_motor_pos_vec = myosins_old->get_vecvec();
-                old_p_motor_pos_vec = crosslks_old->get_vecvec();
+                // net->set_dt(dt);
+                // myosins->set_dt(dt);
+                // crosslks->set_dt(dt);
+                
+                // old_actin_pos_vec = net_old->get_vecvec();
+                // old_a_motor_pos_vec = myosins_old->get_vecvec();
+                // old_p_motor_pos_vec = crosslks_old->get_vecvec();
+                cout<<"t = "<<tcurr<<" back up to "<<t;
                 delete net;
-                net = new filament_ensemble(old_actin_pos_vec, {xrange, yrange}, {xgrid, ygrid}, dt,
+                net = new filament_ensemble(stored_actin_pos_vec, {xrange, yrange}, {xgrid, ygrid}, dt,
                     temperature, viscosity, link_length,
                     link_stretching_stiffness, fene_pct, link_bending_stiffness,
                     link_fracture_force, bnd_cnd);
                 delete myosins;
-                myosins = new motor_ensemble( old_a_motor_pos_vec, {xrange, yrange}, dt, temperature,
+                myosins = new motor_ensemble( stored_a_motor_pos_vec, {xrange, yrange}, dt, temperature,
                     a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
                     a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd, light_param);
                 delete crosslks;
-                crosslks = new motor_ensemble( old_p_motor_pos_vec, {xrange, yrange}, dt, temperature,
+                crosslks = new motor_ensemble( stored_p_motor_pos_vec, {xrange, yrange}, dt, temperature,
                     p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
                     p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
 
@@ -714,45 +652,49 @@ int main(int argc, char* argv[]){
             } else {
                 if (slowed_down) {
                     dt *= 1.5;
+                    net->set_dt(dt);
+                    myosins->set_dt(dt);
+                    crosslks->set_dt(dt);
                     slowed_down = 0;
                 }
                 if (net_status == 0 && myosins_status == 0 && crosslks_status == 0) {
-                    if (stable_checks>stable_thresh && dt<(tfinal/double(nmsgs*2)) && dt<8E-4){
+                    if (stable_checks>stable_thresh && dt<(tfinal/double(nmsgs*2)) && dt<get_upper_limit(tfinal, t)){
                         dt *= 1.1;
                         net->set_dt(dt);
                         myosins->set_dt(dt);
                         crosslks->set_dt(dt);
                         stable_checks = 0;
-                        cout<<"\nAll energies are low, speeding up now"<<endl;
+                        file_counts<<"\nt = "tcurr<<"\tAll energies are low, speeding up now";
                     }
                     stable_checks += 5;
                     
-                    cout<<"\nAll energies are low (no change)"<<endl;
+                    file_counts<<"\nAll energies are low (no change)";
                 } else {
-                    cout<<"No change in time step, non-relaxed state"<<endl;
+                    file_counts<<"\nNo change in time step, non-relaxed state";
                     stable_checks += 1;
                 }
 
-                curr_actin_pos_vec = net->get_vecvec();
-                curr_a_motor_pos_vec = myosins->get_vecvec();
-                curr_p_motor_pos_vec = crosslks->get_vecvec();
-                delete net_old;
-                net_old = new filament_ensemble(curr_actin_pos_vec, {xrange, yrange}, {xgrid, ygrid}, dt,
-                    temperature, viscosity, link_length,
-                    link_stretching_stiffness, fene_pct, link_bending_stiffness,
-                    link_fracture_force, bnd_cnd);
-                delete myosins_old;
-                myosins_old = new motor_ensemble(curr_a_motor_pos_vec, {xrange, yrange}, dt, temperature,
-                    a_motor_length, net_old, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
-                    a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd, light_param);
-                delete crosslks_old;
-                crosslks_old = new motor_ensemble( curr_p_motor_pos_vec, {xrange, yrange}, dt, temperature,
-                    p_motor_length, net_old, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
-                    p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
+                stored_actin_pos_vec = net->get_vecvec();
+                stored_a_motor_pos_vec = myosins->get_vecvec();
+                stored_p_motor_pos_vec = crosslks->get_vecvec();
+                // delete net_old;
+                // net_old = new filament_ensemble(curr_actin_pos_vec, {xrange, yrange}, {xgrid, ygrid}, dt,
+                //     temperature, viscosity, link_length,
+                //     link_stretching_stiffness, fene_pct, link_bending_stiffness,
+                //     link_fracture_force, bnd_cnd);
+                // delete myosins_old;
+                // myosins_old = new motor_ensemble(curr_a_motor_pos_vec, {xrange, yrange}, dt, temperature,
+                //     a_motor_length, net_old, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
+                //     a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd, light_param);
+                // delete crosslks_old;
+                // crosslks_old = new motor_ensemble( curr_p_motor_pos_vec, {xrange, yrange}, dt, temperature,
+                //     p_motor_length, net_old, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
+                //     p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
                 slow_down = 0;
                 int flush = 0;
                 for (unsigned int i = 0; i<time_past.size(); i++){
-                        
+                        cout<<"Wrote out t = "<<to_string(time_past[i]);
+
                         if (time_past[i]>tinit) time_str ="\n";
                         time_str += "t = "+to_string(time_past[i]);
 
@@ -780,7 +722,7 @@ int main(int argc, char* argv[]){
                             to_string(potential_energy_motors_past[i]) + "\t" + to_string(potential_energy_crosslks_past[i]) << endl;
                         //file_pe << net->get_stretching_energy()<<"\t"<<net->get_bending_energy()<<"\t"<<
                         //    myosins->get_potential_energy()<<"\t"<<crosslks->get_potential_energy()<<endl;
-                        file_counts<<time_past[i]<<"\t"<<(count_past[i+1]-count_past[i])<<"\t"<<(time_diff[i+1]-time_diff[i])<<endl;
+                        
                         flush = 1;
 
 
@@ -812,12 +754,13 @@ int main(int argc, char* argv[]){
                     file_counts<<std::flush;
                     flush = 0;
                 }
-                file_time<<t<<"\t"<<dt<<endl;
+                
             }
             //t5 = clock();
             //cout<<"\n Time for check = "<<(t4-t3)<<endl;
             //cout<<"\n Time for record = "<<(t5-t4)<<endl;
             //cout<<"\n DEBUG: time for this step = "<<(t5-t2)<<endl;
+            file_time<<t<<"\t"<<dt<<endl;
         }
         
 
