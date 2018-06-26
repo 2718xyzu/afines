@@ -23,7 +23,8 @@ ostream& operator<<(ostream& os, const vector<T>& v)
 
 //main method
 int main(int argc, char* argv[]){
-    boost::random_device rd;
+    random_device rd;
+    cout<<rd();
     clock_t t1,t2,t3,t4,t5;
     t1=clock();
     t3 = clock();

@@ -365,7 +365,7 @@ int filament_ensemble::check_energies(int slow_down){
                 status = 2;
                 relax = 0;
             }
-            if (one_force > 2) relax = 0;
+            if (one_force > link_k*link_ld) relax = 0;
         }
         //pe += n_motors[m]->get_stretching_energy_fene();
     }
