@@ -91,9 +91,7 @@ int main(int argc, char* argv[]){
     int slowed_down = 0;
     int slow_param = 0;
     int stable_checks = 0;
-    int stable_thresh;
-    if (stable_checks == 1) stable_thresh = 100000;
-    else stable_thresh = round(100000/stable_checks);
+    double stable_thresh;
 
     // Options allowed only on command line
     po::options_description generic("Generic options");
@@ -496,6 +494,10 @@ int main(int argc, char* argv[]){
     vector<double> count_diff, count_past;
     count_past.push_back(0);
     time_diff.push_back(0);
+    if (stable_checks == 1) stable_thresh = 250000;
+    else{
+        stable_thresh = ceil(double(250000/stable_checks));
+    }
 
     while (t <= tfinal) {
 
