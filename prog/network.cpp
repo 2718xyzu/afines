@@ -494,10 +494,14 @@ int main(int argc, char* argv[]){
     vector<double> count_diff, count_past;
     count_past.push_back(0);
     time_diff.push_back(0);
-    if (stable_checks == 1) stable_thresh = 250000;
-    else{
-        stable_thresh = ceil(double(250000/stable_checks));
+    if (check_steps == 1) stable_thresh = 250000;
+    else if(check_steps > 0) {
+        stable_thresh = ceil(double(250000/check_steps));
     }
+    else{
+        stable_thresh = 1E20;
+    }
+    
 
     while (t <= tfinal) {
 
