@@ -381,7 +381,6 @@ int main(int argc, char* argv[]){
     t4 = clock();
     cout<<"\nCreating actin network."<<endl;
     filament_ensemble * net;
-    filament_ensemble * net_old;
     if (actin_pos_vec.size() == 0 && actin_in.size() == 0){
         net = new filament_ensemble(npolymer, nmonomer, nmonomer_extra, extra_bead_prob, {xrange, yrange}, {xgrid, ygrid}, dt,
                 temperature, actin_length, viscosity, link_length, actin_position_arrs, link_stretching_stiffness, fene_pct, link_bending_stiffness,
@@ -403,13 +402,9 @@ int main(int argc, char* argv[]){
     if (link_intersect_flag) p_motor_pos_vec = net->link_link_intersections(p_motor_length, p_linkage_prob);
     if (motor_intersect_flag) a_motor_pos_vec = net->link_link_intersections(a_motor_length, a_linkage_prob);
     if (quad_off_flag) net->turn_quads_off();
-    if (link_intersect_flag) p_motor_pos_vec = net_old->link_link_intersections(p_motor_length, p_linkage_prob);
-    if (motor_intersect_flag) a_motor_pos_vec = net_old->link_link_intersections(a_motor_length, a_linkage_prob);
-    if (quad_off_flag) net_old->turn_quads_off();
 
     cout<<"\nAdding active motors...";
     motor_ensemble * myosins;
-    motor_ensemble * myosins_old;
 
     if (a_motor_pos_vec.size() == 0 && a_motor_in.size() == 0){
         myosins = new motor_ensemble( a_motor_density, {xrange, yrange}, dt, temperature,
@@ -431,7 +426,6 @@ int main(int argc, char* argv[]){
 
     cout<<"Adding passive motors (crosslinkers) ...\n";
     motor_ensemble * crosslks;
-    motor_ensemble * crosslks_old;
 
     if(p_motor_pos_vec.size() == 0 && p_motor_in.size() == 0){
         crosslks = new motor_ensemble( p_motor_density, {xrange, yrange}, dt, temperature,
@@ -658,13 +652,13 @@ int main(int argc, char* argv[]){
                     slowed_down = 0;
                 }
                 if (net_status == 0 && myosins_status == 0 && crosslks_status == 0) {
-                    if (stable_checks>stable_thresh && dt<(tfinal/double(nmsgs*2)) && dt<get_upper_limit(tfinal, t)){
+                    if (stable_checks>stable_thresh && dt<(tfinal/double(nmsgs*2)) && dt<get_upper_dt(tfinal, t)){
                         dt *= 1.1;
                         net->set_dt(dt);
                         myosins->set_dt(dt);
                         crosslks->set_dt(dt);
                         stable_checks = 0;
-                        file_counts<<"\nt = "tcurr<<"\tAll energies are low, speeding up now";
+                        file_counts<<"\nt = "<<tcurr<<"\tAll energies are low, speeding up now";
                     }
                     stable_checks += 5;
                     

@@ -355,7 +355,7 @@ void filament_ensemble::update_energies(){
 int filament_ensemble::check_energies(int slow_down){
     int status = 1;
     int relax = 1;
-    double cutoff_force = 2 * stretching * link_len;
+    double cutoff_force = 2 * link_k * link_ld;
     for (unsigned int m = 0; m < network.size(); m++)
     {
         for (int i = 0; i < network[m]->get_nactins(); i++){ 
@@ -612,6 +612,7 @@ filament_ensemble::filament_ensemble(int npolymer, int nactins_min, int nactins_
     
     visc=vis;
     link_ld = link_len;
+    link_k = stretching;
     dt = delta_t;
     temperature = temp;
     shear_stop = 1e10;
@@ -678,6 +679,7 @@ filament_ensemble::filament_ensemble(double density, array<double,2> myfov, arra
     
     visc=vis;
     link_ld = link_len;
+    link_k = stretching;
     int npolymer=int(ceil(density*fov[0]*fov[1]) / nactins);
     dt = delta_t;
     temperature = temp;
@@ -736,6 +738,7 @@ filament_ensemble::filament_ensemble(vector<vector<double> > actins, array<doubl
 
     visc=vis;
     link_ld = link_len;
+    link_k = stretching;
     dt = delta_t;
     temperature = temp;
     t = 0;
