@@ -23,7 +23,7 @@ ostream& operator<<(ostream& os, const vector<T>& v)
 
 //main method
 int main(int argc, char* argv[]){
-
+    boost::random_device rd;
     clock_t t1,t2,t3,t4,t5;
     t1=clock();
     t3 = clock();
@@ -179,7 +179,7 @@ int main(int argc, char* argv[]){
         ("restart_time", po::value<double>(&restart_time)->default_value(-1), "time to restart simulation from")
 
         ("dir", po::value<string>(&dir)->default_value("."), "output directory")
-        ("myseed", po::value<int>(&myseed)->default_value(time(NULL)), "Random number generator myseed")
+        ("myseed", po::value<int>(&myseed)->default_value(time(NULL)+rd()), "Random number generator myseed")
 
         ("link_intersect_flag", po::value<bool>(&link_intersect_flag)->default_value(false), "flag to put a cross link at all filament intersections")
         ("motor_intersect_flag", po::value<bool>(&motor_intersect_flag)->default_value(false), "flag to put a motor at all filament intersections")
@@ -494,9 +494,10 @@ int main(int argc, char* argv[]){
     vector<double> count_diff, count_past;
     count_past.push_back(0);
     time_diff.push_back(0);
-    if (check_steps == 1) stable_thresh = 250000;
+
+    if (check_steps == 1) stable_thresh = 25000;
     else if(check_steps > 0) {
-        stable_thresh = ceil(double(250000/check_steps));
+        stable_thresh = ceil(double(25000/check_steps));
     }
     else{
         stable_thresh = 1E20;
@@ -596,7 +597,7 @@ int main(int argc, char* argv[]){
                 }else{
                     slow_down = 1;
                 }
-                if (slow_down && dt>1E-5) {
+                if (slow_down && dt>6E-5) {
                     dt /= 2;
                     slowed_down = 1;
                     file_counts<<"\nt = " <<tcurr<<"\tSlow Down, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
