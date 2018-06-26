@@ -491,10 +491,9 @@ int main(int argc, char* argv[]){
 
     vector<string> actins_past, links_past, time_str_past, motors_past, crosslks_past, thermo_past, pe_past;
     vector<double> stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
-    vector<double> time_past, time_diff;
+    vector<double> time_past;
     vector<double> count_diff, count_past;
-    count_past.push_back(0);
-    time_diff.push_back(0);
+    // count_past.push_back(0);
 
     if (check_steps == 1) stable_thresh = 25000;
     else if(check_steps > 0) {
@@ -562,7 +561,7 @@ int main(int argc, char* argv[]){
            cout<<"Time recording = "<<print_times.back()<<endl;
         
             time_past.push_back(t);
-            count_diff.push_back((count-count_past.back()));
+            // count_diff.push_back((count-count_past.back()));
             count_past.push_back(count);
             actins_past.push_back(net->string_actins());
             links_past.push_back(net->string_links());
@@ -589,7 +588,7 @@ int main(int argc, char* argv[]){
             int myosins_status = myosins->check_energies(slow_param);
             int crosslks_status = crosslks->check_energies(slow_param);
             //t4 = clock();
-            if (net_status == 2 || myosins_status == 2 || crosslks_status == 2) {
+            if ((net_status == 2 || myosins_status == 2 || crosslks_status == 2) && slowed_down<2 ) {
                 t -= check_steps * dt;
                 count -= check_steps;
                 stable_checks = 0;
@@ -598,10 +597,14 @@ int main(int argc, char* argv[]){
                 }else{
                     slow_down = 1;
                 }
-                if (slow_down && dt>6E-5) {
+                if (slow_down && dt>5E-5) {
                     dt /= 2;
                     slowed_down = 1;
                     file_counts<<"\nt = " <<tcurr<<"\tSlow Down, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
+                } else if(slow_down){
+                    dt /= 2;
+                    slowed_down = 2;
+                    file_counts<<"\nt = " <<tcurr<<"\tSlow Down (floor), status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
                 } else {
                     file_counts<<"\nt = " <<tcurr<<"\tEnergy exceeded, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
                 }
@@ -637,9 +640,8 @@ int main(int argc, char* argv[]){
                 time_past.clear();
                 count_diff.clear();
                 count_past.clear();
-                count_past.push_back(count);
-                time_diff.clear();
-                time_diff.push_back(t);
+                // count_past.push_back(count);
+
                 actins_past.clear();
                 links_past.clear();
                 motors_past.clear();
@@ -652,8 +654,14 @@ int main(int argc, char* argv[]){
 
                 
             } else {
-                if (slowed_down) {
+                if (slowed_down==1) {
                     dt *= 1.5;
+                    net->set_dt(dt);
+                    myosins->set_dt(dt);
+                    crosslks->set_dt(dt);
+                    slowed_down = 0;
+                }else if(slowed_down==2){
+                    dt *= 2;
                     net->set_dt(dt);
                     myosins->set_dt(dt);
                     crosslks->set_dt(dt);
@@ -695,6 +703,7 @@ int main(int argc, char* argv[]){
                 slow_down = 0;
                 int flush = 0;
                 for (unsigned int i = 0; i<time_past.size(); i++){
+                    // if (count_past[i]<(count-check_steps-100)){
                         cout<<"Wrote out t = "<<to_string(time_past[i]);
 
                         if (time_past[i]>tinit) time_str ="\n";
@@ -728,14 +737,16 @@ int main(int argc, char* argv[]){
                         flush = 1;
 
 
+                    // }
+
                 }
                 if (flush) {
                     time_past.clear();
                     count_diff.clear();
                     count_past.clear();
-                    count_past.push_back(count);
-                    time_diff.clear();
-                    time_diff.push_back(t);
+                    // count_past.push_back(count);
+                    // time_diff.clear();
+                    // time_diff.push_back(t);
                     actins_past.clear();
                     links_past.clear();
                     motors_past.clear();
