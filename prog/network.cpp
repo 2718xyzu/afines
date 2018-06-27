@@ -468,11 +468,14 @@ int main(int argc, char* argv[]){
         stable_thresh = 1E20;
     }
     
-    for (int i = 0; i<butterfly; i++){ //Initialize a simulation with the same parameters but a different initial random number
-        int j = rng_n(0,1);
-        cout<<"butterfly = "<<butterfly<<endl; 
+    if (butterfly>0){
+        double butterfly_effect = 0;
+        for (int i = 0; i<butterfly; i++){
+            butterfly_effect = rng_n(0,1);
+        }
+        butterfly_effect = butterfly_effect + butterfly;
     }
-
+    
     while (t <= tfinal) {
 
         
