@@ -773,6 +773,18 @@ double get_upper_dt(double tfinal,double t){
     return upper_dt;
 }
 
+vector<double> gen_print_times(tfinal, nframes){
+    vector<double> print_times_temp;
+    double bw_print_interval = tfinal/nframes;
+    for (double time_of_print = 0; time_of_print<(tfinal+1); time_of_print+=bw_print_interval){
+        print_times_temp.push_back(time_of_print);
+    }
+    for (int i = print_times_temp.size()-1; i>=0; i--){
+        print_times.push_back(print_times_temp[i]);
+    }
+    return print_times;
+}
+
 template int sgn<int>(int);
 template int sgn<double>(double);
 template int sgn<float>(float);
