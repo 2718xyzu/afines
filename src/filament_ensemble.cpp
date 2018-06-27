@@ -355,7 +355,7 @@ void filament_ensemble::update_energies(){
 int filament_ensemble::check_energies(int slow_down){
     int status = 1;
     int relax = 1;
-    double cutoff_force = 2 * link_k * link_ld;
+    double cutoff_force = 40 * link_k * link_ld;
     for (unsigned int m = 0; m < network.size(); m++)
     {
         for (int i = 0; i < network[m]->get_nactins(); i++){ 
@@ -363,9 +363,10 @@ int filament_ensemble::check_energies(int slow_down){
             double one_force = hypot(force_vec[0],force_vec[1]);
             if (one_force>cutoff_force){
                 status = 2;
+                cout<<one_force<<endl;
                 relax = 0;
             }
-            if (one_force > link_k*link_ld) relax = 0;
+            if (one_force > 4*link_k*link_ld) relax = 0;
         }
         //pe += n_motors[m]->get_stretching_energy_fene();
     }

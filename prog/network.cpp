@@ -93,6 +93,7 @@ int main(int argc, char* argv[]){
     int slow_param = 0;
     int stable_checks = 0;
     double stable_thresh;
+    int butterfly;
 
     // Options allowed only on command line
     po::options_description generic("Generic options");
@@ -202,6 +203,7 @@ int main(int argc, char* argv[]){
         ("light_radius", po::value<double>(&light_radius)->default_value(6.25), "Radius outside of which motors are turned off")
 
         ("check_steps", po::value<int>(&check_steps)->default_value(100), "Number of loop iterations over which backtracking occurs")
+        ("butterfly", po::value<int>(&butterfly)->default_value(0), "Number of random numbers to generate before simulation begins")
         ;
 
     //Hidden options, will be allowed both on command line and
@@ -350,7 +352,6 @@ int main(int argc, char* argv[]){
     set_seed(myseed);
 
 
-
     //const char* path = _filePath.c_str();
 
 
@@ -495,14 +496,18 @@ int main(int argc, char* argv[]){
     vector<double> count_diff, count_past;
     // count_past.push_back(0);
 
-    if (check_steps == 1) stable_thresh = 25000;
+    if (check_steps == 1) stable_thresh = 10000;
     else if(check_steps > 0) {
-        stable_thresh = ceil(double(25000/check_steps));
+        stable_thresh = ceil(double(10000/check_steps));
     }
     else{
         stable_thresh = 1E20;
     }
     
+    for (int i = 0; i<butterfly; i++){ //Initialize a simulation with the same parameters but a different initial random number
+        int j = rng_n(0,1);
+        cout<<"butterfly = "<<butterfly<<endl; 
+    }
 
     while (t <= tfinal) {
 
@@ -560,7 +565,7 @@ int main(int argc, char* argv[]){
            cout<<"attempt to record"<<endl;
            cout<<"Time recording = "<<print_times.back()<<endl;
         
-            time_past.push_back(t);
+            time_past.push_back(print_times.back());
             // count_diff.push_back((count-count_past.back()));
             count_past.push_back(count);
             actins_past.push_back(net->string_actins());
@@ -597,7 +602,7 @@ int main(int argc, char* argv[]){
                 }else{
                     slow_down = 1;
                 }
-                if (slow_down && dt>5E-5) {
+                if (slow_down && dt>6E-5) {
                     dt /= 2;
                     slowed_down = 1;
                     file_counts<<"\nt = " <<tcurr<<"\tSlow Down, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
@@ -617,7 +622,7 @@ int main(int argc, char* argv[]){
                 // old_actin_pos_vec = net_old->get_vecvec();
                 // old_a_motor_pos_vec = myosins_old->get_vecvec();
                 // old_p_motor_pos_vec = crosslks_old->get_vecvec();
-                cout<<"t = "<<tcurr<<" back up to "<<t;
+                cout<<"t = "<<tcurr<<" back up to "<<t<<endl;
                 delete net;
                 net = new filament_ensemble(stored_actin_pos_vec, {xrange, yrange}, {xgrid, ygrid}, dt,
                     temperature, viscosity, link_length,
@@ -704,7 +709,7 @@ int main(int argc, char* argv[]){
                 int flush = 0;
                 for (unsigned int i = 0; i<time_past.size(); i++){
                     // if (count_past[i]<(count-check_steps-100)){
-                        cout<<"Wrote out t = "<<to_string(time_past[i]);
+                        cout<<"Wrote out t = "<<to_string(time_past[i])<<endl;
 
                         if (time_past[i]>tinit) time_str ="\n";
                         time_str += "t = "+to_string(time_past[i]);
