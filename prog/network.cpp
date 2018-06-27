@@ -28,7 +28,7 @@ int main(int argc, char* argv[]){
      * VARIABLES           *
      **********************/
 
-    int myseed;
+    int myseed, butterfly;
 
     // Space
     double xrange, yrange;
@@ -189,6 +189,7 @@ int main(int argc, char* argv[]){
         ("osc_strain_flag", po::value<bool>(&osc_strain_flag)->default_value(false), "flag to turn on oscillatory differential strain")
         ("light_act", po::value<bool>(&light_act)->default_value(false), "Flag to turn on a circle of light activation, where motors can walk only in the light")
         ("light_radius", po::value<double>(&light_radius)->default_value(6.25), "Radius outside of which motors are turned off")
+        ("butterfly", po::value<int>(&butterfly)->default_value(0), "Integer to change random seed systematically")
         ;
 
     //Hidden options, will be allowed both on command line and
@@ -421,6 +422,14 @@ int main(int argc, char* argv[]){
         cout<<"\nDEBUG: t = "<<t<<"; adding pre_strain of "<<pre_strain<<" um here";
         net->update_delrx( pre_strain );
         net->update_shear();
+    }
+
+    if (butterfly>0){
+        double butterfly_effect = 0;
+        for (int i = 0; i<butterfly; i++){
+            butterfly_effect = rng_n(0,1);
+        }
+        butterfly_effect = butterfly_effect + butterfly;
     }
 
     while (t <= tfinal) {
