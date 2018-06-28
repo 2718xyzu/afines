@@ -83,7 +83,7 @@ int main(int argc, char* argv[]){
     bool restart;
     double restart_time;
 
-    bool light_act;
+    bool light_act, variable_dt;
     double light_radius;
     int check_steps;
     int slow_down = 0; //
@@ -200,6 +200,7 @@ int main(int argc, char* argv[]){
         ("light_act", po::value<bool>(&light_act)->default_value(false), "Flag to turn on a circle of light activation, where motors can walk only in the light")
         ("light_radius", po::value<double>(&light_radius)->default_value(6.25), "Radius outside of which motors are turned off")
 
+        ("variable_dt", po::value<bool>(&variable_dt)->default_value(false), "flag to turn on variable timestep implementation")
         ("check_steps", po::value<int>(&check_steps)->default_value(100), "Number of loop iterations over which backtracking occurs")
         ("butterfly", po::value<int>(&butterfly)->default_value(0), "Number of random numbers to generate before simulation begins")
         ;
@@ -249,14 +250,7 @@ int main(int argc, char* argv[]){
     array<double, 2> light_param = {double(light_act), light_radius};
     int n_bw_stdout = max(int((tfinal)/(dt*double(nmsgs))),1);
     int n_bw_print  = max(int((tfinal)/(dt*double(nframes))),1);
-    //double next_bw_print = 0;
-    //double previous_bw_print = 0;
-    // double bw_print_interval = tfinal/nframes;
-    vector<double> print_times = gen_print_times(tfinal, nframes);
-    check_steps = max(min(check_steps, n_bw_print),1);
-    // double dt = dt;
 
-    //int unprinted_count = int(double(tinit)/dt);
 
     tdir   = dir  + "/txt_stack";
     ddir   = dir  + "/data";
@@ -268,8 +262,6 @@ int main(int argc, char* argv[]){
     pmfile = tdir + "/pmotors.txt";
     thfile = ddir + "/filament_e.txt";
     pefile = ddir + "/pe.txt";
-    tfile  = ddir + "/time.txt";
-    cfile =  ddir + "/avg_count.txt";
 
     if(fs::create_directory(dir1)) cerr<< "Directory Created: "<<afile<<std::endl;
     if(fs::create_directory(dir2)) cerr<< "Directory Created: "<<thfile<<std::endl;
@@ -287,7 +279,7 @@ int main(int argc, char* argv[]){
     // To get positions from input files:
     vector<vector<double> > actin_pos_vec;
     vector<vector<double> > a_motor_pos_vec, p_motor_pos_vec; 
-    vector<vector<double> > stored_actin_pos_vec, stored_a_motor_pos_vec, stored_p_motor_pos_vec;
+
 
     if (actin_in.size() > 0)
         actin_pos_vec   = file2vecvec(actin_in, "\t");
@@ -347,8 +339,7 @@ int main(int argc, char* argv[]){
     file_pm.open(pmfile.c_str(), write_mode);
 	file_th.open(thfile.c_str(), write_mode);
 	file_pe.open(pefile.c_str(), write_mode);
-    file_time.open(tfile.c_str(), write_mode);
-    file_counts.open(cfile.c_str(), write_mode);
+
 
 
     // DERIVED QUANTITIES :
@@ -409,9 +400,32 @@ int main(int argc, char* argv[]){
                 p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
     }
 
-    stored_actin_pos_vec = net->get_vecvec();
-    stored_a_motor_pos_vec = myosins->get_vecvec();
-    stored_p_motor_pos_vec = crosslks->get_vecvec();
+    if (variable_dt == 1){
+        vector<double> print_times = gen_print_times(tfinal, nframes);
+        check_steps = max(min(check_steps, n_bw_print),1);
+        dt_var var_dt = dt_var(tfinal, nmsgs, check_steps, file_counts);
+        vector<vector<double> > stored_actin_pos_vec, stored_a_motor_pos_vec, stored_p_motor_pos_vec;
+        stored_actin_pos_vec = net->get_vecvec();
+        stored_a_motor_pos_vec = myosins->get_vecvec();
+        stored_p_motor_pos_vec = crosslks->get_vecvec();
+        vector<string> actins_past, links_past, time_str_past, motors_past, crosslks_past, thermo_past, pe_past;
+        vector<double> stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
+        vector<double> time_past;
+        vector<double> count_diff, count_past;
+        int crosslks_status = 0;
+        int myosins_status = 0;
+        int net_status = 0;
+        if(check_steps == 0) {
+            cout<<"WARNING: check_steps cannot be 0 if you are using a variable dt; setting to default (100)"<<endl;
+            check_steps = 100;
+        }
+        stable_thresh = ceil(double(10000/check_steps));
+        file_time.open(tfile.c_str(), write_mode);
+        file_counts.open(cfile.c_str(), write_mode);
+        tfile  = ddir + "/time.txt";
+        cfile =  ddir + "/avg_count.txt";
+    }
+
 
     if (p_dead_head_flag) crosslks->kill_heads(p_dead_head);
 
@@ -454,22 +468,11 @@ int main(int argc, char* argv[]){
         net->update_shear();
     }
 
-    vector<string> actins_past, links_past, time_str_past, motors_past, crosslks_past, thermo_past, pe_past;
-    vector<double> stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
-    vector<double> time_past;
-    vector<double> count_diff, count_past;
-    int crosslks_status = 0;
-    int myosins_status = 0;
-    int net_status = 0;
+
     // count_past.push_back(0);
 
-    if (check_steps == 1) stable_thresh = 10000;
-    else if(check_steps > 0) {
-        stable_thresh = ceil(double(10000/check_steps));
-    }
-    else{
-        stable_thresh = 1E20;
-    }
+
+
     
     if (butterfly>0){
         double butterfly_effect = 0;
@@ -481,7 +484,42 @@ int main(int argc, char* argv[]){
     
     while (t <= tfinal) {
 
-        
+        if (t+dt/100 >= tinit && (count-unprinted_count)%n_bw_print==0 && !variable_dt) {
+
+            if (t>tinit) time_str ="\n";
+            time_str += "t = "+to_string(t);
+
+            file_a << time_str<<"\tN = "<<to_string(net->get_nactins());
+            net->write_actins(file_a);
+
+            file_l << time_str<<"\tN = "<<to_string(net->get_nlinks());
+            net->write_links(file_l);
+
+            file_am << time_str<<"\tN = "<<to_string(myosins->get_nmotors());
+            myosins->motor_write(file_am);
+
+            file_pm << time_str<<"\tN = "<<to_string(crosslks->get_nmotors());
+            crosslks->motor_write(file_pm);
+
+            file_th << time_str<<"\tN = "<<to_string(net->get_nfilaments());
+
+            net->write_thermo(file_th);
+
+            file_pe << net->get_stretching_energy()<<"\t"<<net->get_bending_energy()<<"\t"<<
+                myosins->get_potential_energy()<<"\t"<<crosslks->get_potential_energy()<<endl;
+
+            file_a<<std::flush;
+            file_l<<std::flush;
+            file_am<<std::flush;
+            file_pm<<std::flush;
+            file_th<<std::flush;
+            file_pe<<std::flush;
+
+		}
+
+
+
+
         //print time count
         if (time_of_strain!=0 && close(t, time_of_strain, dt/(10*time_of_strain))){
             //Perform the shear here

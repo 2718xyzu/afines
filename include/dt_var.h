@@ -26,9 +26,9 @@ class dt_var
         dt_var::update_dt_var(double& t, );
 
     public:
-        double tcurr;
-        int slow_param, net_status, myosins_status, crosslks_status, stable_checks, 
-        stable_thresh, slow_down, slowed_down;
+        double tcurr, stable_thresh;
+        int slow_param, net_status, myosins_status, crosslks_status, stable_checks,
+         slow_down, slowed_down;
     
 };
 
