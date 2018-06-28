@@ -23,12 +23,14 @@
 class dt_var
 {
     public:
-        dt_var::update_dt_var(double& t, );
+        dt_var(double final_time, int num_msgs, int chk_steps,  ostream& account_file);
+        int update_dt_var(double& t, double& dt, int net_status, int myosins_status, int crosslks_status);
 
     public:
-        double tcurr, stable_thresh;
+        double tcurr, stable_thresh, tfinal;
         int slow_param, net_status, myosins_status, crosslks_status, stable_checks,
-         slow_down, slowed_down;
+         slow_down, slowed_down, nmsgs, check_steps;
+        ostream& file_counts;
     
 };
 

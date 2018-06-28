@@ -1,5 +1,6 @@
 #include "filament_ensemble.h"
 #include "motor_ensemble.h"
+#include "dt_var.h"
 #include "globals.h"
 #include "time.h"
 
@@ -400,30 +401,33 @@ int main(int argc, char* argv[]){
                 p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
     }
 
+
+    vector<double> print_times;
+    vector<vector<double> > stored_actin_pos_vec, stored_a_motor_pos_vec, stored_p_motor_pos_vec;
+    vector<string> actins_past, links_past, time_str_past, motors_past, crosslks_past, thermo_past, pe_past;
+    vector<double> stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
+    vector<double> time_past;
+    vector<double> count_diff, count_past;
+    int crosslks_status = 0;
+    int myosins_status = 0;
+    int net_status = 0;
+
     if (variable_dt == 1){
-        vector<double> print_times = gen_print_times(tfinal, nframes);
-        check_steps = max(min(check_steps, n_bw_print),1);
-        dt_var var_dt = dt_var(tfinal, nmsgs, check_steps, file_counts);
-        vector<vector<double> > stored_actin_pos_vec, stored_a_motor_pos_vec, stored_p_motor_pos_vec;
-        stored_actin_pos_vec = net->get_vecvec();
-        stored_a_motor_pos_vec = myosins->get_vecvec();
-        stored_p_motor_pos_vec = crosslks->get_vecvec();
-        vector<string> actins_past, links_past, time_str_past, motors_past, crosslks_past, thermo_past, pe_past;
-        vector<double> stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
-        vector<double> time_past;
-        vector<double> count_diff, count_past;
-        int crosslks_status = 0;
-        int myosins_status = 0;
-        int net_status = 0;
         if(check_steps == 0) {
             cout<<"WARNING: check_steps cannot be 0 if you are using a variable dt; setting to default (100)"<<endl;
             check_steps = 100;
         }
         stable_thresh = ceil(double(10000/check_steps));
-        file_time.open(tfile.c_str(), write_mode);
-        file_counts.open(cfile.c_str(), write_mode);
+        dt_var var_dt = dt_var(tfinal, nmsgs, check_steps, file_counts);
         tfile  = ddir + "/time.txt";
         cfile =  ddir + "/avg_count.txt";
+        file_time.open(tfile.c_str(), write_mode);
+        file_counts.open(cfile.c_str(), write_mode);
+        check_steps = max(min(check_steps, n_bw_print),1);
+        stored_actin_pos_vec = net->get_vecvec();
+        stored_a_motor_pos_vec = myosins->get_vecvec();
+        stored_p_motor_pos_vec = crosslks->get_vecvec();
+        print_times = gen_print_times(tfinal, nframes);
     }
 
 
