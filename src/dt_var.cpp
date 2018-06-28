@@ -8,20 +8,21 @@
 
 
 #include "globals.h"
+#include "dt_var.h"
 #include "vector"
 
-void dt_var::dt_var(double final_time, int num_msgs, int chk_steps,  ostream& account_file){ 
+dt_var::dt_var(double final_time, int num_msgs, int chk_steps){ 
 
     tfinal = final_time;
     nmsgs = num_msgs;
     check_steps = chk_steps;
-    file_counts = account_file;
 
 }
 
 
-int dt_var::update_dt_var(double& t, double& dt, int net_status, int myosins_status, int crosslks_status){
-
+int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int myosins_status, 
+    int crosslks_status, ostream& file_counts){
+    int returned_int;
     tcurr = t;
     slow_param = 0;
     if ((net_status == 2 || myosins_status == 2 || crosslks_status == 2) && slowed_down<2 ) {
@@ -71,8 +72,9 @@ int dt_var::update_dt_var(double& t, double& dt, int net_status, int myosins_sta
         slow_down = 0;
                 
             } 
-        return returned_int;
-    }
+        
+    return returned_int;
+}
 
 // void dt_var::say_my_name(){
 //     returned_int = var_dt.update_dt_var(&t, &dt, net_status, myosins_status, crosslks_status);

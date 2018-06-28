@@ -94,6 +94,8 @@ int main(int argc, char* argv[]){
     double stable_thresh;
     int butterfly;
 
+    int unprinted_count = 0; //Where did this variable go?!?!?!?
+
     // Options allowed only on command line
     po::options_description generic("Generic options");
     generic.add_options()
@@ -418,7 +420,7 @@ int main(int argc, char* argv[]){
             check_steps = 100;
         }
         stable_thresh = ceil(double(10000/check_steps));
-        dt_var var_dt = dt_var(tfinal, nmsgs, check_steps, file_counts);
+        dt_var var_dt = dt_var(tfinal, nmsgs, check_steps);
         tfile  = ddir + "/time.txt";
         cfile =  ddir + "/avg_count.txt";
         file_time.open(tfile.c_str(), write_mode);
