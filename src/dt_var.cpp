@@ -11,12 +11,13 @@
 #include "dt_var.h"
 #include "vector"
 
-dt_var::dt_var(double final_time, int num_msgs, int chk_steps){ 
+dt_var::dt_var(double final_time, int num_msgs, int chk_steps, double stable_threshold){ 
 
     tfinal = final_time;
     nmsgs = num_msgs;
     check_steps = chk_steps;
-
+    stable_checks = 0;
+    stable_thresh = stable_threshold;
 }
 
 
@@ -29,7 +30,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         t -= check_steps * dt;
         count -= check_steps;
         stable_checks = 0;
-        if (net_status==0 && crosslks_status==0 && slow_down == 0){
+        if (net_status+myosins_status+crosslks_status<3 && slow_down == 0){ 
             slow_down = 0;
         }else{
             slow_down = 1;
@@ -50,6 +51,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         cout<<"t = "<<tcurr<<" back up to "<<t<<endl;
         returned_int = 1;
     } else {
+        returned_int = 2;
         if (slowed_down==1) {
             dt *= 1.5;
             slowed_down = 0;
@@ -158,13 +160,13 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
 //     file_time<<t<<"\t"<<dt<<endl;
 // }
 
-void dt_var::clear_all(vector<string> &time_past, vector<string> &count_diff, vector<string> &count_past,
+void dt_var::clear_all(vector<double> &time_past, vector<double> &count_past,
     vector<string> &actins_past, vector<string> &links_past, vector<string> &motors_past, vector<string> &crosslks_past,
     vector<string> &thermo_past, vector<double> &stretching_energy_past, vector<double> &bending_energy_past, 
     vector<double> &potential_energy_motors_past,vector<double> &potential_energy_crosslks_past){
 
     time_past.clear();
-    count_diff.clear();
+    // count_diff.clear();
     count_past.clear();
     actins_past.clear();
     links_past.clear();

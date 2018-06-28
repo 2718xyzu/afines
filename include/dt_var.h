@@ -23,12 +23,12 @@
 class dt_var
 {
     public:
-        dt_var(double final_time, int num_msgs, int chk_steps);
+        dt_var(double final_time, int num_msgs, int chk_steps, double stable_threshold);
 
         int update_dt_var(double& t, double& dt, int& count, int net_status, int myosins_status, int crosslks_status, 
             ostream& account_file);
 
-        void clear_all(vector<string> &time_past, vector<string> &count_diff, vector<string> &count_past,
+        void clear_all(vector<double> &time_past, vector<double> &count_past,
             vector<string> &actins_past, vector<string> &links_past, vector<string> &motors_past, vector<string> &crosslks_past,
             vector<string> &thermo_past, vector<double> &stretching_energy_past, vector<double> &bending_energy_past, 
             vector<double> &potential_energy_motors_past,vector<double> &potential_energy_crosslks_past);
