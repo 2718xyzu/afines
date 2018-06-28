@@ -175,6 +175,8 @@ class filament_ensemble
 
         int check_energies(int slow_down);
 
+        int check_link_energies(int slow_down);
+
         void set_dt(double dt_var);
 
         vector<vector<double > > get_vecvec();

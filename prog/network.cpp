@@ -458,6 +458,9 @@ int main(int argc, char* argv[]){
     vector<double> stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
     vector<double> time_past;
     vector<double> count_diff, count_past;
+    int crosslks_status = 0;
+    int myosins_status = 0;
+    int net_status = 0;
     // count_past.push_back(0);
 
     if (check_steps == 1) stable_thresh = 10000;
@@ -545,12 +548,16 @@ int main(int argc, char* argv[]){
 		count++;
         total_count++;
 
-        
+        net_status = max(net_status, net->check_link_energies(slow_param));
+        myosins_status = max(myosins_status, myosins->check_energies(slow_param));
+        crosslks_status = max(crosslks_status,crosslks->check_energies(slow_param));
+
+
         if (count%check_steps == 0){ 
             double tcurr = t;
-            int net_status = net->check_energies(slow_param);
-            int myosins_status = myosins->check_energies(slow_param);
-            int crosslks_status = crosslks->check_energies(slow_param);
+            // int net_status = net->check_link_energies(slow_param);
+            // int myosins_status = myosins->check_energies(slow_param);
+            // int crosslks_status = crosslks->check_energies(slow_param);
             if ((net_status == 2 || myosins_status == 2 || crosslks_status == 2) && slowed_down<2 ) {
                 t -= check_steps * dt;
                 count -= check_steps;
@@ -709,6 +716,9 @@ int main(int argc, char* argv[]){
             }
 
             file_time<<t<<"\t"<<dt<<endl;
+            net_status = 0;
+            myosins_status = 0; 
+            crosslks_status = 0;
         }
         
 
