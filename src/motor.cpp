@@ -205,8 +205,8 @@ motor::motor( array<double, 4> pos,
         ldir_bind[1] = actin_network->get_direction(f_index[1], l_index[1]);
     }
 
-    prv_rnd_x = {0,0};
-    prv_rnd_y = {0,0};
+    prv_rnd_x = {rng_n(0,1),rng_n(0,1)};
+    prv_rnd_y = {rng_n(0,1),rng_n(0,1)};
 
 }
 

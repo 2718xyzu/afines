@@ -89,9 +89,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         }
         else test_check = 1;
 
-
-
-    }else if(abs(test_check) ==2){
+    }else if(abs(test_check) == 2){
         dt = dtcurr;
         count = countcurr;
         t = tcurr;
@@ -102,8 +100,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
             dt /= 2;
             slowed_down = 2;
             test_check = -2;
-        }
-        else test_check = 2;
+        }else test_check = 2;
 
     }else if(test_check == 3){
         dt = dtcurr;

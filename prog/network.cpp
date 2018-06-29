@@ -207,6 +207,9 @@ int main(int argc, char* argv[]){
         ("check_steps", po::value<int>(&check_steps)->default_value(100), "Number of loop iterations over which backtracking occurs")
         ("butterfly", po::value<int>(&butterfly)->default_value(0), "Number of random numbers to generate before simulation begins")
         ("test_param", po::value<int>(&test_param)->default_value(0), "Temporary test condition for testing dt_var")
+        ("net_reset", po::value<bool>(&net_reset)->default_value(true), "Temporary bool for resetting the net")
+        ("myosins_reset", po::value<bool>(&myosins_reset)->default_value(true), "Temporary bool for resetting myosins")
+        ("crosslks_reset", po::value<bool>(&crosslks_reset)->default_value(true), "Temporary bool for resetting the crosslks")
         ;
 
     //Hidden options, will be allowed both on command line and
@@ -613,20 +616,25 @@ int main(int argc, char* argv[]){
                     stored_a_motor_pos_vec = myosins->get_vecvec();
                     stored_p_motor_pos_vec = crosslks->get_vecvec();
                 }
+                if(net_reset){
                 delete net;
                 net = new filament_ensemble(stored_actin_pos_vec, {xrange, yrange}, {xgrid, ygrid}, dt,
                     temperature, viscosity, link_length,
                     link_stretching_stiffness, fene_pct, link_bending_stiffness,
                     link_fracture_force, bnd_cnd);
+                }
+                if(myosins_reset){
                 delete myosins;
                 myosins = new motor_ensemble( stored_a_motor_pos_vec, {xrange, yrange}, dt, temperature,
                     a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
                     a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd, light_param);
+                }
+                if(crosslks_reset){
                 delete crosslks;
                 crosslks = new motor_ensemble( stored_p_motor_pos_vec, {xrange, yrange}, dt, temperature,
                     p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
                     p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
-
+                }
                 int temp_size = time_past.size();
                 for (int i = 0; i<temp_size; i++){
                     print_times.push_back(time_past.back());

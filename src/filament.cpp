@@ -122,7 +122,7 @@ filament::filament(vector<actin *> actinvec, array<double, 2> myfov, array<int, 
     if (actinvec.size() > 0)
     {
         actins.push_back(new actin(*(actinvec[0])));
-        prv_rnds.push_back({0,0});
+        prv_rnds.push_back({rng_n(),rng_n()});
         damp = actins[0]->get_friction();
     }
     
@@ -134,7 +134,7 @@ filament::filament(vector<actin *> actinvec, array<double, 2> myfov, array<int, 
             links.push_back( new Link(linkLength, stretching_stiffness, max_ext_ratio, this, {(int)j-1, (int)j}, fov, nq) );  
             links[j-1]->step(BC, delrx);
             links[j-1]->update_force(BC, delrx);
-            prv_rnds.push_back({0,0});
+            prv_rnds.push_back({rng_n(),rng_n()});
             
         }
     }

@@ -281,7 +281,7 @@ int motor_ensemble::check_energies(int slow_down)
 {
     int status = 1;
     int relax = 1;
-    double cutoff_force = 1.1 * fracture_force + slow_down;
+    double cutoff_force = 1.5 * fracture_force + slow_down;
     //double cutoff_force = (.99+(slow_down<0)) * fracture_force;
     //double relax_force = fracture_force-.1*(slow_down>0);
         for (unsigned int m = 0; m < n_motors.size(); m++)
@@ -292,7 +292,7 @@ int motor_ensemble::check_energies(int slow_down)
             status = 2;
             relax = 0;
         }
-        if (one_force > fracture_force/2) relax = 0;
+        if (one_force > fracture_force) relax = 0;
         //pe += n_motors[m]->get_stretching_energy_fene();
     }
     if (relax) status = 0;
