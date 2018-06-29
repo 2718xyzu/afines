@@ -33,10 +33,12 @@ class dt_var
             vector<string> &thermo_past, vector<double> &stretching_energy_past, vector<double> &bending_energy_past, 
             vector<double> &potential_energy_motors_past,vector<double> &potential_energy_crosslks_past);
 
+        void set_test(int test_param);
+
     public:
-        double tcurr, stable_thresh, tfinal;
-        int slow_param, net_status, myosins_status, crosslks_status, stable_checks,
-         slow_down, slowed_down, nmsgs, check_steps;
+        double tcurr, dtcurr, stable_thresh, tfinal;
+        int slow_param, countcurr, net_status, myosins_status, crosslks_status, stable_checks,
+         slow_down, slowed_down, nmsgs, check_steps, test_check;
         
     
 };

@@ -18,6 +18,7 @@ dt_var::dt_var(double final_time, int num_msgs, int chk_steps, double stable_thr
     check_steps = chk_steps;
     stable_checks = 0;
     stable_thresh = stable_threshold;
+    test_check = 0;
 }
 
 
@@ -25,6 +26,8 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
     int crosslks_status, ostream& file_counts){
     int returned_int;
     tcurr = t;
+    dtcurr = dt;
+    countcurr = count;
     slow_param = 0;
     if ((net_status == 2 || myosins_status == 2 || crosslks_status == 2) && slowed_down<2 ) {
         t -= check_steps * dt;
@@ -74,7 +77,35 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         slow_down = 0;
                 
             } 
-        
+    if (test_check==1){
+        dt = dtcurr;
+        count = countcurr;
+        t = tcurr;
+        returned_int = 2;
+        if (count%140000 == 0){
+            t -= check_steps * dt;
+            count -= check_steps;
+        }
+
+
+
+    }else if(test_check ==2){
+        dt = dtcurr;
+        count = countcurr;
+        t = tcurr;
+        returned_int = 2;
+        if (count%140000 == 0){
+            t -= check_steps * dt;
+            count -= check_steps;
+            slowed_down = 2;
+        }
+
+    }else if(test_check == 3){
+        dt = dtcurr;
+
+    }
+
+
     return returned_int;
 }
 
@@ -179,5 +210,9 @@ void dt_var::clear_all(vector<double> &time_past, vector<double> &count_past,
     potential_energy_crosslks_past.clear();
 
 
+}
+
+void dt_var::set_test(int test_param){
+    test_check = test_param;
 }
 

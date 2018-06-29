@@ -86,7 +86,7 @@ int main(int argc, char* argv[]){
 
     bool light_act, variable_dt;
     double light_radius;
-    int check_steps;
+    int check_steps, test_param;
     // int slow_down = 0; //
     // int slowed_down = 0;
     int slow_param = 0;
@@ -206,6 +206,7 @@ int main(int argc, char* argv[]){
         ("variable_dt", po::value<bool>(&variable_dt)->default_value(false), "flag to turn on variable timestep implementation")
         ("check_steps", po::value<int>(&check_steps)->default_value(100), "Number of loop iterations over which backtracking occurs")
         ("butterfly", po::value<int>(&butterfly)->default_value(0), "Number of random numbers to generate before simulation begins")
+        ("test_param", po::value<int>(&test_param)->default_value(0), "Temporary test condition for testing dt_var")
         ;
 
     //Hidden options, will be allowed both on command line and
@@ -433,6 +434,7 @@ int main(int argc, char* argv[]){
         print_times = gen_print_times(tfinal, nframes);
     }
         dt_var var_dt = dt_var(tfinal, nmsgs, check_steps, stable_thresh);
+        var_dt.set_test(test_param);
 
 
     if (p_dead_head_flag) crosslks->kill_heads(p_dead_head);
@@ -605,7 +607,7 @@ int main(int argc, char* argv[]){
             int returned_int = var_dt.update_dt_var(t, dt, count, net_status, myosins_status, crosslks_status, file_counts);
 
             if (returned_int == 1){
-                file_counts<<"dt is now"<<dt<<endl;
+                file_counts<<"\n dt is now "<<dt<<endl;
                 delete net;
                 net = new filament_ensemble(stored_actin_pos_vec, {xrange, yrange}, {xgrid, ygrid}, dt,
                     temperature, viscosity, link_length,
