@@ -84,7 +84,7 @@ int main(int argc, char* argv[]){
     bool restart;
     double restart_time;
 
-    bool light_act, variable_dt;
+    bool light_act, variable_dt, net_reset, myosins_reset, crosslks_reset;
     double light_radius;
     int check_steps, test_param;
     // int slow_down = 0; //
