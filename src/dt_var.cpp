@@ -126,11 +126,9 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
             count -= check_steps;
             test_check = -5;
             returned_int = 1;
-        }
-        else test_check = 5;
-
-
-
+        }else test_check = 5;
+    }
+        
     return returned_int;
 }
 
