@@ -622,6 +622,8 @@ int main(int argc, char* argv[]){
                     temperature, viscosity, link_length,
                     link_stretching_stiffness, fene_pct, link_bending_stiffness,
                     link_fracture_force, bnd_cnd);
+                    myosins->set_fil_ens(net);
+                    crosslks->set_fil_ens(net);
                 }
                 if(myosins_reset){
                 delete myosins;

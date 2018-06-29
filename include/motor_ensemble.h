@@ -64,6 +64,8 @@ class motor_ensemble
 
         void add_motor(motor * m);
 
+        void set_fil_ens(filament_ensemble * network);
+
         void set_shear(double g);
 
         void kill_heads(int i);

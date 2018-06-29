@@ -637,3 +637,7 @@ vector<double> motor::get_vec(){
     out.push_back(l_index[1]);
     return out;
 }
+
+void motor::set_fil_ens(filament_ensemble * network){
+    actin_network = filament_ensemble;
+}

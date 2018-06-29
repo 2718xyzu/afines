@@ -119,6 +119,8 @@ class motor
 
         vector<double> get_vec();
 
+        void set_fil_ens(filament_ensemble * network);
+
     public:
         
         double mphi,mld, vs, stall_force, max_bind_dist, mk, kon, koff, kend, r_on, r_off, r_end, temperature, dt,

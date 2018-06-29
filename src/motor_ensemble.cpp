@@ -319,3 +319,11 @@ vector<vector<double> > motor_ensemble::get_vecvec(){
     }
     return out;
 }
+
+void motor_ensemble::set_fil_ens(filament_ensemble * network){
+    f_network = network;
+    for (unsigned int m = 0; m < n_motors.size(); m++)
+    {
+        n_motors[m]->set_fil_ens(network));
+    }
+}
