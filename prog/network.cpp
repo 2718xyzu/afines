@@ -606,8 +606,13 @@ int main(int argc, char* argv[]){
 
             int returned_int = var_dt.update_dt_var(t, dt, count, net_status, myosins_status, crosslks_status, file_counts);
 
-            if (returned_int == 1){
+            if (returned_int == 1 || returned_int == 10){
                 file_counts<<"\n dt is now "<<dt<<endl;
+                if(returned_int == 10){
+                    stored_actin_pos_vec = net->get_vecvec();
+                    stored_a_motor_pos_vec = myosins->get_vecvec();
+                    stored_p_motor_pos_vec = crosslks->get_vecvec();
+                }
                 delete net;
                 net = new filament_ensemble(stored_actin_pos_vec, {xrange, yrange}, {xgrid, ygrid}, dt,
                     temperature, viscosity, link_length,

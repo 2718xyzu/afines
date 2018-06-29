@@ -77,33 +77,58 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         slow_down = 0;
                 
             } 
-    if (test_check==1){
+    if (abs(test_check)==1){
         dt = dtcurr;
         count = countcurr;
         t = tcurr;
         returned_int = 2;
-        if (count%140000 == 0){
+        if (count%140000 == 0 && test_check == 1){
             t -= check_steps * dt;
             count -= check_steps;
+            test_check = -1;
         }
+        else test_check = 1;
 
 
 
-    }else if(test_check ==2){
+    }else if(abs(test_check) ==2){
         dt = dtcurr;
         count = countcurr;
         t = tcurr;
         returned_int = 2;
-        if (count%140000 == 0){
+        if (count%140000 == 0 && test_check == 2){
             t -= check_steps * dt;
             count -= check_steps;
+            dt /= 2;
             slowed_down = 2;
+            test_check = -2;
         }
+        else test_check = 2;
 
     }else if(test_check == 3){
         dt = dtcurr;
 
-    }
+    }else if(test_check == 4){
+        returned_int = 2;
+        dt = dtcurr;
+        count = countcurr;
+        t = tcurr;
+        if (count%140000 == 0){
+            returned_int = 10;
+        }
+    }else if(abs(test_check)==5){
+        dt = dtcurr;
+        count = countcurr;
+        t = tcurr;
+        returned_int = 2;
+        if (count%140000 == 0 && test_check == 5){
+            t -= check_steps * dt;
+            count -= check_steps;
+            test_check = -5;
+            returned_int = 1;
+        }
+        else test_check = 5;
+
 
 
     return returned_int;
