@@ -40,6 +40,8 @@ class motor_ensemble
                 double fstall, double rcut,
                 double vis, double catchlength, double fractureforce, string BC, array<double,2> light_param);
 
+        motor_ensemble(const motor_ensemble& other);
+
         ~motor_ensemble();
 
         int get_nmotors();

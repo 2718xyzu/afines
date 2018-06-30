@@ -41,6 +41,8 @@ class filament
        
         filament();
         
+        filament(const filament& other);
+        
         ~filament();
     
         void set_y_thresh(double y);

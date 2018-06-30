@@ -82,7 +82,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         count = countcurr;
         t = tcurr;
         returned_int = 2;
-        if (count%140000 == 0 && test_check == 1){
+        if (count%100000 == 0 && test_check == 1){
             t -= check_steps * dt;
             count -= check_steps;
             test_check = -1;
@@ -94,7 +94,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         count = countcurr;
         t = tcurr;
         returned_int = 2;
-        if (count%140000 == 0 && test_check == 2){
+        if (count%100000 == 0 && test_check == 2){
             t -= check_steps * dt;
             count -= check_steps;
             dt /= 2;
@@ -110,7 +110,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         dt = dtcurr;
         count = countcurr;
         t = tcurr;
-        if (count%140000 == 0){
+        if (count%100000 == 0){
             returned_int = 10;
         }
     }else if(abs(test_check)==5){
@@ -118,7 +118,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         count = countcurr;
         t = tcurr;
         returned_int = 2;
-        if (count%140000 == 0 && test_check == 5){
+        if (count%100000 == 0 && test_check == 5){
             t -= check_steps * dt;
             count -= check_steps;
             test_check = -5;

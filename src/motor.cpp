@@ -213,6 +213,59 @@ motor::motor( array<double, 4> pos,
 
  motor::~motor(){};
 
+ motor::motor(const motor& other){
+    mphi = other.mphi;
+    mld = other.mld;
+    vs = other.vs;
+    stall_force = other.stall_force;
+    max_bind_dist = other.max_bind_dist;
+    mk = other.mk;
+    kon = other.kon;
+    koff = other.koff;
+    kend = other.kend;
+    r_on = other.r_on;
+    r_off = other.r_off;
+    r_end = other.r_end;
+    temperature = other.temperature;
+    dt = other.dt;
+
+    damp = other.damp;
+    shear = other.shear;
+    max_ext = other.max_ext;
+    eps_ext = other.eps_ext;
+    kinetic_energy = other.kinetic_energy;
+    bd_prefactor = other.bd_prefactor;
+    tension = other.tension;
+    catch_length = other.catch_length;
+
+    fracture_force = other.fracture_force;
+
+    hx = other.hx;
+    hy = other.hy;
+    pos_a_end = other.pos_a_end;
+    fov = other.fov;
+    prv_rnd_x = other.prv_rnd_x;
+    prv_rnd_y = other.prv_rnd_y;
+    force = other.force;
+    disp = other.disp;
+    light_param = other.light_param;
+
+    ldir_bind = other.ldir_bind;
+    bind_disp = other.bind_disp;
+
+    state = other.state;
+    f_index = other.f_index;
+    l_index = other.l_index;
+
+    dist = other.dist;
+    at_barbed_end = other.at_barbed_end;
+
+    BC = other.BC;
+
+    actin_network = other.actin_network;
+
+ }
+
 //return motor state with a given head number
 
 array<int, 2> motor::get_states()
@@ -639,5 +692,5 @@ vector<double> motor::get_vec(){
 }
 
 void motor::set_fil_ens(filament_ensemble * network){
-    actin_network = filament_ensemble;
+    actin_network = network;
 }

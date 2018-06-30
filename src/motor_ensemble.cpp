@@ -205,6 +205,25 @@ void motor_ensemble::motor_walk(double t)
 
 }
 
+motor_ensemble::motor_ensemble(const motor_ensemble& other){
+    
+    //cout<<"\nDEBUG: calling copy constructor"; 
+    mld = other.mld;
+    gamma = other.gamma;
+    tMove = other.tMove;
+    ke = other.ke;
+    pe = other.pe;
+    v = other.v; 
+    fracture_force = other.fracture_force;
+
+    fov = other.fov;
+    f_network = other.f_network;
+    for(unsigned int i = 0; i < other.n_motors.size(); i++){
+        n_motors.push_back(new motor(*(other.n_motors[i])));
+    }
+
+}
+
 /* Used for static, contstantly attached, motors -- ASSUMES both heads are ALWAYS attached */
 
 void motor_ensemble::motor_update()
@@ -324,6 +343,6 @@ void motor_ensemble::set_fil_ens(filament_ensemble * network){
     f_network = network;
     for (unsigned int m = 0; m < n_motors.size(); m++)
     {
-        n_motors[m]->set_fil_ens(network));
+        n_motors[m]->set_fil_ens(network);
     }
 }

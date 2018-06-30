@@ -41,6 +41,8 @@ class motor
 
         motor();
 
+        motor(const motor& other);
+
         ~motor();
 
         string get_BC();

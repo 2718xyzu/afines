@@ -808,6 +808,49 @@ filament_ensemble::filament_ensemble(vector<vector<double> > actins, array<doubl
     fls = { };
 } 
 
+filament_ensemble::filament_ensemble(const filament_ensemble& other){
+    t = other.t;
+    temperature = other.temperature;
+    link_ld = other.link_ld;
+    link_k = other.link_k;
+    visc = other.visc;
+    min_time = other.min_time;
+    dt = other.dt;
+    gamma = other.gamma;
+    shear_stop = other.shear_stop;
+    shear_dt = other.shear_dt;
+    shear_speed = other.shear_speed;
+    delrx = other.delrx;
+
+    max_links_per_quad_per_filament = other.max_links_per_quad_per_filament;
+    max_links_per_quad = other.max_links_per_quad; 
+    straight_filaments = other.straight_filaments;
+    quad_off_flag = other.quad_off_flag;
+    pe_stretch = other.pe_stretch
+    pe_bend = other.pe_bend
+    ke = other.ke;
+    fracture_force = other.fracture_force;
+
+    fov = other.fov;
+    view = other.view;
+    nq = other.nq;
+    half_nq = other.half_nq;
+    broken_filaments = other.broken_filaments;
+    //empty_vector = other.empty_vector;
+
+    links_per_quad = other.links_per_quad;
+    n_links_per_quad = other.n_links_per_quad;
+
+    all_quads = other.all_quads;
+    fls = other.fls;
+    for (unsigned int f = 0; f < other.network.size(); f++){
+        network.push_back(new filament(other.network[f]));
+    }
+
+    network = other.network;
+}
+
+
 void filament_ensemble::set_dt(double dt_var){
     for (unsigned int f = 0; f < network.size(); f++)
         network[f]->set_dt(dt_var);

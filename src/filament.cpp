@@ -143,6 +143,35 @@ filament::filament(vector<actin *> actinvec, array<double, 2> myfov, array<int, 
 
 }
 
+filament::filament(const filament& other){
+    kb = other.kb;
+    temperature = other.temperature;
+    dt = other.dt;
+    fracture_force = other.fracture_force;
+    kinetic_energy = other.kinetic_energy;
+    damp = other.damp;
+    kToverLp = other.kToverLp
+    bd_prefactor = other.bd_prefactor;
+    gamma = other.gamma;
+    max_shear = other.max_shear;
+    delrx = other.delrx;
+    y_thresh = other.y_thresh;
+        
+    fov = other.fov;
+    nq = other.nq;
+    prv_rnds = other.prv_rnds;
+    BC = other.BC;
+
+    for(unsigned int i = 0; i < other.actins.size(); i++){
+        actins.push_back(new actin(*(other.actins[i])));
+    }
+    
+    for(unsigned int i = 0; i < other.links.size(); i++){
+        links.push_back(new Link(*(other.links[i]), this));
+    }
+
+}
+
 filament::~filament(){
     
     //cout<<"DELETING FILAMENT\n";

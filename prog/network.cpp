@@ -626,16 +626,20 @@ int main(int argc, char* argv[]){
                     crosslks->set_fil_ens(net);
                 }
                 if(myosins_reset){
-                delete myosins;
-                myosins = new motor_ensemble( stored_a_motor_pos_vec, {xrange, yrange}, dt, temperature,
-                    a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
-                    a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd, light_param);
+                    motor_ensemble * myosins2 = new motor_ensemble(*myosins);
+                    delete myosins;
+                    myosins = myosins2;
+                // myosins = new motor_ensemble( stored_a_motor_pos_vec, {xrange, yrange}, dt, temperature,
+                //     a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
+                //     a_m_kend, a_m_stall, a_m_cut, viscosity, a_motor_lcatch, a_m_fracture_force, bnd_cnd, light_param);
                 }
                 if(crosslks_reset){
-                delete crosslks;
-                crosslks = new motor_ensemble( stored_p_motor_pos_vec, {xrange, yrange}, dt, temperature,
-                    p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
-                    p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
+                    motor_ensemble * crosslks2 = new motor_ensemble(*crosslks);
+                    delete crosslks;
+                    crosslks = crosslks2;
+                // crosslks = new motor_ensemble( stored_p_motor_pos_vec, {xrange, yrange}, dt, temperature,
+                //     p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
+                //     p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
                 }
                 int temp_size = time_past.size();
                 for (int i = 0; i<temp_size; i++){
