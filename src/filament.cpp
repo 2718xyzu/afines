@@ -150,7 +150,7 @@ filament::filament(const filament& other){
     fracture_force = other.fracture_force;
     kinetic_energy = other.kinetic_energy;
     damp = other.damp;
-    kToverLp = other.kToverLp
+    kToverLp = other.kToverLp;
     bd_prefactor = other.bd_prefactor;
     gamma = other.gamma;
     max_shear = other.max_shear;

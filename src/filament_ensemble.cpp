@@ -377,7 +377,7 @@ int filament_ensemble::check_energies(int slow_down){
 int filament_ensemble::check_link_energies(int slow_down){
     int status = 1;
     int relax = 1;
-    double cutoff_force = 3 * link_k * link_ld;
+    double cutoff_force = 4 * link_k * link_ld;
     for (unsigned int m = 0; m < network.size(); m++)
     {
         for (int i = 0; i < network[m]->get_nlinks(); i++){ 
@@ -826,8 +826,8 @@ filament_ensemble::filament_ensemble(const filament_ensemble& other){
     max_links_per_quad = other.max_links_per_quad; 
     straight_filaments = other.straight_filaments;
     quad_off_flag = other.quad_off_flag;
-    pe_stretch = other.pe_stretch
-    pe_bend = other.pe_bend
+    pe_stretch = other.pe_stretch;
+    pe_bend = other.pe_bend;
     ke = other.ke;
     fracture_force = other.fracture_force;
 
@@ -844,7 +844,7 @@ filament_ensemble::filament_ensemble(const filament_ensemble& other){
     all_quads = other.all_quads;
     fls = other.fls;
     for (unsigned int f = 0; f < other.network.size(); f++){
-        network.push_back(new filament(other.network[f]));
+        network.push_back(new filament(*(other.network[f])));
     }
 
     network = other.network;

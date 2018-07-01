@@ -59,7 +59,7 @@ Link::Link(const Link& other, filament * f){
     force = other.force;
     intpoint = other.intpoint;
 
-    nq = other.nq
+    nq = other.nq;
     half_nq = other.half_nq;
     aindex = other.aindex;
          
