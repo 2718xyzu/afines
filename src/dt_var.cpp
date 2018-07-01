@@ -33,17 +33,17 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         t -= check_steps * dt;
         count -= check_steps;
         stable_checks = floor(stable_checks/2);
-        if (net_status+myosins_status+crosslks_status<4 && slow_down == 0){ 
+        if (net_status+myosins_status+crosslks_status<5 && slow_down == 0){ 
             slow_down = 0;
         }else{
             slow_down = 1;
         }
-        if (slow_down && dt>6E-5) {
-            dt /= 2;
+        if (slow_down && dt>5E-5) {
+            dt = max(dt/2, 5E-5);
             slowed_down = 1;
             file_counts<<"\nt = " <<tcurr<<"\tSlow Down, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
         } else if(slow_down){
-            dt /= 2;
+            dt = dt/2;
             slowed_down = 2;
             file_counts<<"\nt = " <<tcurr<<"\tSlow Down (floor), status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
         } else {
@@ -62,7 +62,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
             dt *= 2;
             slowed_down = 0;
         }
-        if (net_status == 0 && myosins_status == 0 && crosslks_status == 0) {
+        if (net_status+myosins_status+crosslks_status < 2) {
             if (stable_checks>stable_thresh && dt<(tfinal/double(nmsgs*2)) && dt<get_upper_dt(tfinal, t)){
                 dt *= 1.1;
                 stable_checks = 0;
@@ -72,7 +72,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
             file_counts<<"\nAll energies are low (no change)";
         } else {
             file_counts<<"\nNo change in time step, non-relaxed state";
-            stable_checks += 1;
+            stable_checks += (5-(net_status+myosins_status+crosslks_status));
         }
         slow_down = 0;
                 

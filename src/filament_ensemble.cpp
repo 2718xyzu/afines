@@ -590,7 +590,6 @@ void filament_ensemble::update()
         this->quad_update_serial();
     // cout<<"line 574"<<endl;
     this->update_energies();
-    cout<<"okay whatever"<<endl;
     t += dt;
 
 }
@@ -829,7 +828,6 @@ filament_ensemble::filament_ensemble(vector<vector<double> > actins, array<doubl
 } 
 
 filament_ensemble::filament_ensemble(const filament_ensemble& other){
-    cout<<"copy fil_emsemble or whatever"<<endl;
 
     t = other.t;
     temperature = other.temperature;
