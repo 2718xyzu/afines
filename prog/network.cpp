@@ -364,6 +364,7 @@ int main(int argc, char* argv[]){
     // // Create Network Objects
     cout<<"\nCreating actin network."<<endl;
     filament_ensemble * net;
+    filament_ensemble * net2;
     if (actin_pos_vec.size() == 0 && actin_in.size() == 0){
         net = new filament_ensemble(npolymer, nmonomer, nmonomer_extra, extra_bead_prob, {xrange, yrange}, {xgrid, ygrid}, dt,
                 temperature, actin_length, viscosity, link_length, actin_position_arrs, link_stretching_stiffness, fene_pct, link_bending_stiffness,
@@ -381,7 +382,7 @@ int main(int argc, char* argv[]){
 
     cout<<"\nAdding active motors...";
     motor_ensemble * myosins;
-
+    motor_ensemble * myosins2;
     if (a_motor_pos_vec.size() == 0 && a_motor_in.size() == 0){
         myosins = new motor_ensemble( a_motor_density, {xrange, yrange}, dt, temperature,
                 a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
@@ -396,7 +397,7 @@ int main(int argc, char* argv[]){
 
     cout<<"Adding passive motors (crosslinkers) ...\n";
     motor_ensemble * crosslks;
-
+    motor_ensemble * crosslks2;
     if(p_motor_pos_vec.size() == 0 && p_motor_in.size() == 0){
         crosslks = new motor_ensemble( p_motor_density, {xrange, yrange}, dt, temperature,
                 p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
@@ -407,9 +408,9 @@ int main(int argc, char* argv[]){
                 p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
     }
 
-    filament_ensemble * net2 = new filament_ensemble(*net);
-    motor_ensemble * myosins2 = new motor_ensemble(*myosins);
-    motor_ensemble * crosslks2 = new motor_ensemble(*crosslks);
+    net2 = new filament_ensemble(*net);
+    myosins2 = new motor_ensemble(*myosins);
+    crosslks2 = new motor_ensemble(*crosslks);
     myosins2->set_fil_ens(net2);
     crosslks2->set_fil_ens(net2);
 
@@ -537,7 +538,7 @@ int main(int argc, char* argv[]){
 		}
 
 
-
+        // cout<<"line 541"<<endl;
 
         //print time count
         if (time_of_strain!=0 && close(t, time_of_strain, dt/(10*time_of_strain))){
@@ -571,17 +572,19 @@ int main(int argc, char* argv[]){
             //crosslks->print_ensemble_thermo();
             //myosins->print_ensemble_thermo();
         }
-
+        // cout<<"line 575"<<endl;
         //update network
         net->update();//updates all forces, velocities and positions of filaments
         //update cross linkers
+        // cout<<"line 579"<<endl;
         if (static_cl_flag)
             crosslks->motor_update();
         else
             crosslks->motor_walk(t);
+        // cout<<"line 584"<<endl;
         //update motors
         myosins->motor_walk(t);
-
+        // cout<<"line 587"<<endl;
         //clear the vector of fractured filaments
         net->clear_broken();
 
@@ -606,7 +609,7 @@ int main(int argc, char* argv[]){
         total_count++;
 
     if (variable_dt){
-
+        // cout<<"line 610"<<endl;
         net_status = max(net_status, net->check_link_energies(slow_param));
         myosins_status = max(myosins_status, myosins->check_energies(slow_param));
         crosslks_status = max(crosslks_status,crosslks->check_energies(slow_param));
@@ -623,11 +626,13 @@ int main(int argc, char* argv[]){
                 //     stored_p_motor_pos_vec = crosslks->get_vecvec();
                 // }
                 // if(net_reset){
+            
+                t1 = clock();
                 delete net;
-                filament_ensemble * net = new filament_ensemble(*net2);
+                net = new filament_ensemble(*net2);
                 
                 delete myosins;
-                motor_ensemble * myosins = new motor_ensemble(*myosins2);
+                myosins = new motor_ensemble(*myosins2);
 
             // myosins = new motor_ensemble( stored_a_motor_pos_vec, {xrange, yrange}, dt, temperature,
             //     a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
@@ -635,8 +640,9 @@ int main(int argc, char* argv[]){
 
 
                 delete crosslks;
-                motor_ensemble * crosslks = new motor_ensemble(*crosslks2);
-                
+                crosslks = new motor_ensemble(*crosslks2);
+                t2 = clock();
+                cout<<("Time recording objects = ")<<(t2-t1);
                 // crosslks = new motor_ensemble( stored_p_motor_pos_vec, {xrange, yrange}, dt, temperature,
                 //     p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
                 //     p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
@@ -657,20 +663,31 @@ int main(int argc, char* argv[]){
                 thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
 
             }else if(returned_int == 2){
+                // cout<<"line 660"<<endl;
+                // cout<<"dt is now = "<<dt<<endl;
                 net->set_dt(dt);
                 myosins->set_dt(dt);
                 crosslks->set_dt(dt);
+                // cout<<"line 664"<<endl;
+                // file_counts<<"What is this"<<endl;
                 delete net2;
+                // cout<<"deleted net2"<<endl;
                 delete myosins2;
+                // cout<<"deleted myosins2"<<endl;
                 delete crosslks2;
-                t1 = clock();
-                filament_ensemble * net2 = new filament_ensemble(*net);
-                motor_ensemble * myosins2 = new motor_ensemble(*myosins);
-                motor_ensemble * crosslks2 = new motor_ensemble(*crosslks);
+                // cout<<"deleted crosslks2"<<endl;
+                // cout<<"line 668"<<endl;
+                // t1 = clock();
+                //cout<<"line 670"<<endl;
+                net2 = new filament_ensemble(*net);
+                //cout<<"line 672"<<endl;
+                myosins2 = new motor_ensemble(*myosins);
+                crosslks2 = new motor_ensemble(*crosslks);
+                //cout<<"line 674"<<endl;
                 myosins2->set_fil_ens(net2);
                 crosslks2->set_fil_ens(net2);
-                t2 = clock();
-                cout<<("Time recording objects = ")<<(t2-t1);
+                // t2 = clock();
+                // cout<<("Time recording objects = ")<<(t2-t1);
                 
                 // stored_actin_pos_vec = net->get_vecvec();
                 // stored_a_motor_pos_vec = myosins->get_vecvec();

@@ -165,10 +165,11 @@ filament::filament(const filament& other){
     for(unsigned int i = 0; i < other.actins.size(); i++){
         actins.push_back(new actin(*(other.actins[i])));
     }
-    
+    // cout<<"we're okay"<<endl;
     for(unsigned int i = 0; i < other.links.size(); i++){
         links.push_back(new Link(*(other.links[i]), this));
     }
+    // cout<<"we're still okay"<<endl;
 
 }
 
@@ -178,7 +179,7 @@ filament::~filament(){
     int nr = actins.size(), nl = links.size();
     for (int i = 0; i < nr; i ++)
     {    
-        //cout<<"\nDEBUG: deleting pointer "<<actins[i];     
+        // cout<<"\nDEBUG: deleting pointer "<<actins[i];     
         delete actins[i];
     }
     for (int i = 0; i < nl; i ++)

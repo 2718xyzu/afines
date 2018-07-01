@@ -25,16 +25,33 @@ filament_ensemble::~filament_ensemble(){
     //cout<<"DELETING FILAMENT_ENSEMBLE\n";
     
     int s = network.size();
-    
+    // cout<<"line 28"<<endl;
     for (int x = 0; x < nq[0]; x++){
+        // cout<<"line 30"<<endl;
         for (int y = 0; y < nq[1]; y++){
+            // cout<<"line 32"<<endl;
+            try{
+                // cout<<"line 34"<<endl;
             delete links_per_quad[x]->at(y);
+            }
+            catch (int e)
+            {
+                // cout<<"line 39"<<endl;
+            }
+        
         }
+        try{
+            // cout<<"line 44"<<endl;
         delete links_per_quad[x];
+        }
+        catch (int e) {
+            // cout<<"line 48"<<endl;
+        }
         //delete n_links_per_quad[x];
     }
     
     for (int i = 0; i < s; i++){
+        // cout<<"line 54"<<endl;
         delete network[i];
     }
     
@@ -555,22 +572,25 @@ void filament_ensemble::update_int_forces()
 
 void filament_ensemble::update()
 
-{      
+{   
+    // cout<<"line 559"<<endl;   
     int net_sz = network.size();
     // #pragma omp parallel for
     
     for (int f = 0; f < net_sz; f++){
       //  if (f==0) cout<<"\nDEBUG: filament updates using "<<omp_get_num_threads()<<" cores";  
         this->update_filament_stretching(f);
+        // cout<<"line 566"<<endl;
         network[f]->update_bending(t);
+        // cout<<"line 568"<<endl;
         network[f]->update_positions();
     }
-    
+    // cout<<"line 571"<<endl;
     if (!quad_off_flag)
         this->quad_update_serial();
-    
+    // cout<<"line 574"<<endl;
     this->update_energies();
-    
+    cout<<"okay whatever"<<endl;
     t += dt;
 
 }
@@ -809,6 +829,8 @@ filament_ensemble::filament_ensemble(vector<vector<double> > actins, array<doubl
 } 
 
 filament_ensemble::filament_ensemble(const filament_ensemble& other){
+    cout<<"copy fil_emsemble or whatever"<<endl;
+
     t = other.t;
     temperature = other.temperature;
     link_ld = other.link_ld;
@@ -823,7 +845,7 @@ filament_ensemble::filament_ensemble(const filament_ensemble& other){
     delrx = other.delrx;
 
     max_links_per_quad_per_filament = other.max_links_per_quad_per_filament;
-    max_links_per_quad = other.max_links_per_quad; 
+    max_links_per_quad = other.max_links_per_quad;
     straight_filaments = other.straight_filaments;
     quad_off_flag = other.quad_off_flag;
     pe_stretch = other.pe_stretch;
@@ -837,17 +859,33 @@ filament_ensemble::filament_ensemble(const filament_ensemble& other){
     half_nq = other.half_nq;
     broken_filaments = other.broken_filaments;
     //empty_vector = other.empty_vector;
+//the below lines may have been causing problems
+    // links_per_quad = other.links_per_quad;
+    // n_links_per_quad = other.n_links_per_quad;
+    // cout<<"line 865"<<endl;
+    this->nlist_init_serial();
+    // cout<<"line 867"<<endl;
+    //for (int x = 0; x < other.nq[0]; x++){
+    // //     // cout<<"line 30"<<endl;
+    //      for (int y = 0; y < other.nq[1]; y++){
+    // //         cout<<"this works"<<endl;
+    //         links_per_quad[x]->at(y) = other.links_per_quad[x]->at(y);        
+    //      }
+    // //     cout<<"This works too"<<endl;
+    // //     links_per_quad[x] = other.links_per_quad[x];
+    //  }
 
-    links_per_quad = other.links_per_quad;
-    n_links_per_quad = other.n_links_per_quad;
+    
 
+
+    // cout<<"this is fine"<<endl;
     all_quads = other.all_quads;
     fls = other.fls;
     for (unsigned int f = 0; f < other.network.size(); f++){
         network.push_back(new filament(*(other.network[f])));
     }
+    // cout<<"This is still fine"<<endl;
 
-    network = other.network;
 }
 
 

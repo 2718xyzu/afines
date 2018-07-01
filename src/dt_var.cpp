@@ -32,8 +32,8 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
     if ((net_status == 2 || myosins_status == 2 || crosslks_status == 2) && slowed_down<2 ) {
         t -= check_steps * dt;
         count -= check_steps;
-        stable_checks = 0;
-        if (net_status+myosins_status+crosslks_status<3 && slow_down == 0){ 
+        stable_checks = floor(stable_checks/2);
+        if (net_status+myosins_status+crosslks_status<4 && slow_down == 0){ 
             slow_down = 0;
         }else{
             slow_down = 1;
