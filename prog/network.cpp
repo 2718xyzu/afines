@@ -81,7 +81,7 @@ int main(int argc, char* argv[]){
     bool restart;
     double restart_time;
 
-    bool light_act;
+    int light_act;
     double light_radius;
 
     // Options allowed only on command line
@@ -187,7 +187,7 @@ int main(int argc, char* argv[]){
 
         ("diff_strain_flag", po::value<bool>(&diff_strain_flag)->default_value(false), "flag to turn on linear differential strain")
         ("osc_strain_flag", po::value<bool>(&osc_strain_flag)->default_value(false), "flag to turn on oscillatory differential strain")
-        ("light_act", po::value<bool>(&light_act)->default_value(false), "Flag to turn on a circle of light activation, where motors can walk only in the light")
+        ("light_act", po::value<int>(&light_act)->default_value(0), "Flag to turn on a circle of light activation, where motors can walk only in the light")
         ("light_radius", po::value<double>(&light_radius)->default_value(6.25), "Radius outside of which motors are turned off")
         ("butterfly", po::value<int>(&butterfly)->default_value(0), "Integer to change random seed systematically")
         ;

@@ -430,16 +430,15 @@ void motor::step_onehead(int hd)
     if (tension > fracture_force)
         off_prob = 1.0;
 
-    if (light_param[0])
-        radial = hypot(hx[hd],hy[hd]);
+    // if (light_param[0])
+    //     radial = hypot(hx[hd],hy[hd]);
 
     //cout<<"\nDEBUG: at barbed end? : "<<at_barbed_end[hd]<<"; off_prob = "<<off_prob;
     // attempt detachment
     if ( event(off_prob) ) this->detach_head(hd, hpos_new);
     else{
             if (light_param[0]){
-                if (radial > light_param[1])
-                    light_yes = 0;   
+                light_yes = light_activation(hx[hd], hy[hd], light_param[0] , light_param[1])
             }
         //calculate motor velocity
         if (vs != 0 && !(at_barbed_end[hd]) && light_yes){

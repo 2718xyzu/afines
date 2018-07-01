@@ -765,6 +765,26 @@ closefiles:
 
 }
 
+
+bool light_activation(double x, double y, double light_method , double light_param){
+    bool light_yes = true;
+    switch (light_method){
+        case 1:
+            if(sqrt(x^2+y^2)<light_param){
+                light_yes = true;
+            }else light_yes = false;
+            break;
+        default;
+    
+
+    }
+    return light_yes;
+
+
+
+}
+
+
 template int sgn<int>(int);
 template int sgn<double>(double);
 template int sgn<float>(float);

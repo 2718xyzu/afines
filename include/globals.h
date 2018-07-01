@@ -112,6 +112,7 @@ double last_full_timestep(string dirpath);
 void write_first_nlines(string path, int n);
 void write_first_ntsteps(string path, int n);
 void write_first_tsteps(string path, double tstop);
+bool light_activation(double x, double y, double light_method , double light_param);
 
 template <typename T> int sgn(T val);
 
