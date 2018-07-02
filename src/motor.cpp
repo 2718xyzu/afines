@@ -422,7 +422,6 @@ void motor::step_onehead(int hd)
     array<double, 2> hpos_new = generate_off_pos(hd);
     double off_prob = metropolis_prob(hd, {0,0}, hpos_new, at_barbed_end[hd] ? kend : koff);
     bool light_yes = 1;
-    double radial = 20000;
 
     if (tension > 0)
         off_prob *= exp(tension*catch_length/temperature);
@@ -438,7 +437,7 @@ void motor::step_onehead(int hd)
     if ( event(off_prob) ) this->detach_head(hd, hpos_new);
     else{
             if (light_param[0]){
-                light_yes = light_activation(hx[hd], hy[hd], light_param[0] , light_param[1])
+                light_yes = light_activation(hx[hd], hy[hd], light_param[0] , light_param[1]);
             }
         //calculate motor velocity
         if (vs != 0 && !(at_barbed_end[hd]) && light_yes){
