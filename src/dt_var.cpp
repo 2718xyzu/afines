@@ -11,7 +11,7 @@
 #include "dt_var.h"
 #include "vector"
 
-dt_var::dt_var(double final_time, int num_msgs, int chk_steps, double stable_threshold){ 
+dt_var::dt_var(int method, double final_time, int num_msgs, int chk_steps, double stable_threshold){ 
 
     tfinal = final_time;
     nmsgs = num_msgs;
@@ -19,6 +19,14 @@ dt_var::dt_var(double final_time, int num_msgs, int chk_steps, double stable_thr
     stable_checks = 0;
     stable_thresh = stable_threshold;
     test_check = 0;
+    if (method == 1){ //conservative method
+        slow_threshold = 4;
+        slow_amount = 1.5;
+    }else if(method ==2){ //aggressive method
+        slow_threshold = 6;
+        slow_amount = 1.95;
+    }
+
 }
 
 
@@ -33,7 +41,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         t -= check_steps * dt;
         count -= check_steps;
         stable_checks = floor(stable_checks/2);
-        if (net_status+myosins_status+crosslks_status<5 && slow_down == 0){ 
+        if (net_status+myosins_status+crosslks_status < slow_threshold && slow_down == 0){ 
             slow_down = 0;
         }else{
             slow_down = 1;
@@ -50,13 +58,13 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
             file_counts<<"\nt = " <<tcurr<<"\tEnergy exceeded, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
         }
         slow_down = 1;
-        //something has blown up, so we back up
+        //something has blown up, so we go back
         cout<<"t = "<<tcurr<<" back up to "<<t<<endl;
         returned_int = 1;
     } else {
         returned_int = 2;
         if (slowed_down==1) {
-            dt *= 1.5;
+            dt *= slow_amount;
             slowed_down = 0;
         }else if(slowed_down==2){
             dt *= 2;

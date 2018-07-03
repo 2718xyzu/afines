@@ -36,8 +36,8 @@ class dt_var
         void set_test(int test_param);
 
     public:
-        double tcurr, dtcurr, stable_thresh, tfinal;
-        int slow_param, countcurr, net_status, myosins_status, crosslks_status, stable_checks,
+        double tcurr, dtcurr, stable_thresh, tfinal, slow_amount;
+        int slow_param, slow_threshold, countcurr, net_status, myosins_status, crosslks_status, stable_checks,
          slow_down, slowed_down, nmsgs, check_steps, test_check;
         
     

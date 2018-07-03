@@ -394,7 +394,13 @@ int filament_ensemble::check_energies(int slow_down){
 int filament_ensemble::check_link_energies(int slow_down){
     int status = 1;
     int relax = 1;
-    double cutoff_force = 4 * link_k * link_ld;
+    double cutoff_force;
+    if (slow_down == 1){
+        cutoff_force = 3 * link_k * link_ld;
+    }else{
+        cutoff_force = 5 * link_k * link_ld;
+    }
+    
     for (unsigned int m = 0; m < network.size(); m++)
     {
         for (int i = 0; i < network[m]->get_nlinks(); i++){ 
