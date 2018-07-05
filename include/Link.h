@@ -31,6 +31,8 @@ class Link
         
         Link(double len, double stiffness, double max_ext, filament* f, array<int, 2> aindex, array<double, 2> fov, array<int, 2> nq);
         
+        Link(const Link& other, filament * new_fil);
+        
         virtual ~Link();
 
         array<double, 2> get_hx();

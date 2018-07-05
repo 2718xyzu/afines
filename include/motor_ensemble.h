@@ -40,6 +40,8 @@ class motor_ensemble
                 double fstall, double rcut,
                 double vis, double catchlength, double fractureforce, string BC, array<double,2> light_param);
 
+        motor_ensemble(const motor_ensemble& other);
+
         ~motor_ensemble();
 
         int get_nmotors();
@@ -64,13 +66,17 @@ class motor_ensemble
 
         void add_motor(motor * m);
 
+        void set_fil_ens(filament_ensemble * network);
+
         void set_shear(double g);
 
         void kill_heads(int i);
 
-        int check_energies();
+        int check_energies(int slow_down);
         
         void set_dt(double dt_var);
+
+        vector<vector<double> > get_vecvec();
 
     private:
 

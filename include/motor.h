@@ -41,6 +41,8 @@ class motor
 
         motor();
 
+        motor(const motor& other);
+
         ~motor();
 
         string get_BC();
@@ -116,6 +118,10 @@ class motor
         string write();
 
         void set_dt(double dt_var);
+
+        vector<double> get_vec();
+
+        void set_fil_ens(filament_ensemble * network);
 
     public:
         

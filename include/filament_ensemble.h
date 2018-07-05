@@ -45,6 +45,8 @@ class filament_ensemble
         filament_ensemble(vector< vector<double> > actins, array<double,2> myfov, array<int,2> mynq, double delta_t, double temp,
                 double vis, double link_len, double stretching, double ext, double bending, double frac_force, string bc); 
         
+        filament_ensemble(const filament_ensemble& other);
+        
         ~filament_ensemble();
         
         void nlist_init();
@@ -173,13 +175,17 @@ class filament_ensemble
         
         void turn_quads_off();
 
-        int check_energies();
+        int check_energies(int slow_down);
+
+        int check_link_energies(int slow_down);
 
         void set_dt(double dt_var);
+
+        vector<vector<double > > get_vecvec();
     
     protected:
 
-        double t, temperature, link_ld, visc, min_time, dt;
+        double t, temperature, link_ld, link_k, visc, min_time, dt;
         double gamma, shear_stop, shear_dt, shear_speed, delrx;
         double max_links_per_quad_per_filament, max_links_per_quad; 
         bool straight_filaments = false, quad_off_flag;

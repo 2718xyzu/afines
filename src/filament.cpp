@@ -122,7 +122,7 @@ filament::filament(vector<actin *> actinvec, array<double, 2> myfov, array<int, 
     if (actinvec.size() > 0)
     {
         actins.push_back(new actin(*(actinvec[0])));
-        prv_rnds.push_back({0,0});
+        prv_rnds.push_back({rng_n(),rng_n()});
         damp = actins[0]->get_friction();
     }
     
@@ -134,12 +134,42 @@ filament::filament(vector<actin *> actinvec, array<double, 2> myfov, array<int, 
             links.push_back( new Link(linkLength, stretching_stiffness, max_ext_ratio, this, {(int)j-1, (int)j}, fov, nq) );  
             links[j-1]->step(BC, delrx);
             links[j-1]->update_force(BC, delrx);
-            prv_rnds.push_back({0,0});
+            prv_rnds.push_back({rng_n(),rng_n()});
             
         }
     }
     
     bd_prefactor = sqrt(temperature/(2*dt*damp));
+
+}
+
+filament::filament(const filament& other){
+    kb = other.kb;
+    temperature = other.temperature;
+    dt = other.dt;
+    fracture_force = other.fracture_force;
+    kinetic_energy = other.kinetic_energy;
+    damp = other.damp;
+    kToverLp = other.kToverLp;
+    bd_prefactor = other.bd_prefactor;
+    gamma = other.gamma;
+    max_shear = other.max_shear;
+    delrx = other.delrx;
+    y_thresh = other.y_thresh;
+        
+    fov = other.fov;
+    nq = other.nq;
+    prv_rnds = other.prv_rnds;
+    BC = other.BC;
+
+    for(unsigned int i = 0; i < other.actins.size(); i++){
+        actins.push_back(new actin(*(other.actins[i])));
+    }
+    // cout<<"we're okay"<<endl;
+    for(unsigned int i = 0; i < other.links.size(); i++){
+        links.push_back(new Link(*(other.links[i]), this));
+    }
+    // cout<<"we're still okay"<<endl;
 
 }
 
@@ -149,7 +179,7 @@ filament::~filament(){
     int nr = actins.size(), nl = links.size();
     for (int i = 0; i < nr; i ++)
     {    
-        //cout<<"\nDEBUG: deleting pointer "<<actins[i];     
+        // cout<<"\nDEBUG: deleting pointer "<<actins[i];     
         delete actins[i];
     }
     for (int i = 0; i < nl; i ++)
@@ -684,4 +714,10 @@ double filament::get_end2end()
 void filament::set_dt(double dt_var){
     dt = dt_var;
 
+}
+
+vector<double> filament::get_vec(int j){
+    vector<double> out;
+    out = actins[j]->get_pos();
+    return out;
 }

@@ -37,7 +37,7 @@ motor_ensemble::motor_ensemble(double mdensity, array<double, 2> myfov, double d
     fracture_force = fractureforce;
 
     int nm = int(ceil(mdensity*fov[0]*fov[1]));
-    cout<<"\nDEBUG: Number of motors:"<<nm<<"\n";
+    //cout<<"\nDEBUG: Number of motors:"<<nm<<"\n";
 
     double alpha = 1, motorx, motory, mang;
     array<double, 3> motor_pos;
@@ -80,7 +80,7 @@ motor_ensemble::motor_ensemble(vector<vector<double> > motors, array<double, 2> 
     fracture_force = fractureforce;
 
     int nm = motors.size();
-    cout<<"\nDEBUG: Number of motors:"<<nm<<"\n";
+    //cout<<"\nDEBUG: Number of motors:"<<nm<<"\n";
 
     array<double, 4> motor_pos;
     array<int, 2> f_index, l_index, state;
@@ -104,7 +104,7 @@ motor_ensemble::motor_ensemble(vector<vector<double> > motors, array<double, 2> 
 
 
 motor_ensemble::~motor_ensemble( ){
-    cout<<"DELETING MOTOR ENSEMBLE\n";
+    //cout<<"DELETING MOTOR ENSEMBLE\n";
     int s = n_motors.size();
     for (int i = 0; i < s; i++){
         delete n_motors[i];
@@ -205,6 +205,25 @@ void motor_ensemble::motor_walk(double t)
 
 }
 
+motor_ensemble::motor_ensemble(const motor_ensemble& other){
+    
+    //cout<<"\nDEBUG: calling copy constructor"; 
+    mld = other.mld;
+    gamma = other.gamma;
+    tMove = other.tMove;
+    ke = other.ke;
+    pe = other.pe;
+    v = other.v; 
+    fracture_force = other.fracture_force;
+
+    fov = other.fov;
+    f_network = other.f_network;
+    for(unsigned int i = 0; i < other.n_motors.size(); i++){
+        n_motors.push_back(new motor(*(other.n_motors[i])));
+    }
+
+}
+
 /* Used for static, contstantly attached, motors -- ASSUMES both heads are ALWAYS attached */
 
 void motor_ensemble::motor_update()
@@ -277,11 +296,13 @@ double motor_ensemble::get_potential_energy(){
     return pe;
 }
 
-int motor_ensemble::check_energies()
+int motor_ensemble::check_energies(int slow_down)
 {
     int status = 1;
     int relax = 1;
-    double cutoff_force = 1.5 * fracture_force;
+    double cutoff_force = 1.5 * fracture_force + slow_down;
+    //double cutoff_force = (.99+(slow_down<0)) * fracture_force;
+    //double relax_force = fracture_force-.1*(slow_down>0);
         for (unsigned int m = 0; m < n_motors.size(); m++)
     {
         array<double, 2> force_vec = n_motors[m]->get_force();
@@ -307,4 +328,21 @@ void motor_ensemble::set_dt(double dt_var){
         n_motors[m]->set_dt(dt_var);
     }
 
+}
+
+vector<vector<double> > motor_ensemble::get_vecvec(){
+    vector<vector<double> > out;
+    for (unsigned int m = 0; m < n_motors.size(); m++)
+    {
+        out.push_back(n_motors[m]->get_vec());
+    }
+    return out;
+}
+
+void motor_ensemble::set_fil_ens(filament_ensemble * network){
+    f_network = network;
+    for (unsigned int m = 0; m < n_motors.size(); m++)
+    {
+        n_motors[m]->set_fil_ens(network);
+    }
 }

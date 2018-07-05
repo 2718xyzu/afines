@@ -12,3 +12,4 @@ build/
 *.sublime-project
 *.sublime-workspace
 >>>>>>> master
+.vscode/settings.json

@@ -40,6 +40,35 @@ Link::Link(double len, double stretching_stiffness, double max_ext_ratio, filame
     llen = l0;
     //this->step();
 }
+
+Link::Link(const Link& other, filament * f){
+
+    xcm = other.xcm;
+    ycm = other.ycm;
+    phi = other.phi;
+    l0 = other.l0;
+    kl = other.kl;
+    max_ext = other.max_ext;
+    eps_ext = other.eps_ext;
+    llen = other.llen;//, force;
+       
+    fov = other.fov;
+    hx = other.hx;
+    hy = other.hy;
+    disp = other.disp;
+    force = other.force;
+    intpoint = other.intpoint;
+
+    nq = other.nq;
+    half_nq = other.half_nq;
+    aindex = other.aindex;
+
+    fil = f;
+        
+    quad = other.quad;
+
+}
+
 Link::~Link(){ 
     //std::cout<<"DELETING LINK\n";
 };

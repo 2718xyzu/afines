@@ -41,6 +41,8 @@ class filament
        
         filament();
         
+        filament(const filament& other);
+        
         ~filament();
     
         void set_y_thresh(double y);
@@ -125,6 +127,8 @@ class filament
         array<double,2> get_bead_position(int bead);
 
         void set_dt(double dt_var);
+
+        vector<double> get_vec(int j);
 
     protected:
         

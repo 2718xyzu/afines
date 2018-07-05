@@ -70,6 +70,8 @@ class actin
         string write();
         
         string to_string();
+
+        vector<double> get_pos();
         
         bool operator==(const actin& that);    
         

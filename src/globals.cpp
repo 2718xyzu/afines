@@ -16,7 +16,7 @@
 /* distances in microns, time in seconds, forces in pN */
 mt19937_64 generator;
 normal_distribution<double> distribution(0,1);
-//extern double dt;
+
 //uniform_real_distribution<double> distribution(-0.5,0.5);
 
 /*generic functions to be used below*/
@@ -764,6 +764,27 @@ closefiles:
     read_file.close();
     write_file.close();
 
+}
+
+double get_upper_dt(double tfinal,double t){
+    double upper_dt;
+    if (tfinal<100) tfinal = 100;
+    upper_dt = (5E-5)*exp(3*t/tfinal);
+    return upper_dt;
+}
+
+vector<double> gen_print_times(double tfinal, int nframes){
+    vector<double> print_times_temp;
+    vector<double> print_times;
+    double bw_print_interval = tfinal/nframes;
+    for (double time_of_print = 0; time_of_print<(tfinal+1); time_of_print+=bw_print_interval){
+        print_times_temp.push_back(time_of_print);
+    }
+    for (int i = print_times_temp.size()-1; i>=0; i--){
+        print_times.push_back(print_times_temp[i]);
+    }
+    
+    return print_times;
 }
 
 template int sgn<int>(int);

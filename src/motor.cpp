@@ -205,13 +205,66 @@ motor::motor( array<double, 4> pos,
         ldir_bind[1] = actin_network->get_direction(f_index[1], l_index[1]);
     }
 
-    prv_rnd_x = {0,0};
-    prv_rnd_y = {0,0};
+    prv_rnd_x = {rng_n(0,1),rng_n(0,1)};
+    prv_rnd_y = {rng_n(0,1),rng_n(0,1)};
 
 }
 
 
  motor::~motor(){};
+
+ motor::motor(const motor& other){
+    mphi = other.mphi;
+    mld = other.mld;
+    vs = other.vs;
+    stall_force = other.stall_force;
+    max_bind_dist = other.max_bind_dist;
+    mk = other.mk;
+    kon = other.kon;
+    koff = other.koff;
+    kend = other.kend;
+    r_on = other.r_on;
+    r_off = other.r_off;
+    r_end = other.r_end;
+    temperature = other.temperature;
+    dt = other.dt;
+
+    damp = other.damp;
+    shear = other.shear;
+    max_ext = other.max_ext;
+    eps_ext = other.eps_ext;
+    kinetic_energy = other.kinetic_energy;
+    bd_prefactor = other.bd_prefactor;
+    tension = other.tension;
+    catch_length = other.catch_length;
+
+    fracture_force = other.fracture_force;
+
+    hx = other.hx;
+    hy = other.hy;
+    pos_a_end = other.pos_a_end;
+    fov = other.fov;
+    prv_rnd_x = other.prv_rnd_x;
+    prv_rnd_y = other.prv_rnd_y;
+    force = other.force;
+    disp = other.disp;
+    light_param = other.light_param;
+
+    ldir_bind = other.ldir_bind;
+    bind_disp = other.bind_disp;
+
+    state = other.state;
+    f_index = other.f_index;
+    l_index = other.l_index;
+
+    dist = other.dist;
+    at_barbed_end = other.at_barbed_end;
+
+    BC = other.BC;
+
+    actin_network = other.actin_network;
+
+ }
 
 //return motor state with a given head number
 
@@ -623,4 +676,21 @@ string motor::write()
 
 void motor::set_dt(double dt_var){
     dt = dt_var;
+}
+
+vector<double> motor::get_vec(){
+    vector<double> out;
+    out.push_back(hx[0]);
+    out.push_back(hy[0]);
+    out.push_back(disp[0]);
+    out.push_back(disp[1]);
+    out.push_back(f_index[0]);
+    out.push_back(f_index[1]);
+    out.push_back(l_index[0]);
+    out.push_back(l_index[1]);
+    return out;
+}
+
+void motor::set_fil_ens(filament_ensemble * network){
+    actin_network = network;
 }

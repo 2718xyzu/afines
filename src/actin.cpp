@@ -145,3 +145,12 @@ double actin::get_viscosity(){
 double actin::get_friction(){
     return friction;
 }
+
+vector<double> actin::get_pos()
+{
+    vector<double> out;
+    out.push_back(x);
+    out.push_back(y);
+    out.push_back(ld);
+    return out;
+}
