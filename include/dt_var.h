@@ -23,7 +23,7 @@
 class dt_var
 {
     public:
-        dt_var(int method, double final_time, int num_msgs, int chk_steps, double stable_threshold, initDt);
+        dt_var(int method, double final_time, int num_msgs, int chk_steps, double stable_threshold, double initDt);
 
         int update_dt_var(double& t, double& dt, int& count, int net_status, int myosins_status, int crosslks_status, 
             ostream& account_file);
