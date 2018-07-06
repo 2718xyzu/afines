@@ -23,7 +23,7 @@
 class dt_var
 {
     public:
-        dt_var(int method, double final_time, int num_msgs, int chk_steps, double stable_threshold);
+        dt_var(int method, double final_time, int num_msgs, int chk_steps, double stable_threshold, initDt);
 
         int update_dt_var(double& t, double& dt, int& count, int net_status, int myosins_status, int crosslks_status, 
             ostream& account_file);
@@ -36,7 +36,7 @@ class dt_var
         void set_test(int test_param);
 
     public:
-        double tcurr, dtcurr, stable_thresh, tfinal, slow_amount;
+        double tcurr, dtcurr, stable_thresh, tfinal, slow_amount, minDt;
         int slow_param, slow_threshold, countcurr, net_status, myosins_status, crosslks_status, stable_checks,
          slow_down, slowed_down, nmsgs, check_steps, test_check;
         

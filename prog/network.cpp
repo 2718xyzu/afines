@@ -86,7 +86,7 @@ int main(int argc, char* argv[]){
 
     bool light_act, net_reset, myosins_reset, crosslks_reset;
     double light_radius;
-    int check_steps, test_param, variable_dt;
+    int check_steps, test_param, var_dt_meth;
     // int slow_down = 0; //
     // int slowed_down = 0;
     int slow_param = 0;
@@ -203,7 +203,7 @@ int main(int argc, char* argv[]){
         ("light_act", po::value<bool>(&light_act)->default_value(false), "Flag to turn on a circle of light activation, where motors can walk only in the light")
         ("light_radius", po::value<double>(&light_radius)->default_value(6.25), "Radius outside of which motors are turned off")
 
-        ("variable_dt", po::value<int>(&variable_dt)->default_value(0), "flag to turn on variable timestep implementation, with 1 = conservative, 2 = aggressive methods")
+        ("var_dt_meth", po::value<int>(&var_dt_meth)->default_value(0), "flag to turn on variable timestep implementation, with 1 = conservative, 2 = aggressive methods")
         ("check_steps", po::value<int>(&check_steps)->default_value(100), "Number of loop iterations over which backtracking occurs")
         ("butterfly", po::value<int>(&butterfly)->default_value(0), "Number of random numbers to generate before simulation begins")
         ("test_param", po::value<int>(&test_param)->default_value(0), "Temporary test condition for testing dt_var")
@@ -427,7 +427,7 @@ int main(int argc, char* argv[]){
 
 
 
-    if (variable_dt >= 1){
+    if (var_dt_meth >= 1){
         if(check_steps == 0) {
             cout<<"WARNING: check_steps cannot be 0 if you are using a variable dt; setting to default (100)"<<endl;
             check_steps = 100;
@@ -443,7 +443,7 @@ int main(int argc, char* argv[]){
         stored_p_motor_pos_vec = crosslks->get_vecvec();
         print_times = gen_print_times(tfinal, nframes);
     }
-        dt_var var_dt = dt_var(variable_dt, tfinal, nmsgs, check_steps, stable_thresh);
+        dt_var var_dt = dt_var(var_dt_meth, tfinal, nmsgs, check_steps, stable_thresh, dt);
         var_dt.set_test(test_param);
 
 
@@ -504,7 +504,7 @@ int main(int argc, char* argv[]){
     
     while (t <= tfinal) {
 
-        if (t+dt/100 >= tinit && (count-unprinted_count)%n_bw_print==0 && variable_dt == 0) {
+        if (t+dt/100 >= tinit && (count-unprinted_count)%n_bw_print==0 && var_dt_meth == 0) {
 
             if (t>tinit) time_str ="\n";
             time_str += "t = "+to_string(t);
@@ -588,7 +588,7 @@ int main(int argc, char* argv[]){
         //clear the vector of fractured filaments
         net->clear_broken();
 
-    if (variable_dt >= 1 && t+dt/100 >= tinit && t+dt>print_times.back()) { 
+    if (var_dt_meth >= 1 && t+dt/100 >= tinit && t+dt>print_times.back()) { 
            cout<<"Time recording = "<<print_times.back()<<endl;
             time_past.push_back(print_times.back());
             count_past.push_back(count);
@@ -608,9 +608,9 @@ int main(int argc, char* argv[]){
 		count++;
         total_count++;
 
-    if (variable_dt >= 1){
+    if (var_dt_meth >= 1){
         // cout<<"line 610"<<endl;
-        net_status = max(net_status, net->check_link_energies(variable_dt));
+        net_status = max(net_status, net->check_link_energies(var_dt_meth));
         myosins_status = max(myosins_status, myosins->check_energies(slow_param));
         crosslks_status = max(crosslks_status,crosslks->check_energies(slow_param));
 
@@ -908,6 +908,16 @@ int main(int argc, char* argv[]){
     }
 
     }
+
+
+
+
+
+
+
+
+
+
 
     file_a << "\n";
     file_l << "\n";
