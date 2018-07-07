@@ -106,6 +106,7 @@ vector<double> sum_vecs(const vector<double>& v1, const vector<double>& v2);
 vector<double *> vec2ptrvec(const vector<double>&, int dim);
 vector<double *> str2ptrvec(string, string, string);
 vector<array<double,3> > str2arrvec(string, string, string);
+vector<double> str2vec(string coord_str);
 vector<vector<double> > file2vecvec(string path, string delim);
 vector<vector<double> > traj2vecvec(string path, string delim, double tf);
 double last_full_timestep(string dirpath);

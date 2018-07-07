@@ -321,6 +321,20 @@ vector<array<double,3> > str2arrvec(string pos_str, string pos_dlm, string coord
     return out;
 }
 
+vector<double> str2vec(string coord_str)
+{
+    vector<string> posns;
+    vector<double> coords;
+    boost::split(posns, coord_str, ",");
+
+    for(unsigned int i=0; i < posns.size(); i++){
+        coords.push_back((double) atof(posns[i].data());
+    } 
+
+    return coords;
+}
+
+
 vector<vector<double> > file2vecvec(string path, string delim)
 {
     vector<vector<double> > out;
@@ -766,11 +780,11 @@ closefiles:
 }
 
 
-bool light_activation(double x, double y, double light_method , double light_param){
+bool light_activation(double x, double y, double light_method , vector<double> light_param){
     bool light_yes = true;
     switch ((int) floor(light_method)){
         case 1:
-            if(hypot(x,y)<light_param){
+            if(hypot(x,y)<(light_param[0])){
                 light_yes = true;
             }else light_yes = false;
             break;
