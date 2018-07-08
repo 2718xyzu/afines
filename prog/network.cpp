@@ -82,7 +82,7 @@ int main(int argc, char* argv[]){
     double restart_time;
 
     int light_act;
-    string light_coord_string;
+    double light_radius;
 
     // Options allowed only on command line
     po::options_description generic("Generic options");
@@ -188,7 +188,7 @@ int main(int argc, char* argv[]){
         ("diff_strain_flag", po::value<bool>(&diff_strain_flag)->default_value(false), "flag to turn on linear differential strain")
         ("osc_strain_flag", po::value<bool>(&osc_strain_flag)->default_value(false), "flag to turn on oscillatory differential strain")
         ("light_act", po::value<int>(&light_act)->default_value(0), "Flag to turn on a circle of light activation, where motors can walk only in the light")
-        ("light_coord_string", po::value<string>(&light_coord_string)->default_value("6.25"), "Radius outside of which motors are turned off")
+        ("light_radius", po::value<double>(&light_radius)->default_value(6.25), "Radius outside of which motors are turned off")
         ("butterfly", po::value<int>(&butterfly)->default_value(0), "Integer to change random seed systematically")
         ;
 
@@ -234,11 +234,7 @@ int main(int argc, char* argv[]){
     //double actin_density = double(npolymer*nmonomer)/(xrange*yrange);//0.65;
     //cout<<"\nDEBUG: actin_density = "<<actin_density;
     double link_bending_stiffness    = polymer_bending_modulus / link_length;
-    array<vector<double>, 2> light_param;
-    light_param[0].push_back(double(light_act));
-    vector<double> light_coords = str2vec(light_coord_string);
-    light_param[1] = light_coords;
-    //light_param[1] = light_radius;
+    array<double, 2> light_param = {double(light_act), light_radius};
     int n_bw_stdout = max(int((tfinal)/(dt*double(nmsgs))),1);
     int n_bw_print  = max(int((tfinal)/(dt*double(nframes))),1);
 

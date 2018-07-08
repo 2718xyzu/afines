@@ -35,7 +35,7 @@ motor::motor( array<double, 3> pos,
         double fstall, double rcut,
         double vis, double catchlength,
         double fractureforce, string bc,
-        array<vector<double>, 2> light_input) {
+        array<double, 2> light_input) {
 
     vs          = v0;
     mk          = stiffness;//rng(10,100);
@@ -126,7 +126,7 @@ motor::motor( array<double, 4> pos,
         double fstall, double rcut,
         double vis, double catchlength,
         double fractureforce, string bc, 
-        array<vector<double>, 2> light_input) {
+        array<double, 2> light_input) {
 
     vs          = v0;
     mk          = stiffness;
@@ -436,8 +436,8 @@ void motor::step_onehead(int hd)
     // attempt detachment
     if ( event(off_prob) ) this->detach_head(hd, hpos_new);
     else{
-            if (light_param[0][0]){
-                light_yes = light_activation(hx[hd], hy[hd], light_param[0][0] , light_param[1]);
+            if (light_param[0]){
+                light_yes = light_activation(hx[hd], hy[hd], light_param[0] , light_param[1]);
             }
         //calculate motor velocity
         if (vs != 0 && !(at_barbed_end[hd]) && light_yes){
