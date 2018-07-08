@@ -30,14 +30,14 @@ class motor
                 array<double, 2> myfov, double delta_t, double v0, double temp, double stiffness, double max_ext_ratio,
                 double ron, double roff, double rend,
                 double fstall, double rcut,
-                double vis, double catchlength, double fractureForce, string BC, array<double, 2> light_param);
+                double vis, double catchlength, double fractureForce, string BC, array<vector<double>, 2> light_param);
 
         motor(array<double, 4> pos, double mlen, filament_ensemble* network,
                 array<int, 2> mystate, array<int, 2> myfindex, array<int, 2> myrindex,
                 array<double, 2> myfov, double delta_t, double v0, double temp, double stiffness, double max_ext_ratio,
                 double ron, double roff, double rend,
                 double fstall, double rcut,
-                double vis, double catchlength, double fractureForce, string BC, array<double, 2> light_param);
+                double vis, double catchlength, double fractureForce, string BC, array<vector<double>, 2> light_param);
 
         motor();
 
@@ -121,7 +121,8 @@ class motor
                damp, shear, max_ext, eps_ext, kinetic_energy, bd_prefactor, tension, catch_length,
                fracture_force;
 
-        array<double,2> hx, hy, pos_a_end, fov, prv_rnd_x, prv_rnd_y, force, disp, light_param;
+        array<double,2> hx, hy, pos_a_end, fov, prv_rnd_x, prv_rnd_y, force, disp;
+        array<vector<double>,2> light_param;
 
         array<array<double, 2>, 2> ldir_bind, bind_disp;
 

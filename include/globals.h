@@ -108,11 +108,12 @@ vector<double *> str2ptrvec(string, string, string);
 vector<array<double,3> > str2arrvec(string, string, string);
 vector<vector<double> > file2vecvec(string path, string delim);
 vector<vector<double> > traj2vecvec(string path, string delim, double tf);
+vector<double> str2vec(string coord_str);
 double last_full_timestep(string dirpath);
 void write_first_nlines(string path, int n);
 void write_first_ntsteps(string path, int n);
 void write_first_tsteps(string path, double tstop);
-bool light_activation(double x, double y, double light_method , double light_param);
+bool light_activation(double x, double y, double light_method , vector<double> light_param);
 
 template <typename T> int sgn(T val);
 

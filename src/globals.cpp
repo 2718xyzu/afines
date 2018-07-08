@@ -633,6 +633,22 @@ vector<vector<double> > traj2vecvec(string path, string delim, double tf)
     return out;
 }
 
+
+vector<double> str2vec(string coord_str){
+    
+    vector<string> posns;
+    vector<double> coords;
+    boost::split(posns, coord_str, boost::is_any_of(","));
+
+    for(unsigned int i=0; i < posns.size(); i++){
+        coords.push_back((double) atof( posns[i].data()));
+    } 
+
+    return coords;
+
+}
+
+
 double last_full_timestep(string path)
 {
     string pos_str = "";
@@ -766,11 +782,11 @@ closefiles:
 }
 
 
-bool light_activation(double x, double y, double light_method , double light_param){
+bool light_activation(double x, double y, double light_method , vector<double> light_param){
     bool light_yes = true;
     switch ((int) floor(light_method)){
         case 1:
-            if(hypot(x,y)<light_param){
+            if(hypot(x,y)<light_param[0]){
                 light_yes = true;
             }else light_yes = false;
             break;

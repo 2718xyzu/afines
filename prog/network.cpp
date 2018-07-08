@@ -82,7 +82,7 @@ int main(int argc, char* argv[]){
     double restart_time;
 
     int light_act;
-    double light_radius;
+    string light_coord_string;
 
     // Options allowed only on command line
     po::options_description generic("Generic options");
@@ -188,7 +188,7 @@ int main(int argc, char* argv[]){
         ("diff_strain_flag", po::value<bool>(&diff_strain_flag)->default_value(false), "flag to turn on linear differential strain")
         ("osc_strain_flag", po::value<bool>(&osc_strain_flag)->default_value(false), "flag to turn on oscillatory differential strain")
         ("light_act", po::value<int>(&light_act)->default_value(0), "Flag to turn on a circle of light activation, where motors can walk only in the light")
-        ("light_radius", po::value<double>(&light_radius)->default_value(6.25), "Radius outside of which motors are turned off")
+        ("light_coord_string", po::value<string>(&light_coord_string)->default_value("6.25"), "String of comma-separated numbers determining light act parameters")
         ("butterfly", po::value<int>(&butterfly)->default_value(0), "Integer to change random seed systematically")
         ;
 
@@ -234,7 +234,11 @@ int main(int argc, char* argv[]){
     //double actin_density = double(npolymer*nmonomer)/(xrange*yrange);//0.65;
     //cout<<"\nDEBUG: actin_density = "<<actin_density;
     double link_bending_stiffness    = polymer_bending_modulus / link_length;
-    array<double, 2> light_param = {double(light_act), light_radius};
+    array<vector<double>, 2> light_param;
+    light_param[0].push_back((double) light_act);
+    vector<double> light_coords = str2vec(light_coord_string);
+    //light_param[1] = light_coords; //will need to uncomment
+    //light_param[1] = light_radius;
     int n_bw_stdout = max(int((tfinal)/(dt*double(nmsgs))),1);
     int n_bw_print  = max(int((tfinal)/(dt*double(nframes))),1);
 
@@ -374,15 +378,16 @@ int main(int argc, char* argv[]){
 
     cout<<"Adding passive motors (crosslinkers) ...\n";
     motor_ensemble * crosslks;
-
+    array<vector<double>,2> passive_light_param;
+    passive_light_param[0].push_back(0);
     if(p_motor_pos_vec.size() == 0 && p_motor_in.size() == 0)
         crosslks = new motor_ensemble( p_motor_density, {xrange, yrange}, dt, temperature,
                 p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
-                p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, p_motor_position_arrs, bnd_cnd, {0,0});
+                p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, p_motor_position_arrs, bnd_cnd, passive_light_param);
     else
         crosslks = new motor_ensemble( p_motor_pos_vec, {xrange, yrange}, dt, temperature,
                 p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
-                p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
+                p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, passive_light_param);
 
     if (p_dead_head_flag) crosslks->kill_heads(p_dead_head);
 
