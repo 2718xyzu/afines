@@ -93,6 +93,11 @@ motor::motor( array<double, 3> pos,
 
     at_barbed_end = {false, false};
 
+    if(light_param[0][0]==5){
+        light_param[1].push_back(fov[0]);
+        light_param[1].push_back(fov[1]);
+    }
+
     if (state[0] == 1){
         pos_a_end[0] = dist_bc(BC, actin_network->get_end(f_index[0], l_index[0])[0] - hx[0],
                                    actin_network->get_end(f_index[0], l_index[0])[1] - hy[0], fov[0], fov[1], 0);
@@ -153,6 +158,10 @@ motor::motor( array<double, 4> pos,
     damp        =(6*pi*vis*mld);
     bd_prefactor= sqrt(temperature/(2*damp*dt));
     light_param = light_input;
+    if(light_param[0][0]==5){
+        light_param[1].push_back(fov[0]);
+        light_param[1].push_back(fov[1]);
+    }
 
     /********for FENE springs*********/
     max_ext     = max_ext_ratio*mlen;
