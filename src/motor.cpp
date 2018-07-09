@@ -676,9 +676,9 @@ string motor::write()
 
 void motor::set_dt(double dt_var){
     dt = dt_var;
-    kon = ron*dt;
-    koff = roff*dt;
-    kend = rend*dt;
+    kon = r_on*dt;
+    koff = r_off*dt;
+    kend = r_end*dt;
     bd_prefactor = sqrt(temperature/(2*dt*damp));
 }
 
