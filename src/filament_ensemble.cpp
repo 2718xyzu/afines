@@ -894,6 +894,7 @@ filament_ensemble::filament_ensemble(const filament_ensemble& other){
 
 
 void filament_ensemble::set_dt(double dt_var){
+    shear_dt = dt_var;
     for (unsigned int f = 0; f < network.size(); f++)
         network[f]->set_dt(dt_var);
   

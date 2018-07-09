@@ -240,6 +240,7 @@ void filament::update_positions()
     double top_y = y_thresh*fov[1]/2.; 
     int sa = int(actins.size());
     int la = int(links.size());
+    bd_prefactor = sqrt(temperature/(2*dt*damp));
     for (int i = 0; i < sa; i++){
 
         if (fabs(actins[i]->get_ycm()) > top_y) continue;
@@ -273,7 +274,7 @@ void filament::update_positions_range(int lo, int hi)
 
     int low = max(0, lo);
     int high = min(hi, (int)actins.size());
-
+    bd_prefactor = sqrt(temperature/(2*dt*damp));
     for (int i = low; i < high; i++){
        
         if (fabs(actins[i]->get_ycm()) > top_y) continue;
@@ -713,6 +714,7 @@ double filament::get_end2end()
 
 void filament::set_dt(double dt_var){
     dt = dt_var;
+    bd_prefactor = sqrt(temperature/(2*dt*damp));
 
 }
 

@@ -676,6 +676,10 @@ string motor::write()
 
 void motor::set_dt(double dt_var){
     dt = dt_var;
+    kon = ron*dt;
+    koff = roff*dt;
+    kend = rend*dt;
+    bd_prefactor = sqrt(temperature/(2*dt*damp));
 }
 
 vector<double> motor::get_vec(){
