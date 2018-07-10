@@ -23,7 +23,7 @@ motor_ensemble::motor_ensemble(double mdensity, array<double, 2> myfov, double d
         double ron, double roff, double rend,
         double fstall, double rcut,
         double vis, double catchlength, double fractureforce, vector<array<double,3> > positions,
-        string BC, array<vector<double>, 2> light_param) {
+        string BC, vector<vector<double>> light_param) {
 
     fov = myfov;
     mld =mlen;
@@ -65,7 +65,7 @@ motor_ensemble::motor_ensemble(vector<vector<double> > motors, array<double, 2> 
         double mlen, filament_ensemble * network, double v0, double stiffness, double max_ext_ratio,
         double ron, double roff, double rend,
         double fstall, double rcut,
-        double vis, double catchlength, double fractureforce, string BC, array<vector<double>, 2> light_param) {
+        double vis, double catchlength, double fractureforce, string BC, vector<vector<double>> light_param) {
 
     fov = myfov;
     mld = mlen;

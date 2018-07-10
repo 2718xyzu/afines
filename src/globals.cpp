@@ -639,7 +639,7 @@ vector<double> str2vec(string coord_str){
     vector<string> posns;
     vector<double> coords;
     boost::split(posns, coord_str, boost::is_any_of(","));
-
+    
     for(unsigned int i=0; i < posns.size(); i++){
         coords.push_back((double) atof( posns[i].data()));
     } 

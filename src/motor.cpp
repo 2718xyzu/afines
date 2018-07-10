@@ -35,7 +35,7 @@ motor::motor( array<double, 3> pos,
         double fstall, double rcut,
         double vis, double catchlength,
         double fractureforce, string bc,
-        array<vector<double>, 2> light_input) {
+        vector<vector<double>> light_input) {
 
     vs          = v0;
     mk          = stiffness;//rng(10,100);
@@ -131,7 +131,7 @@ motor::motor( array<double, 4> pos,
         double fstall, double rcut,
         double vis, double catchlength,
         double fractureforce, string bc, 
-        array<vector<double>, 2> light_input) {
+        vector<vector<double>> light_input) {
 
     vs          = v0;
     mk          = stiffness;

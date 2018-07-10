@@ -234,9 +234,14 @@ int main(int argc, char* argv[]){
     //double actin_density = double(npolymer*nmonomer)/(xrange*yrange);//0.65;
     //cout<<"\nDEBUG: actin_density = "<<actin_density;
     double link_bending_stiffness    = polymer_bending_modulus / link_length;
-    array<vector<double>, 2> light_param;
-    light_param[0].push_back((double) light_act);
-    vector<double> light_coords = str2vec(light_coord_string);
+    // vector<vector<double>> light_param;
+    vector<double> light_param_0;
+    light_param_0.push_back(light_act);
+    //light_param[0].push_back((double) light_act);
+    vector<double> light_param_1 = str2vec(light_coord_string);
+    vector<vector<double>> light_param;
+    light_param.push_back(light_param_0);
+    light_param.push_back(light_param_1);
     //light_param[1] = light_coords; //will need to uncomment
     //light_param[1] = light_radius;
     int n_bw_stdout = max(int((tfinal)/(dt*double(nmsgs))),1);
@@ -378,8 +383,10 @@ int main(int argc, char* argv[]){
 
     cout<<"Adding passive motors (crosslinkers) ...\n";
     motor_ensemble * crosslks;
-    array<vector<double>,2> passive_light_param;
-    passive_light_param[0].push_back(0);
+    vector<vector<double>> passive_light_param;
+    vector<double> temp;
+    temp.push_back(0);
+    passive_light_param.push_back(temp);
     if(p_motor_pos_vec.size() == 0 && p_motor_in.size() == 0)
         crosslks = new motor_ensemble( p_motor_density, {xrange, yrange}, dt, temperature,
                 p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
