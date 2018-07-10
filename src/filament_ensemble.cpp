@@ -396,9 +396,9 @@ int filament_ensemble::check_link_energies(int slow_down){
     int relax = 1;
     double cutoff_force;
     if (slow_down == 1){
-        cutoff_force = 3 * link_k * link_ld;
+        cutoff_force = 3;
     }else{
-        cutoff_force = 5 * link_k * link_ld;
+        cutoff_force = 5;
     }
     
     for (unsigned int m = 0; m < network.size(); m++)
