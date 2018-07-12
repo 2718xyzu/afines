@@ -177,7 +177,7 @@ class filament_ensemble
 
         int check_energies(int slow_down);
 
-        int check_link_energies(int slow_down);
+        int check_link_energies(int var_dt_meth, double thresh);
 
         void set_dt(double dt_var);
 

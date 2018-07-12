@@ -72,7 +72,7 @@ class motor_ensemble
 
         void kill_heads(int i);
 
-        int check_energies(int slow_down);
+        int check_energies(int slow_down, double thresh);
         
         void set_dt(double dt_var);
 
