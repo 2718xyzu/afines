@@ -11,7 +11,7 @@
 #include "dt_var.h"
 #include "vector"
 
-dt_var::dt_var(int method, double final_time, int num_msgs, int chk_steps, double stable_threshold, double initDt){ 
+dt_var::dt_var(int method, double final_time, int num_msgs, int chk_steps, double stable_threshold, double initDt, int numRetry){ 
 
     tfinal = final_time;
     nmsgs = num_msgs;
@@ -27,6 +27,7 @@ dt_var::dt_var(int method, double final_time, int num_msgs, int chk_steps, doubl
         slow_amount = 1.95;
     }
     minDt = initDt;
+    retries = numRetry;
 
 }
 
@@ -38,7 +39,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
     dtcurr = dt;
     countcurr = count;
     slow_param = 0;
-    if ((net_status == 2 || myosins_status == 2 || crosslks_status == 2) && slowed_down<2 ) {
+    if ((net_status == 2 || myosins_status == 2 || crosslks_status == 2) && slowed_down<(retries+1) ) {
         t -= check_steps * dt;
         count -= check_steps;
         stable_checks = floor(stable_checks/2);
@@ -52,8 +53,8 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
             slowed_down = 1;
             file_counts<<"\nt = " <<tcurr<<"\tSlow Down, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
         } else if(slow_down){
-            dt /= 2;
-            slowed_down = 2;
+            dt /= 1.5;
+            slowed_down++;
             file_counts<<"\nt = " <<tcurr<<"\tSlow Down (floor), status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
         } else {
             file_counts<<"\nt = " <<tcurr<<"\tEnergy exceeded, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
@@ -67,9 +68,9 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         if (slowed_down==1) {
             dt *= slow_amount;
             slowed_down = 0;
-        }else if(slowed_down==2){
-            dt *= 2;
-            slowed_down = 0;
+        }else if(slowed_down > 1){
+            dt *= 1.5;
+            slowed_down--;
         }
         if (net_status+myosins_status+crosslks_status < 2) {
             if (stable_checks>stable_thresh && dt<(tfinal/double(nmsgs*2)) && dt<get_upper_dt(tfinal, t)){
@@ -77,7 +78,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
                 stable_checks = 0;
                 file_counts<<"\nt = "<<tcurr<<"\tAll energies are low, speeding up now";
             }
-            stable_checks += 5;
+            stable_checks += 10;
             file_counts<<"\nAll energies are low (no change)";
         } else {
             file_counts<<"\nNo change in time step, non-relaxed state";

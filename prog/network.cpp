@@ -92,6 +92,7 @@ int main(int argc, char* argv[]){
     // int stable_checks = 0;
     double stable_thresh=0, net_thresh, myosins_thresh, crosslks_thresh;
     int butterfly;
+    int num_retries;
 
     int unprinted_count = 0; 
 
@@ -212,6 +213,7 @@ int main(int argc, char* argv[]){
         ("net_thresh", po::value<double>(&net_thresh)->default_value(2.999), "Link force threshold for slowing down")
         ("myosins_thresh", po::value<double>(&myosins_thresh)->default_value(2.999), "Myosin force threshold for slowing down")
         ("crosslks_thresh", po::value<double>(&crosslks_thresh)->default_value(2.999), "Crosslks force threshold for slowing down")       
+        ("num_retries", po::value<int>(&num_retries)->default_value(1), "Number of times to try re-running section after going below minDt")
         ;
 
     //Hidden options, will be allowed both on command line and
@@ -417,8 +419,8 @@ int main(int argc, char* argv[]){
     crosslks2->set_fil_ens(net2);
     net_thresh == 2.999 ? (var_dt_meth == 1 ? (net_thresh = 3) : (net_thresh = 5)) : (net_thresh = net_thresh);
     myosins_thresh == 2.999 ? (myosins_thresh = 1.5 * a_m_fracture_force) : (myosins_thresh = myosins_thresh);
-    crosslks_thresh == 2.999 ? (crosslks_thresh = 1.5 * a_m_fracture_force) : (crosslks_thresh = crosslks_thresh);
-
+    crosslks_thresh == 2.999 ? (crosslks_thresh = 1.5 * p_m_fracture_force) : (crosslks_thresh = crosslks_thresh);
+    cout<<"net_thresh = "<<net_thresh<<"\t myosins_thresh = "<<myosins_thresh<<"\t crosslks_thresh = "<<crosslks_thresh<<endl;
 
 
     vector<double> print_times;
@@ -449,7 +451,7 @@ int main(int argc, char* argv[]){
         stored_p_motor_pos_vec = crosslks->get_vecvec();
         print_times = gen_print_times(tfinal, nframes);
     }
-        dt_var var_dt = dt_var(var_dt_meth, tfinal, nmsgs, check_steps, stable_thresh, dt);
+        dt_var var_dt = dt_var(var_dt_meth, tfinal, nmsgs, check_steps, stable_thresh, dt, num_retries);
         var_dt.set_test(test_param);
 
 
