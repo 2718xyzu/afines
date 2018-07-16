@@ -785,37 +785,37 @@ closefiles:
 bool light_activation(double x, double y, double light_method , vector<double> lp){
     bool light_yes = true;
     switch ((int) floor(light_method)){
-        case 1:
+        case 1: //one circle, in the center
             if(hypot(x,y)<lp[0]){
                 light_yes = true;
             }else light_yes = false;
             break;
 
-        case 2:
+        case 2: //two circles, on the diagonal
             if(hypot(x-lp[1],y-lp[1])<lp[0] || hypot(x+lp[1],y+lp[1])<lp[0]){
                 light_yes = true;
             }else light_yes = false;
             break;
 
-        case 3: 
+        case 3:  //four circles, one in each quadrant
             if(hypot(abs(x)-lp[1],abs(y)-lp[1])<lp[0]){
                 light_yes = true;
             }else light_yes = false;
             break;
 
-        case 4: 
+        case 4: //vertical bars
             if((x>lp[0] && x<lp[1]) || (x>lp[2] && x<lp[3])){
                 light_yes = true;
             }else light_yes = false;
             break;
 
-        case 5:
+        case 5: //triangles
             if(y>lp[5]*(x-lp[0])/(lp[1]-lp[0])-lp[5]/2 || y<lp[5]*(x-lp[2])/(lp[3]-lp[2])-lp[5]/2 ){
                 light_yes = true;
             }else light_yes = false;
             break;
 
-        case 6:
+        case 6: //annulus
             if (hypot(x,y)>lp[0] && hypot(x,y)<lp[1]){
                 light_yes = true;
             }else light_yes = false;
