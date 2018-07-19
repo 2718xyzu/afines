@@ -131,7 +131,7 @@ boost::optional<array<double, 2> > seg_seg_intersection(const array<double, 2>&,
 boost::optional<array<double, 2> > seg_seg_intersection_bc(string, double, const array<double, 2>&, const array<double, 2>&, const array<double, 2>&, const array<double, 2>&, const array<double, 2>&);
 std::string quads_error_message(std::string, vector<array<int, 2> >, vector<array<int, 2> > );
 
-double get_upper_dt(double tfinal,double t);
+double get_upper_dt(double dtinit, double tfinal,double t);
 vector<double> gen_print_times(double tfinal, int nframes);
 #endif
 

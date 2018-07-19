@@ -48,7 +48,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         }else{
             slow_down = 1;
         }
-        if (slow_down && dt>minDt) {
+        if (slow_down && dt>=minDt) {
             dt /= 2;
             slowed_down = 1;
             file_counts<<"\nt = " <<tcurr<<"\tSlow Down, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
@@ -73,7 +73,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
             slowed_down--;
         }
         if (net_status+myosins_status+crosslks_status < 2) {
-            if (stable_checks>stable_thresh && dt<(tfinal/double(nmsgs*2)) && dt<get_upper_dt(tfinal, t)){
+            if (stable_checks>stable_thresh && dt<(tfinal/double(nmsgs*2)) && dt<get_upper_dt(mindt, tfinal, t)){
                 dt *= 1.1;
                 stable_checks = 0;
                 file_counts<<"\nt = "<<tcurr<<"\tAll energies are low, speeding up now";

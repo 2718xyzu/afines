@@ -766,10 +766,10 @@ closefiles:
 
 }
 
-double get_upper_dt(double tfinal,double t){
+double get_upper_dt(double dtinit, double tfinal,double t){
     double upper_dt;
     if (tfinal<100) tfinal = 100;
-    upper_dt = (5E-5)*exp(3*t/tfinal);
+    upper_dt = (dtinit)*exp(3*t/tfinal);
     return upper_dt;
 }
 
