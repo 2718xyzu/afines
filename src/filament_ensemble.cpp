@@ -369,43 +369,43 @@ void filament_ensemble::update_energies(){
     }
 }
 
-int filament_ensemble::check_energies(int slow_down){
-    int status = 1;
-    int relax = 1;
-    double cutoff_force = 40 * link_k * link_ld;
-    for (unsigned int m = 0; m < network.size(); m++)
-    {
-        for (int i = 0; i < network[m]->get_nactins(); i++){ 
-            array<double, 2> force_vec = network[m]->get_actin(i)->get_force();
-            double one_force = hypot(force_vec[0],force_vec[1]);
-            if (one_force>cutoff_force){
-                status = 2;
-                cout<<one_force<<endl;
-                relax = 0;
-            }
-            if (one_force > 4*link_k*link_ld) relax = 0;
-        }
-        //pe += n_motors[m]->get_stretching_energy_fene();
-    }
-    if (relax) status = 0;
-    return status;
-}
+// int filament_ensemble::check_energies(int slow_down){
+//     int status = 1;
+//     int relax = 1;
+//     double cutoff_force = 40 * link_k * link_ld;
+//     for (unsigned int m = 0; m < network.size(); m++)
+//     {
+//         for (int i = 0; i < network[m]->get_nactins(); i++){ 
+//             array<double, 2> force_vec = network[m]->get_actin(i)->get_force();
+//             double one_force = hypot(force_vec[0],force_vec[1]);
+//             if (one_force>cutoff_force){
+//                 status = 2;
+//                 cout<<one_force<<endl;
+//                 relax = 0;
+//             }
+//             if (one_force > 4*link_k*link_ld) relax = 0;
+//         }
+//         //pe += n_motors[m]->get_stretching_energy_fene();
+//     }
+//     if (relax) status = 0;
+//     return status;
+// }
 
 int filament_ensemble::check_link_energies(int var_dt_meth, double thresh){
     int status = 1;
     int relax = 1;
-    
+    int count = 0;
     for (unsigned int m = 0; m < network.size(); m++)
     {
         for (int i = 0; i < network[m]->get_nlinks(); i++){ 
             array<double, 2> force_vec = network[m]->get_link(i)->get_force();
             double one_force = hypot(force_vec[0],force_vec[1]);
             if (one_force>thresh){
-                status = 2;
+                status++;
                 cout<<one_force<<endl;
                 relax = 0;
             }
-            if (one_force > .75*thresh) relax = 0;
+            if (one_force > .9*thresh) relax = 0;
         }
         //pe += n_motors[m]->get_stretching_energy_fene();
     }

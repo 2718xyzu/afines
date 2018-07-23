@@ -41,7 +41,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
     dtcurr = dt;
     countcurr = count;
     slow_param = 0;
-    if ((net_status == 2 || myosins_status == 2 || crosslks_status == 2) && backed_up<0) {
+    if ((net_status >= 2 || myosins_status >= 2 || crosslks_status >= 2) && backed_up<0) {
         if (slowed_down<(retries+1)){
         t -= check_steps * dt;
         count -= check_steps;
@@ -141,5 +141,17 @@ void dt_var::erase1(vector<double> &time_past, vector<double> &count_past,
     potential_energy_motors_past.erase(potential_energy_motors_past.begin());
     potential_energy_crosslks_past.erase(potential_energy_crosslks_past.begin());
 
+
+}
+
+void dt_var::update_thresholds(array<int, 3> statuses){
+    count = (count+1)%10;
+    n_s[count] = statuses[0];
+    m_s[count] = statuses[1];
+    c_s[count] = statuses[2]; 
+
+    int max_n_s = *max_element(n_s, n_s+10);
+    int max_m_s = *max_element(m_s, m_s+10);
+    int max_c_s = *max_element(c_s, c_s+10);
 
 }

@@ -300,16 +300,15 @@ int motor_ensemble::check_energies(int slow_down, double thresh)
 {
     int status = 1;
     int relax = 1;
-
+    double lowerThresh = max(.9*thresh, fracture_force);
     for (unsigned int m = 0; m < n_motors.size(); m++){
         array<double, 2> force_vec = n_motors[m]->get_force();
         double one_force = hypot(force_vec[0],force_vec[1]);
         if (one_force>thresh) {
-            status = 2;
+            status++;
             relax = 0;
         }
-        if (one_force > fracture_force) relax = 0;
-        //pe += n_motors[m]->get_stretching_energy_fene();
+        if (one_force > lower_thresh) relax = 0;
     }
     if (relax) status = 0;
     return status;

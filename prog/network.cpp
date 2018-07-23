@@ -632,7 +632,7 @@ int main(int argc, char* argv[]){
         crosslks_status = max(crosslks_status,crosslks->check_energies(slow_param, crosslks_thresh));
 
         if (count%check_steps == 0){ 
-
+            var_dt.update_thresholds({net_status, myosins_status, crosslks_status});
             int returned_int = var_dt.update_dt_var(t, dt, count, net_status, myosins_status, crosslks_status, file_counts);
             cout<<"line 634"<<endl;
             if (returned_int == 1){
@@ -690,10 +690,12 @@ int main(int argc, char* argv[]){
                 crosslks2->set_fil_ens(net2);
                 cout<<"line 685"<<endl;
                 int flush = 0;
-                unsigned int lastPrint = time_past.size();
+                int lastPrint = (int) time_past.size();
+                cout<<lastPrint<<endl;
+                cout<<"line 694"<<endl;
                 for (unsigned int i = 0; i<time_past.size(); i++){
                     if(time_past[i]>backupNet1->t) continue;
-                    lastPrint = i;
+                    lastPrint = (int) i;
                     cout<<"Wrote out t = "<<to_string(time_past[i])<<endl;
                     if (time_past[i]>tinit) time_str ="\n";
                     time_str += "t = "+to_string(time_past[i]);
@@ -718,16 +720,18 @@ int main(int argc, char* argv[]){
                     
                     flush = 1;
                 }
-                if (lastPrint<(time_past.size()-1)){
+                if (lastPrint<(((int) time_past.size())-1)){
+                    cout<<"erasing first elements"<<endl;
                     for (unsigned int i = 0; i<lastPrint-1; i++){
                         var_dt.erase1(time_past, count_past, actins_past, links_past, motors_past, crosslks_past,
                         thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
                     }
+                }else if(lastPrint == (((int) time_past.size())-1) {
+                        var_dt.clear_all(time_past, count_past, actins_past, links_past, motors_past, crosslks_past,
+                        thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
                 }
                 if (flush) {
-                    var_dt.clear_all(time_past, count_past, actins_past, links_past, motors_past, crosslks_past,
-                        thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
-
+                    
                     file_a<<std::flush;
                     file_l<<std::flush;
                     file_am<<std::flush;

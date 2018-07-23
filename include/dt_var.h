@@ -40,10 +40,14 @@ class dt_var
             vector<string> &thermo_past, vector<double> &stretching_energy_past, vector<double> &bending_energy_past, 
             vector<double> &potential_energy_motors_past,vector<double> &potential_energy_crosslks_past);
 
+        void update_thresholds(array<int, 3> statuses);
+
     public:
         double tcurr, dtcurr, stable_thresh, tfinal, slow_amount, minDt;
         int slow_param, slow_threshold, countcurr, net_status, myosins_status, crosslks_status, stable_checks,
-         slow_down, slowed_down, nmsgs, check_steps, test_check, retries, backed_up;
+         slow_down, slowed_down, nmsgs, check_steps, test_check, retries, backed_up, count;
+
+        array<int, 10> n_s, m_s, c_s; 
         
     
 };
