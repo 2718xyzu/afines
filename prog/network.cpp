@@ -639,6 +639,7 @@ int main(int argc, char* argv[]){
 
                 backupMyosins2->set_fil_ens(backupNet2);
                 backupCrosslks2->set_fil_ens(backupNet2);
+                backupNet2->t = t;
 
             }
             else{
