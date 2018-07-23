@@ -28,18 +28,20 @@ dt_var::dt_var(int method, double final_time, int num_msgs, int chk_steps, doubl
     }
     minDt = initDt;
     retries = numRetry;
+    backed_up = 2;
 
 }
 
 
 int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int myosins_status, 
-    int crosslks_status, ostream& file_counts){
+        int crosslks_status, ostream& file_counts){
+
     int returned_int;
     tcurr = t;
     dtcurr = dt;
     countcurr = count;
     slow_param = 0;
-    if ((net_status == 2 || myosins_status == 2 || crosslks_status == 2) ) {
+    if ((net_status == 2 || myosins_status == 2 || crosslks_status == 2) && backed_up<0) {
         if (slowed_down<(retries+1)){
         t -= check_steps * dt;
         count -= check_steps;
@@ -70,6 +72,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         }
     } else {
         returned_int = 2;
+        backed_up--;
         if (slowed_down==1) {
             dt *= slow_amount;
             slowed_down = 0;
@@ -121,3 +124,22 @@ void dt_var::set_test(int test_param){
     test_check = test_param;
 }
 
+void dt_var::erase1(vector<double> &time_past, vector<double> &count_past,
+    vector<string> &actins_past, vector<string> &links_past, vector<string> &motors_past, vector<string> &crosslks_past,
+    vector<string> &thermo_past, vector<double> &stretching_energy_past, vector<double> &bending_energy_past, 
+    vector<double> &potential_energy_motors_past,vector<double> &potential_energy_crosslks_past){
+
+    time_past.erase(time_past.begin());
+    count_past.erase(count_past.begin());
+    actins_past.erase(actins_past.begin());
+    links_past.erase(links_past.begin());
+    motors_past.erase(motors_past.begin());
+    crosslks_past.erase(crosslks_past.begin());
+    thermo_past.erase(thermo_past.begin());
+    stretching_energy_past.erase(stretching_energy_past.begin());
+    bending_energy_past.erase(bending_energy_past.begin());
+    potential_energy_motors_past.erase(potential_energy_motors_past.begin());
+    potential_energy_crosslks_past.erase(potential_energy_crosslks_past.begin());
+
+
+}

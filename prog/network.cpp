@@ -93,8 +93,7 @@ int main(int argc, char* argv[]){
     double stable_thresh=0, net_thresh, myosins_thresh, crosslks_thresh;
     int butterfly;
     int num_retries;
-    int farther_back = 73;
-    int section = 2;
+
 
     int unprinted_count = 0; 
 
@@ -372,7 +371,7 @@ int main(int argc, char* argv[]){
     filament_ensemble * net;
     filament_ensemble * net2;
     filament_ensemble * backupNet1;
-    filament_ensemble * backupNet2;
+
     if (actin_pos_vec.size() == 0 && actin_in.size() == 0){
         net = new filament_ensemble(npolymer, nmonomer, nmonomer_extra, extra_bead_prob, {xrange, yrange}, {xgrid, ygrid}, dt,
                 temperature, actin_length, viscosity, link_length, actin_position_arrs, link_stretching_stiffness, fene_pct, link_bending_stiffness,
@@ -392,7 +391,7 @@ int main(int argc, char* argv[]){
     motor_ensemble * myosins;
     motor_ensemble * myosins2;
     motor_ensemble * backupMyosins1;
-    motor_ensemble * backupMyosins2;
+
     if (a_motor_pos_vec.size() == 0 && a_motor_in.size() == 0){
         myosins = new motor_ensemble( a_motor_density, {xrange, yrange}, dt, temperature,
                 a_motor_length, net, a_motor_v, a_motor_stiffness, fene_pct, a_m_kon, a_m_koff,
@@ -409,7 +408,7 @@ int main(int argc, char* argv[]){
     motor_ensemble * crosslks;
     motor_ensemble * crosslks2;
     motor_ensemble * backupCrosslks1;
-    motor_ensemble * backupCrosslks2;
+
     if(p_motor_pos_vec.size() == 0 && p_motor_in.size() == 0){
         crosslks = new motor_ensemble( p_motor_density, {xrange, yrange}, dt, temperature,
                 p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
@@ -423,6 +422,9 @@ int main(int argc, char* argv[]){
     net2 = new filament_ensemble(*net);
     myosins2 = new motor_ensemble(*myosins);
     crosslks2 = new motor_ensemble(*crosslks);
+    backupNet1 = new filament_ensemble(*net);
+    backupMyosins1 = new motor_ensemble(*myosins);
+    backupCrosslks1 = new motor_ensemble(*crosslks);
     myosins2->set_fil_ens(net2);
     crosslks2->set_fil_ens(net2);
     net_thresh == 2.999 ? (var_dt_meth == 1 ? (net_thresh = 3) : (net_thresh = 5)) : (net_thresh = net_thresh);
@@ -592,7 +594,7 @@ int main(int argc, char* argv[]){
         //update network
         net->update();//updates all forces, velocities and positions of filaments
         //update cross linkers
-        // cout<<"line 579"<<endl;
+
         if (static_cl_flag)
             crosslks->motor_update();
         else
@@ -600,7 +602,7 @@ int main(int argc, char* argv[]){
         // cout<<"line 584"<<endl;
         //update motors
         myosins->motor_walk(t);
-        // cout<<"line 587"<<endl;
+
         //clear the vector of fractured filaments
         net->clear_broken();
 
@@ -623,81 +625,7 @@ int main(int argc, char* argv[]){
         t+=dt;
 		count++;
         total_count++;
-
-    if (var_dt_meth >= 1){
-
-
-        if(count%farther_back == 1){
-            if(section == 1){
-                section = 2;
-                delete backupNet2;
-                backupNet2 = new filament_ensemble(*net);
-                delete backupMyosins2;
-                backupMyosins2 = new motor_ensemble(*myosins);
-                delete backupCrosslks2;
-                backupCrosslks2 = new motor_ensemble(*crosslks);
-
-                backupMyosins2->set_fil_ens(backupNet2);
-                backupCrosslks2->set_fil_ens(backupNet2);
-                backupNet2->t = t;
-
-            }
-            else{
-                section = 1;
-                delete backupNet1;
-                backupNet1 = new filament_ensemble(*net);
-                delete backupMyosins1;
-                backupMyosins1 = new motor_ensemble(*myosins);
-                delete backupCrosslks1;
-                backupCrosslks1 = new motor_ensemble(*crosslks);
-
-                backupMyosins1->set_fil_ens(backupNet1);
-                backupCrosslks1->set_fil_ens(backupNet1);
-                backupNet1->t = t;
-
-            }
-            int flush = 0;
-                for (unsigned int i = 0; i<time_past.size(); i++){
-
-                    cout<<"Wrote out t = "<<to_string(time_past[i])<<endl;
-                    if (time_past[i]>tinit) time_str ="\n";
-                    time_str += "t = "+to_string(time_past[i]);
-
-                    file_a << time_str<<"\tN = "<<to_string(net->get_nactins());
-                    file_a << actins_past[i];
-
-                    file_l << time_str<<"\tN = "<<to_string(net->get_nlinks());
-                    file_l << links_past[i];
-
-                    file_am << time_str<<"\tN = "<<to_string(myosins->get_nmotors());
-                    file_am << motors_past[i];
-
-                    file_pm << time_str<<"\tN = "<<to_string(crosslks->get_nmotors());
-                    file_pm << crosslks_past[i];
-
-                    file_th << time_str<<"\tN = "<<to_string(net->get_nfilaments());
-                    file_th << thermo_past[i];
-
-                    file_pe << to_string(stretching_energy_past[i]) + "\t" + to_string(bending_energy_past[i]) + "\t" +
-                        to_string(potential_energy_motors_past[i]) + "\t" + to_string(potential_energy_crosslks_past[i]) << endl;
-                    
-                    flush = 1;
-                }
-                if (flush) {
-                    var_dt.clear_all(time_past, count_past, actins_past, links_past, motors_past, crosslks_past,
-                        thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
-
-                    file_a<<std::flush;
-                    file_l<<std::flush;
-                    file_am<<std::flush;
-                    file_pm<<std::flush;
-                    file_th<<std::flush;
-                    file_pe<<std::flush;
-                    file_time<<std::flush;
-                    file_counts<<std::flush;
-                    flush = 0;
-                }
-        }
+        cout<<"line 625 time = "<<t;
 
         net_status = max(net_status, net->check_link_energies(var_dt_meth, net_thresh));
         myosins_status = max(myosins_status, myosins->check_energies(slow_param, myosins_thresh));
@@ -706,7 +634,7 @@ int main(int argc, char* argv[]){
         if (count%check_steps == 0){ 
 
             int returned_int = var_dt.update_dt_var(t, dt, count, net_status, myosins_status, crosslks_status, file_counts);
-
+            cout<<"line 634"<<endl;
             if (returned_int == 1){
                 file_counts<<"\n dt is now "<<dt<<endl;
             
@@ -734,25 +662,38 @@ int main(int argc, char* argv[]){
                 thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
 
             }else if(returned_int == 2){
-                // cout<<"line 660"<<endl;
-                // cout<<"dt is now = "<<dt<<endl;
+
                 net->set_dt(dt);
                 myosins->set_dt(dt);
                 crosslks->set_dt(dt);
 
-                delete net2;
-                delete myosins2;
-                delete crosslks2;
+                cout<<"net is "<<net<<endl;
+                cout<<"net2 is "<<net2<<endl;
+                cout<<"backupNet1 is "<<backupNet1<<endl;
+
+                cout<<"line 667"<<endl;
+                delete backupNet1;
+                cout<<"backupNet1 is "<<backupNet1<<endl;
+                delete backupMyosins1;
+                delete backupCrosslks1;
+                cout<<"line 671"<<endl;
+                backupNet1 = net2;
+                cout<<"backupNet1 is "<<backupNet1<<endl;
+                backupMyosins1 = myosins2;
+                backupCrosslks1 = crosslks2;
+                cout<<"line 678"<<endl;
 
                 net2 = new filament_ensemble(*net);
                 myosins2 = new motor_ensemble(*myosins);
                 crosslks2 = new motor_ensemble(*crosslks);
                 myosins2->set_fil_ens(net2);
                 crosslks2->set_fil_ens(net2);
-
+                cout<<"line 685"<<endl;
                 int flush = 0;
+                unsigned int lastPrint = time_past.size();
                 for (unsigned int i = 0; i<time_past.size(); i++){
-
+                    if(time_past[i]>backupNet1->t) continue;
+                    lastPrint = i;
                     cout<<"Wrote out t = "<<to_string(time_past[i])<<endl;
                     if (time_past[i]>tinit) time_str ="\n";
                     time_str += "t = "+to_string(time_past[i]);
@@ -777,6 +718,12 @@ int main(int argc, char* argv[]){
                     
                     flush = 1;
                 }
+                if (lastPrint<(time_past.size()-1)){
+                    for (unsigned int i = 0; i<lastPrint-1; i++){
+                        var_dt.erase1(time_past, count_past, actins_past, links_past, motors_past, crosslks_past,
+                        thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
+                    }
+                }
                 if (flush) {
                     var_dt.clear_all(time_past, count_past, actins_past, links_past, motors_past, crosslks_past,
                         thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
@@ -793,22 +740,39 @@ int main(int argc, char* argv[]){
                 }
 
             } else if(returned_int == 5){
+                cout<<(backupNet1->t)<<endl;
                 file_counts<<"\n dt is now "<<dt<<endl;
             
                 delete net;
-                net = new filament_ensemble(*net2);
+                net = new filament_ensemble(*backupNet1);
+                delete net2;
+                net2 = new filament_ensemble(*backupNet1);
                 
                 delete myosins;
-                myosins = new motor_ensemble(*myosins2);
+                myosins = new motor_ensemble(*backupMyosins1);
+                delete myosins2;
+                myosins2 = new motor_ensemble(*backupMyosins1);
 
                 delete crosslks;
-                crosslks = new motor_ensemble(*crosslks2);
+                crosslks = new motor_ensemble(*backupCrosslks1);
+                delete crosslks2;
+                crosslks2 = new motor_ensemble(*backupCrosslks1);
+
 
                 myosins->set_fil_ens(net);
                 crosslks->set_fil_ens(net);
                 net->set_dt(dt);
                 myosins->set_dt(dt);
-                crosslks->set_dt(dt);
+                crosslks->set_dt(dt);               
+                myosins2->set_fil_ens(net2);
+                crosslks2->set_fil_ens(net2);
+                net2->set_dt(dt);
+                myosins2->set_dt(dt);
+                crosslks2->set_dt(dt);
+                
+                t = net->t;
+
+                var_dt.backed_up = 2;
 
                 for (unsigned int i = 0; i<time_past.size(); i++){
                     print_times.push_back(time_past.back());
@@ -826,7 +790,6 @@ int main(int argc, char* argv[]){
             myosins_status = 0; 
             crosslks_status = 0;
         }
-    }
 
     }
 
