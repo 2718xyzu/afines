@@ -369,43 +369,43 @@ void filament_ensemble::update_energies(){
     }
 }
 
-int filament_ensemble::check_energies(int slow_down){
-    int status = 1;
-    int relax = 1;
-    double cutoff_force = 40 * link_k * link_ld;
-    for (unsigned int m = 0; m < network.size(); m++)
-    {
-        for (int i = 0; i < network[m]->get_nactins(); i++){ 
-            array<double, 2> force_vec = network[m]->get_actin(i)->get_force();
-            double one_force = hypot(force_vec[0],force_vec[1]);
-            if (one_force>cutoff_force){
-                status = 2;
-                cout<<one_force<<endl;
-                relax = 0;
-            }
-            if (one_force > 4*link_k*link_ld) relax = 0;
-        }
-        //pe += n_motors[m]->get_stretching_energy_fene();
-    }
-    if (relax) status = 0;
-    return status;
-}
+// int filament_ensemble::check_energies(int slow_down){
+//     int status = 1;
+//     int relax = 1;
+//     double cutoff_force = 40 * link_k * link_ld;
+//     for (unsigned int m = 0; m < network.size(); m++)
+//     {
+//         for (int i = 0; i < network[m]->get_nactins(); i++){ 
+//             array<double, 2> force_vec = network[m]->get_actin(i)->get_force();
+//             double one_force = hypot(force_vec[0],force_vec[1]);
+//             if (one_force>cutoff_force){
+//                 status = 2;
+//                 cout<<one_force<<endl;
+//                 relax = 0;
+//             }
+//             if (one_force > 4*link_k*link_ld) relax = 0;
+//         }
+//         //pe += n_motors[m]->get_stretching_energy_fene();
+//     }
+//     if (relax) status = 0;
+//     return status;
+// }
 
 int filament_ensemble::check_link_energies(int var_dt_meth, double thresh){
     int status = 1;
     int relax = 1;
-    
+    int count = 0;
     for (unsigned int m = 0; m < network.size(); m++)
     {
         for (int i = 0; i < network[m]->get_nlinks(); i++){ 
             array<double, 2> force_vec = network[m]->get_link(i)->get_force();
             double one_force = hypot(force_vec[0],force_vec[1]);
             if (one_force>thresh){
-                status = 2;
+                status++;
                 cout<<one_force<<endl;
                 relax = 0;
             }
-            if (one_force > .75*thresh) relax = 0;
+            if (one_force > .9*thresh) relax = 0;
         }
         //pe += n_motors[m]->get_stretching_energy_fene();
     }
@@ -856,42 +856,28 @@ filament_ensemble::filament_ensemble(const filament_ensemble& other){
     nq = other.nq;
     half_nq = other.half_nq;
     broken_filaments = other.broken_filaments;
-    //empty_vector = other.empty_vector;
-//the below lines may have been causing problems
-    // links_per_quad = other.links_per_quad;
-    // n_links_per_quad = other.n_links_per_quad;
-    // cout<<"line 865"<<endl;
+
     this->nlist_init_serial();
-    // cout<<"line 867"<<endl;
-    //for (int x = 0; x < other.nq[0]; x++){
-    // //     // cout<<"line 30"<<endl;
-    //      for (int y = 0; y < other.nq[1]; y++){
-    // //         cout<<"this works"<<endl;
-    //         links_per_quad[x]->at(y) = other.links_per_quad[x]->at(y);        
-    //      }
-    // //     cout<<"This works too"<<endl;
-    // //     links_per_quad[x] = other.links_per_quad[x];
-    //  }
-
-    
-
-
-    // cout<<"this is fine"<<endl;
     all_quads = other.all_quads;
     fls = other.fls;
+    
     for (unsigned int f = 0; f < other.network.size(); f++){
         network.push_back(new filament(*(other.network[f])));
     }
-    // cout<<"This is still fine"<<endl;
 
 }
 
 
 void filament_ensemble::set_dt(double dt_var){
     shear_dt = dt_var;
+    dt = dt_var;
     for (unsigned int f = 0; f < network.size(); f++)
         network[f]->set_dt(dt_var);
-  
+
+}
+
+double filament_ensemble::get_dt(){
+    return dt;
 }
 
 vector<vector<double > > filament_ensemble::get_vecvec(){

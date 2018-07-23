@@ -181,11 +181,15 @@ class filament_ensemble
 
         void set_dt(double dt_var);
 
+        double get_dt();
+
         vector<vector<double > > get_vecvec();
+
+        double t,dt;
     
     protected:
 
-        double t, temperature, link_ld, link_k, visc, min_time, dt;
+        double temperature, link_ld, link_k, visc, min_time;
         double gamma, shear_stop, shear_dt, shear_speed, delrx;
         double max_links_per_quad_per_filament, max_links_per_quad; 
         bool straight_filaments = false, quad_off_flag;
