@@ -856,29 +856,11 @@ filament_ensemble::filament_ensemble(const filament_ensemble& other){
     nq = other.nq;
     half_nq = other.half_nq;
     broken_filaments = other.broken_filaments;
-    //empty_vector = other.empty_vector;
-//the below lines may have been causing problems
-    // links_per_quad = other.links_per_quad;
-    // n_links_per_quad = other.n_links_per_quad;
-    // cout<<"line 865"<<endl;
+
     this->nlist_init_serial();
-    // cout<<"line 867"<<endl;
-    //for (int x = 0; x < other.nq[0]; x++){
-    // //     // cout<<"line 30"<<endl;
-    //      for (int y = 0; y < other.nq[1]; y++){
-    // //         cout<<"this works"<<endl;
-    //         links_per_quad[x]->at(y) = other.links_per_quad[x]->at(y);        
-    //      }
-    // //     cout<<"This works too"<<endl;
-    // //     links_per_quad[x] = other.links_per_quad[x];
-    //  }
-
-    
-
-
-    // cout<<"this is fine"<<endl;
     all_quads = other.all_quads;
     fls = other.fls;
+    
     for (unsigned int f = 0; f < other.network.size(); f++){
         network.push_back(new filament(*(other.network[f])));
     }
@@ -889,9 +871,14 @@ filament_ensemble::filament_ensemble(const filament_ensemble& other){
 
 void filament_ensemble::set_dt(double dt_var){
     shear_dt = dt_var;
+    dt = dt_var;
     for (unsigned int f = 0; f < network.size(); f++)
         network[f]->set_dt(dt_var);
   
+}
+
+double get_dt(){
+    return dt;
 }
 
 vector<vector<double > > filament_ensemble::get_vecvec(){

@@ -39,7 +39,8 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
     dtcurr = dt;
     countcurr = count;
     slow_param = 0;
-    if ((net_status == 2 || myosins_status == 2 || crosslks_status == 2) && slowed_down<(retries+1) ) {
+    if ((net_status == 2 || myosins_status == 2 || crosslks_status == 2) ) {
+        if (slowed_down<(retries+1)){
         t -= check_steps * dt;
         count -= check_steps;
         stable_checks = floor(stable_checks/2);
@@ -63,6 +64,10 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
         //something has blown up, so we go back
         cout<<"t = "<<tcurr<<" back up to "<<t<<endl;
         returned_int = 1;
+        }else{
+            cout<<"t = "<<tcurr<<" back up farther to ";
+            returned_int = 5;
+        }
     } else {
         returned_int = 2;
         if (slowed_down==1) {

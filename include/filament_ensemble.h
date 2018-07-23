@@ -181,6 +181,8 @@ class filament_ensemble
 
         void set_dt(double dt_var);
 
+        double get_dt();
+
         vector<vector<double > > get_vecvec();
     
     protected:
