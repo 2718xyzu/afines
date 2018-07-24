@@ -394,7 +394,6 @@ void filament_ensemble::update_energies(){
 int filament_ensemble::check_link_energies(int var_dt_meth, double thresh){
     int status = 1;
     int relax = 1;
-    int count = 0;
     for (unsigned int m = 0; m < network.size(); m++)
     {
         for (int i = 0; i < network[m]->get_nlinks(); i++){ 
