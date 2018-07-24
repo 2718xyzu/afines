@@ -68,8 +68,8 @@ int main(int argc, char* argv[]){
     string config_file, actin_in, a_motor_in, p_motor_in;
 
     // Output
-    string   dir, tdir, ddir,  afile,  amfile,  pmfile,  lfile, thfile, pefile, tfile, cfile;
-    ofstream o_file, file_a, file_am, file_pm, file_l, file_th, file_pe, file_time, file_counts;
+    string   dir, tdir, ddir,  afile,  amfile,  pmfile,  lfile, thfile, pefile, tfile, cfile, threshfile;
+    ofstream o_file, file_a, file_am, file_pm, file_l, file_th, file_pe, file_time, file_counts, file_thresh;
     ios_base::openmode write_mode = ios_base::out;
 
     // External Force
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]){
     int check_steps, test_param, var_dt_meth;
     // int slow_down = 0; //
     // int slowed_down = 0;
-    int slow_param = 0;
+    // int slow_param = 0;
     // int stable_checks = 0;
     double stable_thresh=0, net_thresh, myosins_thresh, crosslks_thresh;
     int butterfly;
@@ -274,6 +274,7 @@ int main(int argc, char* argv[]){
     pmfile = tdir + "/pmotors.txt";
     thfile = ddir + "/filament_e.txt";
     pefile = ddir + "/pe.txt";
+    threshfile = ddir + "/thresholds.txt";
 
     if(fs::create_directory(dir1)) cerr<< "Directory Created: "<<afile<<std::endl;
     if(fs::create_directory(dir2)) cerr<< "Directory Created: "<<thfile<<std::endl;
@@ -351,6 +352,7 @@ int main(int argc, char* argv[]){
     file_pm.open(pmfile.c_str(), write_mode);
 	file_th.open(thfile.c_str(), write_mode);
 	file_pe.open(pefile.c_str(), write_mode);
+    file_thresh.open(threshfile.c_str(),write_mode);
 
 
 
@@ -439,11 +441,11 @@ int main(int argc, char* argv[]){
     vector<double> stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
     vector<double> time_past;
     vector<double> count_past;
-    int crosslks_status = 0;
-    int myosins_status = 0;
-    int net_status = 0;
-
-
+    // array<int, 3> obj_statuses; //these arrays must have one element for each ensemble in the simulation
+    array<double, 3> obj_thresholds;
+    obj_thresholds[0] = net_thresh;
+    obj_thresholds[1] = myosins_thresh;
+    obj_thresholds[2] = crosslks_thresh;
 
     if (var_dt_meth >= 1){
         if(check_steps == 0) {
@@ -461,7 +463,7 @@ int main(int argc, char* argv[]){
         stored_p_motor_pos_vec = crosslks->get_vecvec();
         print_times = gen_print_times(tfinal, nframes);
     }
-        dt_var var_dt = dt_var(var_dt_meth, tfinal, nmsgs, check_steps, stable_thresh, dt, num_retries);
+        dt_var var_dt = dt_var(var_dt_meth, tfinal, nmsgs, check_steps, stable_thresh, dt, num_retries, obj_thresholds);
         var_dt.set_test(test_param);
 
 
@@ -625,16 +627,14 @@ int main(int argc, char* argv[]){
         t+=dt;
 		count++;
         total_count++;
-        cout<<"line 625 time = "<<t;
 
-        net_status = max(net_status, net->check_link_energies(var_dt_meth, net_thresh));
-        myosins_status = max(myosins_status, myosins->check_energies(slow_param, myosins_thresh));
-        crosslks_status = max(crosslks_status,crosslks->check_energies(slow_param, crosslks_thresh));
+        var_dt.check_energies(net, myosins, crosslks);
 
         if (count%check_steps == 0){ 
-            var_dt.update_thresholds({net_status, myosins_status, crosslks_status});
-            int returned_int = var_dt.update_dt_var(t, dt, count, net_status, myosins_status, crosslks_status, file_counts);
-            cout<<"line 634"<<endl;
+            string out = var_dt.update_thresholds();
+                if (out.size() > 0) file_thresh<<t<<"\t"<<out<<endl;
+            int returned_int = var_dt.update_dt_var(t, dt, count, file_counts);
+
             if (returned_int == 1){
                 file_counts<<"\n dt is now "<<dt<<endl;
             
@@ -667,32 +667,23 @@ int main(int argc, char* argv[]){
                 myosins->set_dt(dt);
                 crosslks->set_dt(dt);
 
-                cout<<"net is "<<net<<endl;
-                cout<<"net2 is "<<net2<<endl;
-                cout<<"backupNet1 is "<<backupNet1<<endl;
-
-                cout<<"line 667"<<endl;
                 delete backupNet1;
-                cout<<"backupNet1 is "<<backupNet1<<endl;
                 delete backupMyosins1;
                 delete backupCrosslks1;
-                cout<<"line 671"<<endl;
                 backupNet1 = net2;
-                cout<<"backupNet1 is "<<backupNet1<<endl;
                 backupMyosins1 = myosins2;
                 backupCrosslks1 = crosslks2;
-                cout<<"line 678"<<endl;
 
                 net2 = new filament_ensemble(*net);
                 myosins2 = new motor_ensemble(*myosins);
                 crosslks2 = new motor_ensemble(*crosslks);
                 myosins2->set_fil_ens(net2);
                 crosslks2->set_fil_ens(net2);
-                cout<<"line 685"<<endl;
+
                 int flush = 0;
                 int lastPrint = (int) time_past.size();
-                cout<<lastPrint<<endl;
-                cout<<"line 694"<<endl;
+
+
                 for (unsigned int i = 0; i<time_past.size(); i++){
                     if(time_past[i]>backupNet1->t) continue;
                     lastPrint = (int) i;
@@ -722,13 +713,13 @@ int main(int argc, char* argv[]){
                 }
                 if (lastPrint<(((int) time_past.size())-1)){
                     cout<<"erasing first elements"<<endl;
-                    for (unsigned int i = 0; i<lastPrint-1; i++){
+                    for (int i = 0; i<lastPrint-1; i++){
                         var_dt.erase1(time_past, count_past, actins_past, links_past, motors_past, crosslks_past,
                         thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
                     }
-                }else if(lastPrint == (((int) time_past.size())-1) {
+                }else if(lastPrint == (((int) time_past.size())-1)) {
                         var_dt.clear_all(time_past, count_past, actins_past, links_past, motors_past, crosslks_past,
-                        thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
+                            thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
                 }
                 if (flush) {
                     
@@ -790,9 +781,7 @@ int main(int argc, char* argv[]){
 
 
             file_time<<t<<"\t"<<dt<<endl;
-            net_status = 0;
-            myosins_status = 0; 
-            crosslks_status = 0;
+            var_dt.obj_statuses = {0,0,0};
         }
 
     }
@@ -811,6 +800,7 @@ int main(int argc, char* argv[]){
     file_th.close();
     file_pe.close();
     file_time.close();
+    file_thresh.close();
     //Delete all objects created
     //cout<<"\nHere's where I think I delete things\n";
 

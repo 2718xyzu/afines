@@ -300,7 +300,7 @@ int motor_ensemble::check_energies(int slow_down, double thresh)
 {
     int status = 1;
     int relax = 1;
-    double lowerThresh = max(.9*thresh, fracture_force);
+    double lower_thresh = max(.9*thresh, fracture_force);
     for (unsigned int m = 0; m < n_motors.size(); m++){
         array<double, 2> force_vec = n_motors[m]->get_force();
         double one_force = hypot(force_vec[0],force_vec[1]);

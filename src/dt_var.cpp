@@ -10,8 +10,11 @@
 #include "globals.h"
 #include "dt_var.h"
 #include "vector"
+// #include "filament_ensemble.h"
+// #include "motor_ensemble.h"
 
-dt_var::dt_var(int method, double final_time, int num_msgs, int chk_steps, double stable_threshold, double initDt, int numRetry){ 
+dt_var::dt_var(int method, double final_time, int num_msgs, int chk_steps, double stable_threshold, double initDt, int numRetry,
+        array<double, 3> thresholds){ 
 
     tfinal = final_time;
     nmsgs = num_msgs;
@@ -21,7 +24,7 @@ dt_var::dt_var(int method, double final_time, int num_msgs, int chk_steps, doubl
     test_check = 0;
     if (method == 1){ //conservative method
         slow_threshold = 4;
-        slow_amount = 1.5;
+        slow_amount = 1.5; //slow_amount is the reciprocal of the net proportional change after a single reversal (assuming time step changes)
     }else if(method ==2){ //aggressive method
         slow_threshold = 6;
         slow_amount = 1.95;
@@ -29,12 +32,14 @@ dt_var::dt_var(int method, double final_time, int num_msgs, int chk_steps, doubl
     minDt = initDt;
     retries = numRetry;
     backed_up = 2;
+    obj_thresholds = thresholds;
+    check_count = 0;
+    var_dt_meth = method;
 
 }
 
 
-int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int myosins_status, 
-        int crosslks_status, ostream& file_counts){
+int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_counts){
 
     int returned_int;
     tcurr = t;
@@ -99,7 +104,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, int net_status, int
     return returned_int;
 }
 
-void dt_var::clear_all(vector<double> &time_past, vector<double> &count_past,
+void dt_var::clear_all(vector<double> &time_past, vector<double> &count_past, //in the interests of keeping network.cpp cleaner
     vector<string> &actins_past, vector<string> &links_past, vector<string> &motors_past, vector<string> &crosslks_past,
     vector<string> &thermo_past, vector<double> &stretching_energy_past, vector<double> &bending_energy_past, 
     vector<double> &potential_energy_motors_past,vector<double> &potential_energy_crosslks_past){
@@ -144,14 +149,56 @@ void dt_var::erase1(vector<double> &time_past, vector<double> &count_past,
 
 }
 
-void dt_var::update_thresholds(array<int, 3> statuses){
-    count = (count+1)%10;
-    n_s[count] = statuses[0];
-    m_s[count] = statuses[1];
-    c_s[count] = statuses[2]; 
 
-    int max_n_s = *max_element(n_s, n_s+10);
-    int max_m_s = *max_element(m_s, m_s+10);
-    int max_c_s = *max_element(c_s, c_s+10);
+void dt_var::check_energies(filament_ensemble * network, motor_ensemble * myosins, motor_ensemble * crosslks){
+        obj_statuses[0] = max(obj_statuses[0], network->check_link_energies(var_dt_meth, obj_thresholds[0]));
+        obj_statuses[1] = max(obj_statuses[1], myosins->check_energies(0, obj_thresholds[1]));
+        obj_statuses[2] = max(obj_statuses[2],crosslks->check_energies(0, obj_statuses[2]));
+}
 
+string dt_var::update_thresholds(){
+    string out = "";
+    check_count = (check_count+1)%10;
+    n_s[check_count] = obj_statuses[0];
+    m_s[check_count] = obj_statuses[1];
+    c_s[check_count] = obj_statuses[2]; 
+
+    if(check_count == 0){
+
+    int max_n_s = *max_element(n_s.begin(), n_s.begin()+10);
+    int max_m_s = *max_element(m_s.begin(), m_s.begin()+10);
+    int max_c_s = *max_element(c_s.begin(), c_s.begin()+10);
+
+    if(max_n_s == 0){
+        obj_thresholds[0] *= .95;
+    }else if(max_n_s == 3){
+        int increase_threshold = 0;
+        for (int i = 0; i<10; i++){
+            if(n_s[i]>=3) increase_threshold++;
+        }
+        if (increase_threshold>1) obj_thresholds[0] *= 1.05;
+    }
+    if(max_m_s == 0){
+        obj_thresholds[1] *= .95;
+    }else if(max_m_s == 3){
+        int increase_threshold = 0;
+        for (int i = 0; i<10; i++){
+            if(m_s[i]>=3) increase_threshold++;
+        }
+        if (increase_threshold>1) obj_thresholds[1] *= 1.05;
+    }
+
+    if(max_c_s == 0){
+        obj_thresholds[2] *= .95;
+    }else if(max_c_s == 3){
+        int increase_threshold = 0;
+        for (int i = 0; i<10; i++){
+            if(c_s[i]>=3) increase_threshold++;
+        }
+        if (increase_threshold>1) obj_thresholds[2] *= 1.05;
+    }
+    out = "\t"+to_string(obj_thresholds[0])+"\t"+to_string(obj_thresholds[1])+"\t"+to_string(obj_thresholds[2]);
+    }
+
+    return out;
 }
