@@ -156,8 +156,8 @@ void dt_var::check_energies(filament_ensemble * network, motor_ensemble * myosin
         obj_statuses[2] = max(obj_statuses[2],crosslks->check_energies(0, obj_statuses[2]));
 }
 
-void dt_var::update_thresholds(){
-
+string dt_var::update_thresholds(){
+    string out = "";
     check_count = (check_count+1)%10;
     n_s[check_count] = obj_statuses[0];
     m_s[check_count] = obj_statuses[1];
@@ -197,8 +197,8 @@ void dt_var::update_thresholds(){
         }
         if (increase_threshold>1) obj_thresholds[2] *= 1.05;
     }
-
+    out = "\t"+to_string(obj_thresholds[0])+"\t"+to_string(obj_thresholds[1])+"\t"+to_string(obj_thresholds[2]);
     }
 
-
+    return out;
 }

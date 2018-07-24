@@ -42,7 +42,7 @@ class dt_var
             vector<string> &thermo_past, vector<double> &stretching_energy_past, vector<double> &bending_energy_past, 
             vector<double> &potential_energy_motors_past,vector<double> &potential_energy_crosslks_past);
 
-        void update_thresholds();
+        string update_thresholds();
 
         void check_energies(filament_ensemble * network, motor_ensemble * myosins, motor_ensemble * crosslks);
 

@@ -68,8 +68,8 @@ int main(int argc, char* argv[]){
     string config_file, actin_in, a_motor_in, p_motor_in;
 
     // Output
-    string   dir, tdir, ddir,  afile,  amfile,  pmfile,  lfile, thfile, pefile, tfile, cfile;
-    ofstream o_file, file_a, file_am, file_pm, file_l, file_th, file_pe, file_time, file_counts;
+    string   dir, tdir, ddir,  afile,  amfile,  pmfile,  lfile, thfile, pefile, tfile, cfile, threshfile;
+    ofstream o_file, file_a, file_am, file_pm, file_l, file_th, file_pe, file_time, file_counts, file_thresh;
     ios_base::openmode write_mode = ios_base::out;
 
     // External Force
@@ -274,6 +274,7 @@ int main(int argc, char* argv[]){
     pmfile = tdir + "/pmotors.txt";
     thfile = ddir + "/filament_e.txt";
     pefile = ddir + "/pe.txt";
+    threshfile = ddir + "/thresholds.txt";
 
     if(fs::create_directory(dir1)) cerr<< "Directory Created: "<<afile<<std::endl;
     if(fs::create_directory(dir2)) cerr<< "Directory Created: "<<thfile<<std::endl;
@@ -351,6 +352,7 @@ int main(int argc, char* argv[]){
     file_pm.open(pmfile.c_str(), write_mode);
 	file_th.open(thfile.c_str(), write_mode);
 	file_pe.open(pefile.c_str(), write_mode);
+    file_thresh.open(threshfile.c_str(),write_mode);
 
 
 
@@ -629,7 +631,8 @@ int main(int argc, char* argv[]){
         var_dt.check_energies(net, myosins, crosslks);
 
         if (count%check_steps == 0){ 
-            var_dt.update_thresholds();
+            string out = var_dt.update_thresholds();
+                if (out.size() > 0) file_thresh<<t<<"\t"<<out<<endl;
             int returned_int = var_dt.update_dt_var(t, dt, count, file_counts);
 
             if (returned_int == 1){
@@ -797,6 +800,7 @@ int main(int argc, char* argv[]){
     file_th.close();
     file_pe.close();
     file_time.close();
+    file_thresh.close();
     //Delete all objects created
     //cout<<"\nHere's where I think I delete things\n";
 
