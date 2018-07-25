@@ -83,7 +83,7 @@ int main(int argc, char* argv[]){
     bool restart;
     double restart_time;
 
-    bool light_act, net_reset, myosins_reset, crosslks_reset;
+    bool light_act;
     double light_radius;
     int check_steps, test_param, var_dt_meth;
     // int slow_down = 0; //
@@ -92,7 +92,7 @@ int main(int argc, char* argv[]){
     // int stable_checks = 0;
     double stable_thresh=0, net_thresh, myosins_thresh, crosslks_thresh;
     int butterfly;
-    int num_retries;
+    int num_retries, adaptive_flag;
 
 
     int unprinted_count = 0; 
@@ -208,14 +208,14 @@ int main(int argc, char* argv[]){
         ("check_steps", po::value<int>(&check_steps)->default_value(100), "Number of loop iterations over which backtracking occurs")
         ("butterfly", po::value<int>(&butterfly)->default_value(0), "Number of random numbers to generate before simulation begins")
         ("test_param", po::value<int>(&test_param)->default_value(0), "Temporary test condition for testing dt_var")
-        ("net_reset", po::value<bool>(&net_reset)->default_value(true), "Temporary bool for resetting the net")
-        ("myosins_reset", po::value<bool>(&myosins_reset)->default_value(true), "Temporary bool for resetting myosins")
-        ("crosslks_reset", po::value<bool>(&crosslks_reset)->default_value(true), "Temporary bool for resetting the crosslks")
+        // ("net_reset", po::value<bool>(&net_reset)->default_value(true), "Temporary bool for resetting the net")
+        // ("myosins_reset", po::value<bool>(&myosins_reset)->default_value(true), "Temporary bool for resetting myosins")
+        // ("crosslks_reset", po::value<bool>(&crosslks_reset)->default_value(true), "Temporary bool for resetting the crosslks")
         ("net_thresh", po::value<double>(&net_thresh)->default_value(2.999), "Link force threshold for slowing down")
         ("myosins_thresh", po::value<double>(&myosins_thresh)->default_value(2.999), "Myosin force threshold for slowing down")
         ("crosslks_thresh", po::value<double>(&crosslks_thresh)->default_value(2.999), "Crosslks force threshold for slowing down")       
         ("num_retries", po::value<int>(&num_retries)->default_value(1), "Number of times to try re-running section after going below minDt")
-        ;
+        ("adaptive_flag", po::value<int>(&adaptive_flag)->default_value(0), "Flag to turn on adaptive thresholds");
 
     //Hidden options, will be allowed both on command line and
     //in config file, but will not be shown to user
@@ -631,8 +631,10 @@ int main(int argc, char* argv[]){
         var_dt.check_energies(net, myosins, crosslks);
 
         if (count%check_steps == 0){ 
-            string out = var_dt.update_thresholds();
-                if (out.size() > 0) file_thresh<<t<<"\t"<<out<<endl;
+            if(adaptive_flag == 1){
+                string out = var_dt.update_thresholds();
+                    if (out.size() > 0) file_thresh<<t<<"\t"<<out<<endl;
+            }
             int returned_int = var_dt.update_dt_var(t, dt, count, file_counts);
 
             if (returned_int == 1){

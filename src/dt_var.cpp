@@ -46,12 +46,12 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_count
     dtcurr = dt;
     countcurr = count;
     slow_param = 0;
-    if ((net_status >= 2 || myosins_status >= 2 || crosslks_status >= 2) && backed_up<0) {
+    if ((obj_statuses[0]>=2 || obj_statuses[1]>=2  || obj_statuses[2]>=2) && backed_up<0) {
         if (slowed_down<(retries+1)){
         t -= check_steps * dt;
         count -= check_steps;
         stable_checks = floor(stable_checks/2);
-        if (net_status+myosins_status+crosslks_status < slow_threshold && slow_down == 0){ 
+        if (obj_statuses[0]+obj_statuses[1]+obj_statuses[2] < slow_threshold && slow_down == 0){ 
             slow_down = 0;
         }else{
             slow_down = 1;
@@ -59,13 +59,13 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_count
         if (slow_down && dt>=minDt) {
             dt /= 2;
             slowed_down = 1;
-            file_counts<<"\nt = " <<tcurr<<"\tSlow Down, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
+            file_counts<<"\nt = " <<tcurr<<"\tSlow Down, status:\tn_s = "<<obj_statuses[0]<<"\tm_s = "<<obj_statuses[1]<<"\tc_s = "<<obj_statuses[2];
         } else if(slow_down){
             dt /= 1.5;
             slowed_down++;
-            file_counts<<"\nt = " <<tcurr<<"\tSlow Down (floor), status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
+            file_counts<<"\nt = " <<tcurr<<"\tSlow Down (floor), status:\tn_s = "<<obj_statuses[0]<<"\tm_s = "<<obj_statuses[1]<<"\tc_s = "<<obj_statuses[2];
         } else {
-            file_counts<<"\nt = " <<tcurr<<"\tEnergy exceeded, status:\tn_s = "<<net_status<<"\tm_s = "<<myosins_status<<"\tc_s = "<<crosslks_status;
+            file_counts<<"\nt = " <<tcurr<<"\tEnergy exceeded, status:\tn_s = "<<obj_statuses[0]<<"\tm_s = "<<obj_statuses[1]<<"\tc_s = "<<obj_statuses[2];
         }
         slow_down = 1;
         //something has blown up, so we go back
@@ -85,7 +85,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_count
             dt *= 1.5;
             slowed_down--;
         }
-        if (net_status+myosins_status+crosslks_status < 2) {
+        if (obj_statuses[0]+obj_statuses[1]+obj_statuses[2] < 2) {
             if (stable_checks>stable_thresh && dt<(tfinal/double(nmsgs*2)) && dt<get_upper_dt(minDt, tfinal, t)){
                 dt *= 1.1;
                 stable_checks = 0;
@@ -95,7 +95,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_count
             file_counts<<"\nAll energies are low (no change)";
         } else {
             file_counts<<"\nNo change in time step, non-relaxed state";
-            stable_checks += (5-(net_status+myosins_status+crosslks_status));
+            stable_checks += (5-(obj_statuses[0]+obj_statuses[1]+obj_statuses[2]));
         }
         slow_down = 0;
                 
@@ -153,7 +153,7 @@ void dt_var::erase1(vector<double> &time_past, vector<double> &count_past,
 void dt_var::check_energies(filament_ensemble * network, motor_ensemble * myosins, motor_ensemble * crosslks){
         obj_statuses[0] = max(obj_statuses[0], network->check_link_energies(var_dt_meth, obj_thresholds[0]));
         obj_statuses[1] = max(obj_statuses[1], myosins->check_energies(0, obj_thresholds[1]));
-        obj_statuses[2] = max(obj_statuses[2],crosslks->check_energies(0, obj_statuses[2]));
+        obj_statuses[2] = max(obj_statuses[2],crosslks->check_energies(0, obj_thresholds[2]));
 }
 
 string dt_var::update_thresholds(){
@@ -169,18 +169,22 @@ string dt_var::update_thresholds(){
     int max_m_s = *max_element(m_s.begin(), m_s.begin()+10);
     int max_c_s = *max_element(c_s.begin(), c_s.begin()+10);
 
-    if(max_n_s == 0){
+    int sum_n_s = accumulate(n_s.begin(), n_s.begin()+10, 0);
+    int sum_m_s = accumulate(m_s.begin(), m_s.begin()+10, 0);
+    int sum_c_s = accumulate(c_s.begin(), c_s.begin()+10, 0);
+
+    if(sum_n_s < 4){
         obj_thresholds[0] *= .95;
-    }else if(max_n_s == 3){
+    }else if(max_n_s >= 3){
         int increase_threshold = 0;
         for (int i = 0; i<10; i++){
             if(n_s[i]>=3) increase_threshold++;
         }
         if (increase_threshold>1) obj_thresholds[0] *= 1.05;
     }
-    if(max_m_s == 0){
+    if(sum_m_s < 4){
         obj_thresholds[1] *= .95;
-    }else if(max_m_s == 3){
+    }else if(max_m_s >= 3){
         int increase_threshold = 0;
         for (int i = 0; i<10; i++){
             if(m_s[i]>=3) increase_threshold++;
@@ -188,9 +192,9 @@ string dt_var::update_thresholds(){
         if (increase_threshold>1) obj_thresholds[1] *= 1.05;
     }
 
-    if(max_c_s == 0){
+    if(sum_c_s < 4){
         obj_thresholds[2] *= .95;
-    }else if(max_c_s == 3){
+    }else if(max_c_s >= 3){
         int increase_threshold = 0;
         for (int i = 0; i<10; i++){
             if(c_s[i]>=3) increase_threshold++;

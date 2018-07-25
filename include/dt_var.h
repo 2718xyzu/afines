@@ -48,7 +48,7 @@ class dt_var
 
     public:
         double tcurr, dtcurr, stable_thresh, tfinal, slow_amount, minDt, net_thresh, myosins_thresh, crosslks_thresh;
-        int slow_param, slow_threshold, countcurr, net_status, myosins_status, crosslks_status, stable_checks,
+        int slow_param, slow_threshold, countcurr, stable_checks,
          slow_down, slowed_down, nmsgs, check_steps, test_check, retries, backed_up, check_count, var_dt_meth;
 
         array<int, 10> n_s, m_s, c_s;
