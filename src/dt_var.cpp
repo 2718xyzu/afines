@@ -66,8 +66,9 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_count
             file_counts<<"\nt = " <<tcurr<<"\tSlow Down (floor), status:\tn_s = "<<obj_statuses[0]<<"\tm_s = "<<obj_statuses[1]<<"\tc_s = "<<obj_statuses[2];
         } else {
             file_counts<<"\nt = " <<tcurr<<"\tEnergy exceeded, status:\tn_s = "<<obj_statuses[0]<<"\tm_s = "<<obj_statuses[1]<<"\tc_s = "<<obj_statuses[2];
+            slow_down = 1;
         }
-        slow_down = 1;
+        
         //something has blown up, so we go back
         cout<<"t = "<<tcurr<<" back up to "<<t<<endl;
         returned_int = 1;

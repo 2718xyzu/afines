@@ -628,6 +628,7 @@ int main(int argc, char* argv[]){
 		count++;
         total_count++;
 
+    if (var_dt_meth >= 1){
         var_dt.check_energies(net, myosins, crosslks);
 
         if (count%check_steps == 0){ 
@@ -785,6 +786,7 @@ int main(int argc, char* argv[]){
             file_time<<t<<"\t"<<dt<<endl;
             var_dt.obj_statuses = {0,0,0};
         }
+    }
 
     }
 
