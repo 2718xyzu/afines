@@ -100,15 +100,19 @@ class Link
         
         array<double, 2> get_neg_disp();
 
+        bool blow_up;
+
+        double llen_pct_change;
+
     protected:
 
-        double xcm, ycm, phi, l0, kl, max_ext, eps_ext, llen;//, force;
+        double xcm, ycm, phi, l0, kl, max_ext, eps_ext, llen, llen_past, tension;//, force;
        
         array<double,2> fov, hx, hy;
         array<double, 2> disp, force, intpoint;
 
         array<int, 2> nq, half_nq, aindex;
-         
+        
         filament *fil;
         
         vector< array<int,2> > quad; //vector of two vectors(x and y quadrants) of integers

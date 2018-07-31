@@ -34,7 +34,7 @@ Link::Link(double len, double stretching_stiffness, double max_ext_ratio, filame
     
     hx = {0,0};
     hy = {0,0};
-
+    
     force = {0,0};
     intpoint = {0,0};
     llen = l0;
@@ -51,6 +51,8 @@ Link::Link(const Link& other, filament * f){
     max_ext = other.max_ext;
     eps_ext = other.eps_ext;
     llen = other.llen;//, force;
+    llen_past = other.llen_past;
+    llen_pct_change = other.llen_pct_change;
        
     fov = other.fov;
     hx = other.hx;
@@ -92,7 +94,11 @@ void Link::step(string bc, double shear_dist)
 
     disp = rij_bc(bc, hx[1]-hx[0], hy[1]-hy[0], fov[0], fov[1], shear_dist); 
     phi=atan2(disp[1],disp[0]);
+    llen_past = llen;
     llen = hypot(disp[0], disp[1]);
+    llen_pct_change = (llen-llen_past)/llen;
+    blow_up = (llen_pct_change > .4 && llen > l0) ? 1 : 0;
+
 
 }
 

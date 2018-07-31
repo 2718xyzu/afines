@@ -314,6 +314,17 @@ int motor_ensemble::check_energies(int slow_down, double thresh)
     return status;
 }
 
+int motor_ensemble::check_blowups(double timestamp){
+    int status = 1; 
+    for (unsigned int m = 0; m < n_motors.size(); m++){
+        if (n_motors[m]->blow_up){
+            status++;
+            cout<<"t = "<<timestamp<<"; Motor: "<<(n_motors[m]->disp_pct_change)<<endl;
+        } 
+    }
+    return status;
+}
+
 void motor_ensemble::print_ensemble_thermo(){
     cout<<"\nAll Motors\t:\tKE = "<<ke<<"\tPEs = "<<pe<<"\tPEb = "<<0<<"\tTE = "<<(ke+pe);
 }

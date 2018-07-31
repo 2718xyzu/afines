@@ -46,6 +46,8 @@ class dt_var
 
         void check_energies(filament_ensemble * network, motor_ensemble * myosins, motor_ensemble * crosslks);
 
+        void check_blowups(filament_ensemble * network, motor_ensemble * myosins, motor_ensemble * crosslks, double t);
+
     public:
         double tcurr, dtcurr, stable_thresh, tfinal, slow_amount, minDt, net_thresh, myosins_thresh, crosslks_thresh;
         int slow_param, slow_threshold, countcurr, stable_checks,

@@ -628,8 +628,9 @@ int main(int argc, char* argv[]){
 		count++;
         total_count++;
 
-    if (var_dt_meth >= 1){
-        var_dt.check_energies(net, myosins, crosslks);
+    if (var_dt_meth >= 1){                               
+        //var_dt.check_energies(net, myosins, crosslks); //force cutoffs
+        var_dt.check_blowups(net, myosins, crosslks, t);   //percent cutoffs
 
         if (count%check_steps == 0){ 
             if(adaptive_flag == 1){
@@ -637,6 +638,7 @@ int main(int argc, char* argv[]){
                     if (out.size() > 0) file_thresh<<t<<"\t"<<out<<endl;
             }
             int returned_int = var_dt.update_dt_var(t, dt, count, file_counts);
+            // var_dt.update_objects(returned_int, net, myosins, crosslks, net2, myosins2, crosslks2, backupNet1, backupMyosins1, backupCrosslks1);
 
             if (returned_int == 1){
                 file_counts<<"\n dt is now "<<dt<<endl;
@@ -739,8 +741,11 @@ int main(int argc, char* argv[]){
 
             } else if(returned_int == 5){
                 cout<<(backupNet1->t)<<endl;
-                file_counts<<"\n dt is now "<<dt<<endl;
-            
+                file_counts<<"\n dt is now "<<backupNet1->dt<<endl;
+                dt = var_dt.minDt;
+                var_dt.slowed_down = 0;
+                var_dt.dtcurr = dt;
+
                 delete net;
                 net = new filament_ensemble(*backupNet1);
                 delete net2;
@@ -770,7 +775,7 @@ int main(int argc, char* argv[]){
                 
                 t = net->t;
 
-                var_dt.backed_up = 2;
+                var_dt.backed_up = 1;
 
                 for (unsigned int i = 0; i<time_past.size(); i++){
                     print_times.push_back(time_past.back());

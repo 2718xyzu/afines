@@ -412,6 +412,21 @@ int filament_ensemble::check_link_energies(int var_dt_meth, double thresh){
     return status;
 }
  
+int filament_ensemble::check_blowups(double timestamp){
+    int status = 1;
+    for (unsigned int m = 0; m < network.size(); m++)
+    {
+        for (int i = 0; i < network[m]->get_nlinks(); i++){
+            if (network[m]->get_link(i)->blow_up){
+                status++;
+                cout<<"t = "<<timestamp<<"; Link: "<<(network[m]->get_link(i)->llen_pct_change)<<endl;
+            }
+        }
+    }
+    return status;
+}
+
+
 double filament_ensemble::get_stretching_energy(){
     return pe_stretch;
 }

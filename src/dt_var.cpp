@@ -46,7 +46,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_count
     dtcurr = dt;
     countcurr = count;
     slow_param = 0;
-    if ((obj_statuses[0]>=2 || obj_statuses[1]>=2  || obj_statuses[2]>=2) && backed_up<0) {
+    if ((obj_statuses[0]>=2 || obj_statuses[1]>=2  || obj_statuses[2]>=2) && !(backed_up==1 && slowed_down>=(retries+1))) {
         if (slowed_down<(retries+1)){
         t -= check_steps * dt;
         count -= check_steps;
@@ -105,6 +105,158 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_count
     return returned_int;
 }
 
+// int dt_var::update_objects(){
+
+//             if (returned_int == 1){
+//                 file_counts<<"\n dt is now "<<dt<<endl;
+            
+//                 delete net;
+//                 net = new filament_ensemble(*net2);
+                
+//                 delete myosins;
+//                 myosins = new motor_ensemble(*myosins2);
+
+//                 delete crosslks;
+//                 crosslks = new motor_ensemble(*crosslks2);
+
+//                 myosins->set_fil_ens(net);
+//                 crosslks->set_fil_ens(net);
+//                 net->set_dt(dt);
+//                 myosins->set_dt(dt);
+//                 crosslks->set_dt(dt);
+
+//                 for (unsigned int i = 0; i<time_past.size(); i++){
+//                     print_times.push_back(time_past.back());
+//                     time_past.pop_back(); 
+//                 }
+
+//             var_dt.clear_all(time_past, count_past, actins_past, links_past, motors_past, crosslks_past,
+//                 thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
+
+//             }else if(returned_int == 2){
+
+//                 net->set_dt(dt);
+//                 myosins->set_dt(dt);
+//                 crosslks->set_dt(dt);
+
+//                 delete backupNet1;
+//                 delete backupMyosins1;
+//                 delete backupCrosslks1;
+//                 backupNet1 = net2;
+//                 backupMyosins1 = myosins2;
+//                 backupCrosslks1 = crosslks2;
+
+//                 net2 = new filament_ensemble(*net);
+//                 myosins2 = new motor_ensemble(*myosins);
+//                 crosslks2 = new motor_ensemble(*crosslks);
+//                 myosins2->set_fil_ens(net2);
+//                 crosslks2->set_fil_ens(net2);
+
+//                 int flush = 0;
+//                 int lastPrint = (int) time_past.size();
+
+
+//                 for (unsigned int i = 0; i<time_past.size(); i++){
+//                     if(time_past[i]>backupNet1->t) continue;
+//                     lastPrint = (int) i;
+//                     cout<<"Wrote out t = "<<to_string(time_past[i])<<endl;
+//                     if (time_past[i]>tinit) time_str ="\n";
+//                     time_str += "t = "+to_string(time_past[i]);
+
+//                     file_a << time_str<<"\tN = "<<to_string(net->get_nactins());
+//                     file_a << actins_past[i];
+
+//                     file_l << time_str<<"\tN = "<<to_string(net->get_nlinks());
+//                     file_l << links_past[i];
+
+//                     file_am << time_str<<"\tN = "<<to_string(myosins->get_nmotors());
+//                     file_am << motors_past[i];
+
+//                     file_pm << time_str<<"\tN = "<<to_string(crosslks->get_nmotors());
+//                     file_pm << crosslks_past[i];
+
+//                     file_th << time_str<<"\tN = "<<to_string(net->get_nfilaments());
+//                     file_th << thermo_past[i];
+
+//                     file_pe << to_string(stretching_energy_past[i]) + "\t" + to_string(bending_energy_past[i]) + "\t" +
+//                         to_string(potential_energy_motors_past[i]) + "\t" + to_string(potential_energy_crosslks_past[i]) << endl;
+                    
+//                     flush = 1;
+//                 }
+//                 if (lastPrint<(((int) time_past.size())-1)){
+//                     cout<<"erasing first elements"<<endl;
+//                     for (int i = 0; i<lastPrint-1; i++){
+//                         var_dt.erase1(time_past, count_past, actins_past, links_past, motors_past, crosslks_past,
+//                         thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
+//                     }
+//                 }else if(lastPrint == (((int) time_past.size())-1)) {
+//                         var_dt.clear_all(time_past, count_past, actins_past, links_past, motors_past, crosslks_past,
+//                             thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
+//                 }
+//                 if (flush) {
+                    
+//                     file_a<<std::flush;
+//                     file_l<<std::flush;
+//                     file_am<<std::flush;
+//                     file_pm<<std::flush;
+//                     file_th<<std::flush;
+//                     file_pe<<std::flush;
+//                     file_time<<std::flush;
+//                     file_counts<<std::flush;
+//                     flush = 0;
+//                 }
+
+//             } else if(returned_int == 5){
+//                 cout<<(backupNet1->t)<<endl;
+//                 file_counts<<"\n dt is now "<<dt<<endl;
+            
+//                 delete net;
+//                 net = new filament_ensemble(*backupNet1);
+//                 delete net2;
+//                 net2 = new filament_ensemble(*backupNet1);
+                
+//                 delete myosins;
+//                 myosins = new motor_ensemble(*backupMyosins1);
+//                 delete myosins2;
+//                 myosins2 = new motor_ensemble(*backupMyosins1);
+
+//                 delete crosslks;
+//                 crosslks = new motor_ensemble(*backupCrosslks1);
+//                 delete crosslks2;
+//                 crosslks2 = new motor_ensemble(*backupCrosslks1);
+
+
+//                 myosins->set_fil_ens(net);
+//                 crosslks->set_fil_ens(net);
+//                 net->set_dt(dt);
+//                 myosins->set_dt(dt);
+//                 crosslks->set_dt(dt);               
+//                 myosins2->set_fil_ens(net2);
+//                 crosslks2->set_fil_ens(net2);
+//                 net2->set_dt(dt);
+//                 myosins2->set_dt(dt);
+//                 crosslks2->set_dt(dt);
+                
+//                 t = net->t;
+
+//                 var_dt.backed_up = 2;
+
+//                 for (unsigned int i = 0; i<time_past.size(); i++){
+//                     print_times.push_back(time_past.back());
+//                     time_past.pop_back(); 
+//                 }
+
+//             var_dt.clear_all(time_past, count_past, actins_past, links_past, motors_past, crosslks_past,
+//                 thermo_past, stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past);
+
+//             }
+
+
+//             file_time<<t<<"\t"<<dt<<endl;
+//             obj_statuses = {0,0,0};
+// }
+
+
 void dt_var::clear_all(vector<double> &time_past, vector<double> &count_past, //in the interests of keeping network.cpp cleaner
     vector<string> &actins_past, vector<string> &links_past, vector<string> &motors_past, vector<string> &crosslks_past,
     vector<string> &thermo_past, vector<double> &stretching_energy_past, vector<double> &bending_energy_past, 
@@ -156,6 +308,13 @@ void dt_var::check_energies(filament_ensemble * network, motor_ensemble * myosin
         obj_statuses[1] = max(obj_statuses[1], myosins->check_energies(0, obj_thresholds[1]));
         obj_statuses[2] = max(obj_statuses[2],crosslks->check_energies(0, obj_thresholds[2]));
 }
+
+void dt_var::check_blowups(filament_ensemble * network, motor_ensemble * myosins, motor_ensemble * crosslks, double timestamp){
+        obj_statuses[0] = max(obj_statuses[0], network->check_blowups(timestamp));
+        obj_statuses[1] = max(obj_statuses[1], myosins->check_blowups(timestamp));
+        obj_statuses[2] = max(obj_statuses[2],crosslks->check_blowups(timestamp));
+}
+
 
 string dt_var::update_thresholds(){
     string out = "";

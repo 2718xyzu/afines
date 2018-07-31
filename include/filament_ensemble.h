@@ -179,6 +179,8 @@ class filament_ensemble
 
         int check_link_energies(int var_dt_meth, double thresh);
 
+        int check_blowups(double timestamp);
+
         void set_dt(double dt_var);
 
         double get_dt();

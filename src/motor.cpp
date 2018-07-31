@@ -84,6 +84,9 @@ motor::motor( array<double, 3> pos,
     hy[1] = posH1[1];
 
     disp = rij_bc(BC, hx[1]-hx[0], hy[1]-hy[0], fov[0], fov[1], actin_network->get_delrx());
+    norm_disp = hypot(disp[0], disp[1]);
+    norm_disp_past = norm_disp;
+    
 
     pos_a_end = {0, 0}; // pos_a_end = distance from pointy end -- by default 0
                         // i.e., if l_index[hd] = j, then pos_a_end[hd] is the distance to the "j+1"th actin
@@ -239,6 +242,9 @@ motor::motor( array<double, 4> pos,
     catch_length = other.catch_length;
 
     fracture_force = other.fracture_force;
+    norm_disp = other.norm_disp;
+    norm_disp_past = other.norm_disp_past;
+    disp_pct_change = other.disp_pct_change;
 
     hx = other.hx;
     hy = other.hy;
@@ -374,7 +380,11 @@ bool motor::attach(int hd)
 void motor::update_force()
 {
     //force = {mk*(disp[0]-mld*cos(mphi)), mk*(disp[1]-mld*sin(mphi))};
-    tension = mk*(hypot(disp[0], disp[1]) - mld);
+    norm_disp_past = norm_disp;
+    norm_disp = hypot(disp[0], disp[1]);
+    disp_pct_change = (norm_disp-norm_disp_past)/norm_disp;
+    blow_up = (disp_pct_change > 1.01 && norm_disp > mld) ? 1 : 0;
+    tension = mk*(norm_disp - mld);
     force = {tension*cos(mphi), tension*sin(mphi)};
 }
 

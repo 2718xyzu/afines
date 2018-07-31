@@ -127,7 +127,7 @@ class motor
         
         double mphi,mld, vs, stall_force, max_bind_dist, mk, kon, koff, kend, r_on, r_off, r_end, temperature, dt,
                damp, shear, max_ext, eps_ext, kinetic_energy, bd_prefactor, tension, catch_length,
-               fracture_force;
+               fracture_force, norm_disp, norm_disp_past, disp_pct_change;
 
         array<double,2> hx, hy, pos_a_end, fov, prv_rnd_x, prv_rnd_y, force, disp, light_param;
 
@@ -137,7 +137,7 @@ class motor
 
         map<vector<int>, double> dist;
         array<bool, 2> at_barbed_end;
-
+        bool blow_up;
         string BC;
 
         filament_ensemble* actin_network;
