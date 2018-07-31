@@ -28,7 +28,7 @@ int main(int argc, char* argv[]){
     cout<<rd();
 
     /***********************
-     * VARIABLES           *
+    * VARIABLES           *
      **********************/
     int myseed;
 
@@ -521,13 +521,17 @@ int main(int argc, char* argv[]){
         }
         butterfly_effect = butterfly_effect + butterfly;
     }
-    
+    int minute_record = 0;
+    int total_record = 0;
+
     while (t <= tfinal) {
 
-        if (t+dt/100 >= tinit && (count-unprinted_count)%n_bw_print==0 && var_dt_meth == 0) {
-
+        if (t+dt/100 >= tinit && minute_record>0 && total_record<2000) {
+            //if (t+dt/100 >= tinit && (count-unprinted_count)%n_bw_print==0 && var_dt_meth == 0){
+            minute_record--;
+            total_record++;
             if (t>tinit) time_str ="\n";
-            time_str += "t = "+to_string(t);
+            time_str += "t = "+to_string(total_record)+to_string(t);
 
             file_a << time_str<<"\tN = "<<to_string(net->get_nactins());
             net->write_actins(file_a);
@@ -696,20 +700,20 @@ int main(int argc, char* argv[]){
                     if (time_past[i]>tinit) time_str ="\n";
                     time_str += "t = "+to_string(time_past[i]);
 
-                    file_a << time_str<<"\tN = "<<to_string(net->get_nactins());
-                    file_a << actins_past[i];
+                    // file_a << time_str<<"\tN = "<<to_string(net->get_nactins());
+                    // file_a << actins_past[i];
 
-                    file_l << time_str<<"\tN = "<<to_string(net->get_nlinks());
-                    file_l << links_past[i];
+                    // file_l << time_str<<"\tN = "<<to_string(net->get_nlinks());
+                    // file_l << links_past[i];
 
-                    file_am << time_str<<"\tN = "<<to_string(myosins->get_nmotors());
-                    file_am << motors_past[i];
+                    // file_am << time_str<<"\tN = "<<to_string(myosins->get_nmotors());
+                    // file_am << motors_past[i];
 
-                    file_pm << time_str<<"\tN = "<<to_string(crosslks->get_nmotors());
-                    file_pm << crosslks_past[i];
+                    // file_pm << time_str<<"\tN = "<<to_string(crosslks->get_nmotors());
+                    // file_pm << crosslks_past[i];
 
-                    file_th << time_str<<"\tN = "<<to_string(net->get_nfilaments());
-                    file_th << thermo_past[i];
+                    // file_th << time_str<<"\tN = "<<to_string(net->get_nfilaments());
+                    // file_th << thermo_past[i];
 
                     file_pe << to_string(stretching_energy_past[i]) + "\t" + to_string(bending_energy_past[i]) + "\t" +
                         to_string(potential_energy_motors_past[i]) + "\t" + to_string(potential_energy_crosslks_past[i]) << endl;
@@ -740,6 +744,7 @@ int main(int argc, char* argv[]){
                 }
 
             } else if(returned_int == 5){
+                minute_record = 50;
                 cout<<(backupNet1->t)<<endl;
                 file_counts<<"\n dt is now "<<backupNet1->dt<<endl;
                 dt = var_dt.minDt;
