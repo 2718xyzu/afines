@@ -205,7 +205,7 @@ int main(int argc, char* argv[]){
         ("light_radius", po::value<double>(&light_radius)->default_value(6.25), "Radius outside of which motors are turned off")
 
         ("var_dt_meth", po::value<int>(&var_dt_meth)->default_value(0), "flag to turn on variable timestep implementation, with 1 = conservative, 2 = aggressive methods")
-        ("check_steps", po::value<int>(&check_steps)->default_value(100), "Number of loop iterations over which backtracking occurs")
+        ("check_steps", po::value<int>(&check_steps)->default_value(10), "Number of loop iterations over which backtracking occurs")
         ("butterfly", po::value<int>(&butterfly)->default_value(0), "Number of random numbers to generate before simulation begins")
         ("test_param", po::value<int>(&test_param)->default_value(0), "Temporary test condition for testing dt_var")
         // ("net_reset", po::value<bool>(&net_reset)->default_value(true), "Temporary bool for resetting the net")
@@ -625,6 +625,7 @@ int main(int argc, char* argv[]){
     }
 
         t+=dt;
+        net->t = t;
 		count++;
         total_count++;
 

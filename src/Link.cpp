@@ -97,7 +97,7 @@ void Link::step(string bc, double shear_dist)
     llen_past = llen;
     llen = hypot(disp[0], disp[1]);
     llen_pct_change = (llen-llen_past)/llen;
-    blow_up = (llen_pct_change > .4 && llen > l0) ? 1 : 0;
+    blow_up = (llen_pct_change > .5 && llen > l0) ? 1 : 0;
 
 
 }
