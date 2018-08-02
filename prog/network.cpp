@@ -742,10 +742,7 @@ int main(int argc, char* argv[]){
 
             } else if(returned_int == 5){
                 cout<<(backupNet1->t)<<endl;
-                file_counts<<"\n dt is now "<<backupNet1->dt<<endl;
-                dt = var_dt.minDt;
-                var_dt.slowed_down = 0;
-                var_dt.dtcurr = dt;
+                file_counts<<"\n dt is now "<<dt<<endl;
 
                 delete net;
                 net = new filament_ensemble(*backupNet1);

@@ -318,7 +318,8 @@ double motor::metropolis_prob(int hd, array<int, 2> fl_idx, array<double, 2> new
 }
 
 bool motor::allowed_bind(int hd, array<int, 2> fl_idx){
-    return (f_index[pr(hd)] != fl_idx[0] || l_index[pr(hd)] != fl_idx[1]);
+    return (f_index[pr(hd)] != fl_idx[0]); //I have a theory that heads binding to the same filament may cause blowups
+    //return (f_index[pr(hd)] != fl_idx[0] || l_index[pr(hd)] != fl_idx[1]);
 }
 
 //check for attachment of unbound heads given head index (0 for head 1, and 1 for head 2)
