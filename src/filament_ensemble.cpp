@@ -477,7 +477,7 @@ void filament_ensemble::set_visc(double nu){
  
 void filament_ensemble::update_forces(int f_index, int a_index, double f1, double f2){
     network[f_index]->update_forces(a_index, f1,f2);
-    if(hypot(f1,f2)>80) cout<<"Actin Force: "<<f1<<'\t'<<f2<<endl;
+    if(abs(f1)>50||abs(f2)>50) cout<<"Actin Force: "<<f1<<'\t'<<f2<<endl;
 }
 
  

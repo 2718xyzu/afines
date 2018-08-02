@@ -47,7 +47,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_count
     countcurr = count;
     slow_param = 0;
     if ((obj_statuses[0]>=2 || obj_statuses[1]>=2  || obj_statuses[2]>=2) && backed_up<0) {
-        if (slowed_down<(retries+1)){
+        if (slowed_down<(2*retries+1)){
         t -= check_steps * dt;
         count -= check_steps;
         stable_checks = floor(stable_checks/2);
@@ -62,7 +62,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_count
             file_counts<<"\nt = " <<tcurr<<"\tSlow Down, status:\tn_s = "<<obj_statuses[0]<<"\tm_s = "<<obj_statuses[1]<<"\tc_s = "<<obj_statuses[2];
         } else if(slow_down){
             dt /= 1.5;
-            slowed_down++;
+            slowed_down+=2;
             file_counts<<"\nt = " <<tcurr<<"\tSlow Down (floor), status:\tn_s = "<<obj_statuses[0]<<"\tm_s = "<<obj_statuses[1]<<"\tc_s = "<<obj_statuses[2];
         } else {
             file_counts<<"\nt = " <<tcurr<<"\tEnergy exceeded, status:\tn_s = "<<obj_statuses[0]<<"\tm_s = "<<obj_statuses[1]<<"\tc_s = "<<obj_statuses[2];
@@ -83,7 +83,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_count
             dt *= slow_amount;
             slowed_down = 0;
         }else if(slowed_down > 1){
-            dt *= 1.5;
+            dt *= sqrt(1.5);
             slowed_down--;
         }
         if (obj_statuses[0]+obj_statuses[1]+obj_statuses[2] < 2) {
