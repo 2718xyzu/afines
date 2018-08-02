@@ -86,7 +86,7 @@ motor::motor( array<double, 3> pos,
     disp = rij_bc(BC, hx[1]-hx[0], hy[1]-hy[0], fov[0], fov[1], actin_network->get_delrx());
     norm_disp = hypot(disp[0], disp[1]);
     norm_disp_past = norm_disp;
-    
+
 
     pos_a_end = {0, 0}; // pos_a_end = distance from pointy end -- by default 0
                         // i.e., if l_index[hd] = j, then pos_a_end[hd] is the distance to the "j+1"th actin
@@ -318,7 +318,8 @@ double motor::metropolis_prob(int hd, array<int, 2> fl_idx, array<double, 2> new
 }
 
 bool motor::allowed_bind(int hd, array<int, 2> fl_idx){
-    return (f_index[pr(hd)] != fl_idx[0] || l_index[pr(hd)] != fl_idx[1]);
+    return (f_index[pr(hd)] != fl_idx[0]); //I have a theory that heads binding to the same filament may cause blowups
+    //return (f_index[pr(hd)] != fl_idx[0] || l_index[pr(hd)] != fl_idx[1]);
 }
 
 //check for attachment of unbound heads given head index (0 for head 1, and 1 for head 2)

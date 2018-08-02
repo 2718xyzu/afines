@@ -46,7 +46,7 @@ int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_count
     dtcurr = dt;
     countcurr = count;
     slow_param = 0;
-    if ((obj_statuses[0]>=2 || obj_statuses[1]>=2  || obj_statuses[2]>=2) && !(backed_up==1 && slowed_down>=(retries+1))) {
+    if ((obj_statuses[0]>=2 || obj_statuses[1]>=2  || obj_statuses[2]>=2) && backed_up<0) {
         if (slowed_down<(retries+1)){
         t -= check_steps * dt;
         count -= check_steps;
