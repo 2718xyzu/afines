@@ -214,7 +214,7 @@ int main(int argc, char* argv[]){
         ("net_thresh", po::value<double>(&net_thresh)->default_value(2.999), "Link force threshold for slowing down")
         ("myosins_thresh", po::value<double>(&myosins_thresh)->default_value(2.999), "Myosin force threshold for slowing down")
         ("crosslks_thresh", po::value<double>(&crosslks_thresh)->default_value(2.999), "Crosslks force threshold for slowing down")       
-        ("num_retries", po::value<int>(&num_retries)->default_value(1), "Number of times to try re-running section after going below minDt")
+        ("num_retries", po::value<int>(&num_retries)->default_value(3), "Number of times to try re-running section after going below minDt")
         ("adaptive_flag", po::value<int>(&adaptive_flag)->default_value(0), "Flag to turn on adaptive thresholds");
 
     //Hidden options, will be allowed both on command line and
@@ -742,10 +742,7 @@ int main(int argc, char* argv[]){
 
             } else if(returned_int == 5){
                 cout<<(backupNet1->t)<<endl;
-                file_counts<<"\n dt is now "<<backupNet1->dt<<endl;
-                dt = var_dt.minDt;
-                var_dt.slowed_down = 0;
-                var_dt.dtcurr = dt;
+                file_counts<<"\n dt is now "<<dt<<endl;
 
                 delete net;
                 net = new filament_ensemble(*backupNet1);
