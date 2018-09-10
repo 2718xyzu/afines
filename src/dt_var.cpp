@@ -13,8 +13,9 @@
 // #include "filament_ensemble.h"
 // #include "motor_ensemble.h"
 
-dt_var::dt_var(int method, double final_time, int num_msgs, int chk_steps, double stable_threshold, double initDt, int numRetry,
-        array<double, 3> thresholds){ 
+dt_var::dt_var(filament_ensemble * net,  motor_ensemble * myosins, motor_ensemble * crosslks, 
+        int method, double final_time, int num_msgs, int chk_steps, double stable_threshold, double initDt, int numRetry,
+        array<double, 3> thresholds, ostream& f_counts, ostream& f_time){ 
 
     tfinal = final_time;
     nmsgs = num_msgs;
@@ -36,16 +37,31 @@ dt_var::dt_var(int method, double final_time, int num_msgs, int chk_steps, doubl
     check_count = 0;
     var_dt_meth = method;
 
+    net2 = new filament_ensemble(*net);
+    myosins2 = new motor_ensemble(*myosins);
+    crosslks2 = new motor_ensemble(*crosslks);
+    backupNet1 = new filament_ensemble(*net);
+    backupMyosins1 = new motor_ensemble(*myosins);
+    backupCrosslks1 = new motor_ensemble(*crosslks);
+    myosins2->set_fil_ens(net2);
+    crosslks2->set_fil_ens(net2);
+
+    stored_actin_pos_vec = net->get_vecvec();
+    stored_a_motor_pos_vec = myosins->get_vecvec();
+    stored_p_motor_pos_vec = crosslks->get_vecvec();
+
+
 }
 
 
-int dt_var::update_dt_var(double& t, double& dt, int& count, ostream& file_counts){
+int dt_var::update_dt_var(double& t, double& dt, int& count){
 
     int returned_int;
     tcurr = t;
     dtcurr = dt;
     countcurr = count;
     slow_param = 0;
+    file_counts<<"\nt = "<<t;
     if ((obj_statuses[0]>=2 || obj_statuses[1]>=2  || obj_statuses[2]>=2) && backed_up<0) {
         if (slowed_down<(2*retries+1)){
         t -= check_steps * dt;
@@ -278,9 +294,9 @@ void dt_var::clear_all(vector<double> &time_past, vector<double> &count_past, //
 
 }
 
-void dt_var::set_test(int test_param){
-    test_check = test_param;
-}
+// void dt_var::set_test(int test_param){
+//     test_check = test_param;
+// }
 
 void dt_var::erase1(vector<double> &time_past, vector<double> &count_past,
     vector<string> &actins_past, vector<string> &links_past, vector<string> &motors_past, vector<string> &crosslks_past,
@@ -366,3 +382,17 @@ string dt_var::update_thresholds(){
 
     return out;
 }
+
+void dt_var::push_back_data_vecs(filament_ensemble * net,  motor_ensemble * myosins, motor_ensemble * crosslks)
+    {
+        count_past.push_back(count);
+        actins_past.push_back(net->string_actins());
+        links_past.push_back(net->string_links());
+        motors_past.push_back(myosins->string_motors());
+        crosslks_past.push_back(crosslks->string_motors());
+        thermo_past.push_back(net->string_thermo());
+        bending_energy_past.push_back(net->get_bending_energy());
+        stretching_energy_past.push_back(net->get_stretching_energy());
+        potential_energy_motors_past.push_back(myosins->get_potential_energy());
+        potential_energy_crosslks_past.push_back(crosslks->get_potential_energy());
+    }

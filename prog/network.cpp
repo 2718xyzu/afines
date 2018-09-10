@@ -371,8 +371,8 @@ int main(int argc, char* argv[]){
     // // Create Network Objects
     cout<<"\nCreating actin network."<<endl;
     filament_ensemble * net;
-    filament_ensemble * net2;
-    filament_ensemble * backupNet1;
+    // filament_ensemble * net2;
+    // filament_ensemble * backupNet1;
 
     if (actin_pos_vec.size() == 0 && actin_in.size() == 0){
         net = new filament_ensemble(npolymer, nmonomer, nmonomer_extra, extra_bead_prob, {xrange, yrange}, {xgrid, ygrid}, dt,
@@ -391,8 +391,8 @@ int main(int argc, char* argv[]){
 
     cout<<"\nAdding active motors...";
     motor_ensemble * myosins;
-    motor_ensemble * myosins2;
-    motor_ensemble * backupMyosins1;
+    // motor_ensemble * myosins2;
+    // motor_ensemble * backupMyosins1;
 
     if (a_motor_pos_vec.size() == 0 && a_motor_in.size() == 0){
         myosins = new motor_ensemble( a_motor_density, {xrange, yrange}, dt, temperature,
@@ -408,8 +408,9 @@ int main(int argc, char* argv[]){
 
     cout<<"Adding passive motors (crosslinkers) ...\n";
     motor_ensemble * crosslks;
-    motor_ensemble * crosslks2;
-    motor_ensemble * backupCrosslks1;
+    // motor_ensemble * crosslks2;
+    // motor_ensemble * backupCrosslks1;
+
 
     if(p_motor_pos_vec.size() == 0 && p_motor_in.size() == 0){
         crosslks = new motor_ensemble( p_motor_density, {xrange, yrange}, dt, temperature,
@@ -420,27 +421,29 @@ int main(int argc, char* argv[]){
                 p_motor_length, net, p_motor_v, p_motor_stiffness, fene_pct, p_m_kon, p_m_koff,
                 p_m_kend, p_m_stall, p_m_cut, viscosity, p_motor_lcatch, p_m_fracture_force, bnd_cnd, {0,0});
     }
-
-    net2 = new filament_ensemble(*net);
-    myosins2 = new motor_ensemble(*myosins);
-    crosslks2 = new motor_ensemble(*crosslks);
-    backupNet1 = new filament_ensemble(*net);
-    backupMyosins1 = new motor_ensemble(*myosins);
-    backupCrosslks1 = new motor_ensemble(*crosslks);
-    myosins2->set_fil_ens(net2);
-    crosslks2->set_fil_ens(net2);
-    net_thresh == 2.999 ? (var_dt_meth == 1 ? (net_thresh = 3) : (net_thresh = 5)) : (net_thresh = net_thresh);
-    myosins_thresh == 2.999 ? (myosins_thresh = 1.5 * a_m_fracture_force) : (myosins_thresh = myosins_thresh);
-    crosslks_thresh == 2.999 ? (crosslks_thresh = 1.5 * p_m_fracture_force) : (crosslks_thresh = crosslks_thresh);
+    //Things moved:
+    // net2 = new filament_ensemble(*net);
+    // myosins2 = new motor_ensemble(*myosins);
+    // crosslks2 = new motor_ensemble(*crosslks);
+    // backupNet1 = new filament_ensemble(*net);
+    // backupMyosins1 = new motor_ensemble(*myosins);
+    // backupCrosslks1 = new motor_ensemble(*crosslks);
+    // myosins2->set_fil_ens(net2);
+    // crosslks2->set_fil_ens(net2);
+    //
+    net_thresh = net_thresh == 2.999 ? (var_dt_meth == 1 ? (3) : (5)) : (net_thresh);
+    myosins_thresh = myosins_thresh== 2.999 ? (1.5 * a_m_fracture_force) : (myosins_thresh);
+    crosslks_thresh = crosslks_thresh == 2.999 ? (1.5 * p_m_fracture_force) : (crosslks_thresh);
     cout<<"net_thresh = "<<net_thresh<<"\t myosins_thresh = "<<myosins_thresh<<"\t crosslks_thresh = "<<crosslks_thresh<<endl;
 
-
+    //Things I moved to dt_var
     vector<double> print_times;
     vector<vector<double> > stored_actin_pos_vec, stored_a_motor_pos_vec, stored_p_motor_pos_vec;
     vector<string> actins_past, links_past, time_str_past, motors_past, crosslks_past, thermo_past, pe_past;
     vector<double> stretching_energy_past, bending_energy_past, potential_energy_motors_past, potential_energy_crosslks_past;
     vector<double> time_past;
     vector<double> count_past;
+    //
     // array<int, 3> obj_statuses; //these arrays must have one element for each ensemble in the simulation
     array<double, 3> obj_thresholds;
     obj_thresholds[0] = net_thresh;
@@ -449,8 +452,8 @@ int main(int argc, char* argv[]){
 
     if (var_dt_meth >= 1){
         if(check_steps == 0) {
-            cout<<"WARNING: check_steps cannot be 0 if you are using a variable dt; setting to default (100)"<<endl;
-            check_steps = 100;
+            cout<<"WARNING: check_steps cannot be 0 if you are using a variable dt; setting to default (10)"<<endl;
+            check_steps = 10;
         }
         stable_thresh = ceil(double(10000/check_steps));
         tfile  = ddir + "/time.txt";
@@ -458,13 +461,14 @@ int main(int argc, char* argv[]){
         file_time.open(tfile.c_str(), write_mode);
         file_counts.open(cfile.c_str(), write_mode);
         check_steps = max(min(check_steps, n_bw_print),1);
-        stored_actin_pos_vec = net->get_vecvec();
-        stored_a_motor_pos_vec = myosins->get_vecvec();
-        stored_p_motor_pos_vec = crosslks->get_vecvec();
+        // stored_actin_pos_vec = net->get_vecvec();
+        // stored_a_motor_pos_vec = myosins->get_vecvec();
+        // stored_p_motor_pos_vec = crosslks->get_vecvec();
         print_times = gen_print_times(tfinal, nframes);
     }
-        dt_var var_dt = dt_var(var_dt_meth, tfinal, nmsgs, check_steps, stable_thresh, dt, num_retries, obj_thresholds);
-        var_dt.set_test(test_param);
+        dt_var var_dt = dt_var(net, myosins, crosslks, var_dt_meth, tfinal, nmsgs, check_steps, stable_thresh, dt, num_retries, obj_thresholds, 
+            file_counts, file_time);
+        // var_dt.set_test(test_param);
 
 
     if (p_dead_head_flag) crosslks->kill_heads(p_dead_head);
@@ -611,16 +615,7 @@ int main(int argc, char* argv[]){
     if (var_dt_meth >= 1 && t+dt/100 >= tinit && t+dt>print_times.back()) { 
            cout<<"Time recording = "<<print_times.back()<<endl;
             time_past.push_back(print_times.back());
-            count_past.push_back(count);
-            actins_past.push_back(net->string_actins());
-            links_past.push_back(net->string_links());
-            motors_past.push_back(myosins->string_motors());
-            crosslks_past.push_back(crosslks->string_motors());
-            thermo_past.push_back(net->string_thermo());
-            bending_energy_past.push_back(net->get_bending_energy());
-            stretching_energy_past.push_back(net->get_stretching_energy());
-            potential_energy_motors_past.push_back(myosins->get_potential_energy());
-            potential_energy_crosslks_past.push_back(crosslks->get_potential_energy());
+            var_dt.push_back_data_vecs();
             print_times.pop_back();
     }
 
@@ -638,7 +633,7 @@ int main(int argc, char* argv[]){
                 string out = var_dt.update_thresholds();
                     if (out.size() > 0) file_thresh<<t<<"\t"<<out<<endl;
             }
-            int returned_int = var_dt.update_dt_var(t, dt, count, file_counts);
+            int returned_int = var_dt.update_dt_var(t, dt, count);
             // var_dt.update_objects(returned_int, net, myosins, crosslks, net2, myosins2, crosslks2, backupNet1, backupMyosins1, backupCrosslks1);
 
             if (returned_int == 1){
