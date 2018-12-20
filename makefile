@@ -17,8 +17,7 @@ CFLAGS_DEBUG := -Wall -std=c++11 -DBOOST_TEST_DYN_LINK -pg
 
 # BOOST_SUFFIX := -mt
 LIB := -L ${BOOST_ROOT} -lboost_unit_test_framework${BOOST_SUFFIX} -lboost_program_options${BOOST_SUFFIX} -lboost_filesystem${BOOST_SUFFIX} -lboost_system${BOOST_SUFFIX}
-INC := -I include  -I /usr/include/ -I /usr/local/include/ -I /opt/local/include/
-
+INC := -I include  -I /usr/local/Cellar/boost/1.68.0/include  -I /usr/local/boost_1_68_0 # -I /Applications/boost_1_68_0/include 
 #NOW := $(shell date +"%c" | tr ' :' '_')
 
 $(TARGET): $(OBJECTS)
@@ -47,7 +46,7 @@ tar:
 # Programs
 network: $(OBJECTS)
 	mkdir -p $(TARGETDIR)
-	$(CC) $(CFLAGS) $(OBJECTS) prog/network.cpp $(INC) $(LIB) -o bin/afines
+	$(CC) $(CFLAGS) $(OBJECTS) prog/network.cpp $(INC) $(LIB) -o bin/afines -v
 debug: $(OBJECTS_DEBUG)
 	mkdir -p $(TARGETDIR)
 	$(CC) $(CFLAGS_DEBUG) $(OBJECTS_DEBUG) prog/network.cpp $(INC) $(LIB) -o bin/afines_debug
