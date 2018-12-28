@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Sublime project stuff
 *.sublime-workspace
 *.sublime-project
@@ -6,10 +5,9 @@
 # built file stuff
 bin/
 build/
-=======
 bin/
 build/
 *.sublime-project
 *.sublime-workspace
->>>>>>> master
 .vscode/settings.json
+.DS_Store
