@@ -68,8 +68,8 @@ int main(int argc, char* argv[]){
     string config_file, actin_in, a_motor_in, p_motor_in;
 
     // Output
-    string   dir, tdir, ddir,  afile,  amfile,  pmfile,  lfile, thfile, pefile, tfile, cfile, threshfile;
-    ofstream o_file, file_a, file_am, file_pm, file_l, file_th, file_pe, file_time, file_counts, file_thresh;
+    string   dir, tdir, ddir,  afile,  amfile,  pmfile,  lfile, thfile, pefile, tfile, cfile, threshfile, blowupsfile;
+    ofstream o_file, file_a, file_am, file_pm, file_l, file_th, file_pe, file_time, file_counts, file_thresh, file_blowups;
     ios_base::openmode write_mode = ios_base::out;
 
     // External Force
@@ -275,6 +275,7 @@ int main(int argc, char* argv[]){
     thfile = ddir + "/filament_e.txt";
     pefile = ddir + "/pe.txt";
     threshfile = ddir + "/thresholds.txt";
+    blowupsfile = ddir + "/blowups.txt";
 
     if(fs::create_directory(dir1)) cerr<< "Directory Created: "<<afile<<std::endl;
     if(fs::create_directory(dir2)) cerr<< "Directory Created: "<<thfile<<std::endl;
@@ -353,6 +354,7 @@ int main(int argc, char* argv[]){
 	file_th.open(thfile.c_str(), write_mode);
 	file_pe.open(pefile.c_str(), write_mode);
     file_thresh.open(threshfile.c_str(),write_mode);
+    file_blowups.open(blowupsfile.c_str(), write_mode);
 
 
 
@@ -597,6 +599,8 @@ int main(int argc, char* argv[]){
         net->update();//updates all forces, velocities and positions of filaments
         //update cross linkers
 
+        net->write_blowups(t, file_blowups);
+
         if (static_cl_flag)
             crosslks->motor_update();
         else
@@ -799,6 +803,7 @@ int main(int argc, char* argv[]){
     file_pm << "\n";
     file_th << "\n";
     file_time << "\n";
+    file_blowups << "\n";
 
     file_a.close();
     file_l.close();
@@ -808,6 +813,7 @@ int main(int argc, char* argv[]){
     file_pe.close();
     file_time.close();
     file_thresh.close();
+    file_blowups.close();
     //Delete all objects created
     //cout<<"\nHere's where I think I delete things\n";
 

@@ -188,6 +188,8 @@ class filament_ensemble
         vector<vector<double > > get_vecvec();
 
         double t,dt;
+
+        void write_blowups(double timestamp, ostream& file);
     
     protected:
 

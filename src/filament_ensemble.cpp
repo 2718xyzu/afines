@@ -419,11 +419,23 @@ int filament_ensemble::check_blowups(double timestamp){
         for (int i = 0; i < network[m]->get_nlinks(); i++){
             if (network[m]->get_link(i)->blow_up){
                 status++;
-                cout<<"t = "<<timestamp<<"; Link: "<<(network[m]->get_link(i)->llen_pct_change)<<endl;
+                //cout<<"t = "<<timestamp<<"; Link: "<<(network[m]->get_link(i)->llen_pct_change)<<endl;
             }
         }
     }
     return status;
+}
+
+void filament_ensemble::write_blowups(double timestamp, ostream& file){
+    for (unsigned int m = 0; m < network.size(); m++)
+    {
+        for (int i = 0; i < network[m]->get_nlinks(); i++){
+            if (network[m]->get_link(i)->blow_up){
+                file<<"t = "<<timestamp<<"; Filament: " + to_string(m) + "; "<<(network[m]->get_link(i)->llen_pct_change)<<endl;
+            }
+        }
+    }
+
 }
 
 
